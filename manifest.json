@@ -17,5 +17,11 @@
       "js": ["content.js"],
       "run_at": "document_start"
     }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["farming_phrases.txt"],
+      "matches": ["<all_urls>"]
+    }
   ]
 }
