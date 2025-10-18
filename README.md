@@ -108,7 +108,3 @@ MIT License - Feel free to use and modify
 For issues or questions, please open an issue on the repository.
 
 ---
-
-Generated with [Continue](https://continue.dev)
-
-Co-Authored-By: Continue <noreply@continue.dev>
