@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>AutoChat</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      width: 380px; 
+      padding: 14px; 
+      margin: 0;
+    }
+    h2 { 
+      margin: 0 0 12px 0; 
+      font-size: 18px; 
+      color: #333;
+    }
+    button { 
+      width: 100%; 
+      margin: 6px 0; 
+      padding: 10px; 
+      border: none;
+      border-radius: 4px;
+      background: #4CAF50;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    button.secondary {
+      background: #2196F3;
+    }
+    button.secondary:hover {
+      background: #0b7dda;
+    }
+    button.danger {
+      background: #f44336;
+    }
+    button.danger:hover {
+      background: #da190b;
+    }
+    label { 
+      display: block; 
+      margin-top: 10px; 
+      font-size: 13px;
+      font-weight: 500;
+      color: #555;
+    }
+    input[type="text"], input[type="number"], textarea { 
+      width: 100%; 
+      box-sizing: border-box; 
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    .status { 
+      font-size: 12px; 
+      color: #666; 
+      margin: 6px 0;
+      padding: 6px 8px;
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+    .status.success { 
+      color: #2e7d32; 
+      background: #e8f5e9;
+      font-weight: 500;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .row input {
+      margin-top: 0;
+    }
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .help {
+      font-size: 11px;
+      color: #888;
+      margin-top: 2px;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #e0e0e0;
+      margin: 14px 0;
+    }
+  </style>
+</head>
+<body>
+  <h2>💬 AutoChat</h2>
+  
+  <button id="markInput">🎯 Mark Chat Input Field</button>
+  <div id="inputStatus" class="status">No input field marked</div>
+  
+  <hr>
+  
+  <label>Messages (one per line):
+    <textarea id="messageList" placeholder="Hello!&#10;How are you?&#10;Nice to meet you"></textarea>
+    <div class="help">Enter multiple messages, one per line</div>
+  </label>
+  
+  <label>Send Mode:
+    <select id="sendMode">
+      <option value="random">Random order</option>
+      <option value="sequential">Sequential order</option>
+    </select>
+  </label>
+  
+  <label>Time Interval (seconds):</label>
+  <div class="row">
+    <div style="flex: 1;">
+      <label style="margin-top: 0;">Min:
+        <input id="minInterval" type="number" min="1" max="3600" value="60">
+      </label>
+    </div>
+    <div style="flex: 1;">
+      <label style="margin-top: 0;">Max:
+        <input id="maxInterval" type="number" min="1" max="3600" value="120">
+      </label>
+    </div>
+  </div>
+  <div class="help">Random interval between min and max seconds</div>
+  
+  <hr>
+  
+  <button id="startAutoSend">▶️ Start Auto-Send</button>
+  <button id="stopAutoSend" class="danger">⏹️ Stop Auto-Send</button>
+  <button id="sendOnce" class="secondary">📤 Send Random Message Once</button>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
