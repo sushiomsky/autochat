@@ -1,20 +1,23 @@
 {
   "manifest_version": 3,
   "name": "AutoChat - Auto Message Sender",
-  "version": "3.0",
-  "description": "Automatically send messages to chat inputs with random or sequential mode and customizable time intervals.",
+  "version": "4.0",
+  "description": "Enhanced automated message sender with typing simulation, anti-detection, analytics, and smart scheduling features.",
   "permissions": ["scripting", "activeTab", "storage"],
   "host_permissions": ["<all_urls>"],
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "popup-enhanced.html",
     "default_icon": {
       "48": "icon48.png"
     }
   },
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "js": ["content-enhanced.js"],
       "run_at": "document_start"
     }
   ],
