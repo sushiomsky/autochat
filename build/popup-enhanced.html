@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>AutoChat Enhanced</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h2>💬 AutoChat Enhanced</h2>
+    
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+    
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-label">Today</div>
+        <div class="stat-value" id="messagesSentToday">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Total</div>
+        <div class="stat-value" id="totalMessages">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Status</div>
+        <div class="stat-value" id="autoSendStatus">⚪ Inactive</div>
+      </div>
+    </div>
+    
+    <!-- Main Actions -->
+    <button id="markInput" class="btn-primary">🎯 Mark Chat Input Field</button>
+    <div id="inputStatus" class="status">No input field marked</div>
+    
+    <hr>
+    
+    <!-- Messages -->
+    <label>Messages (one per line):
+      <textarea id="messageList" placeholder="Hello!&#10;How are you?&#10;{time} - Nice to meet you&#10;Random number: {random_number}"></textarea>
+      <div class="help">Use {time}, {date}, {random_emoji}, {random_number} for variables</div>
+    </label>
+    
+    <div class="btn-row">
+      <button id="loadDefaultPhrases" class="btn-secondary">📚 Load Phrases</button>
+      <button id="managePhrases" class="btn-secondary">✏️ Manage</button>
+      <button id="openSettings" class="btn-secondary">⚙️ Settings</button>
+    </div>
+    
+    <!-- Basic Settings -->
+    <label>Send Mode:
+      <select id="sendMode">
+        <option value="random">🔀 Random order</option>
+        <option value="sequential">➡️ Sequential order</option>
+      </select>
+    </label>
+    
+    <label>Time Interval (seconds):</label>
+    <div class="input-row">
+      <div class="input-group">
+        <label>Min:
+          <input id="minInterval" type="number" min="1" max="3600" value="60">
+        </label>
+      </div>
+      <div class="input-group">
+        <label>Max:
+          <input id="maxInterval" type="number" min="1" max="3600" value="120">
+        </label>
+      </div>
+    </div>
+    <div class="help">Random interval between min and max seconds</div>
+    
+    <hr>
+    
+    <!-- Control Buttons -->
+    <button id="startAutoSend" class="btn-success">▶️ Start Auto-Send</button>
+    <button id="stopAutoSend" class="btn-danger">⏹️ Stop Auto-Send</button>
+    <button id="sendOnce" class="btn-secondary">📤 Send Once</button>
+    <button id="openAnalytics" class="btn-secondary">📊 Analytics</button>
+    
+    <!-- Version -->
+    <div class="version">v4.0 Enhanced Edition</div>
+  </div>
+  
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <h3>⚙️ Advanced Settings</h3>
+      
+      <label>
+        <input type="checkbox" id="typingSimulation" checked>
+        🎹 Typing Simulation (40-80 WPM)
+      </label>
+      <div class="help">Simulates realistic human typing speed</div>
+      
+      <label>
+        <input type="checkbox" id="variableDelays" checked>
+        ⏱️ Variable Delays (0.5-2s think time)
+      </label>
+      <div class="help">Random delays before typing to appear human</div>
+      
+      <label>
+        <input type="checkbox" id="antiRepetition" checked>
+        🔄 Anti-Repetition
+      </label>
+      <div class="help">Avoid sending same message repeatedly</div>
+      
+      <label>
+        <input type="checkbox" id="templateVariables" checked>
+        📝 Template Variables
+      </label>
+      <div class="help">Enable {time}, {date}, {random_emoji}, etc.</div>
+      
+      <hr>
+      
+      <label>
+        Daily Message Limit:
+        <input type="number" id="dailyLimit" min="0" max="10000" value="0" placeholder="0 = unlimited">
+      </label>
+      <div class="help">Automatically stop after X messages per day (0 = no limit)</div>
+      
+      <hr>
+      
+      <label>
+        <input type="checkbox" id="activeHours">
+        🕐 Active Hours Only
+      </label>
+      
+      <div id="activeHoursInputs" class="input-row" style="display: none;">
+        <div class="input-group">
+          <label>Start (hour):
+            <input type="number" id="activeHoursStart" min="0" max="23" value="9">
+          </label>
+        </div>
+        <div class="input-group">
+          <label>End (hour):
+            <input type="number" id="activeHoursEnd" min="0" max="23" value="22">
+          </label>
+        </div>
+      </div>
+      <div class="help">Only send messages during specified hours (24h format)</div>
+      
+      <hr>
+      
+      <div class="btn-row">
+        <button id="exportSettings" class="btn-secondary">📥 Export</button>
+        <button id="importSettings" class="btn-secondary">📤 Import</button>
+      </div>
+      
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+  
+  <!-- Phrase Manager Modal -->
+  <div id="phraseModal" class="modal">
+    <div class="modal-content">
+      <h3>📝 Manage Phrases</h3>
+      
+      <div class="section">
+        <label>Add New Phrase:
+          <textarea id="newPhraseInput" placeholder="Type a new phrase here..." rows="3"></textarea>
+        </label>
+        <button id="addNewPhrase" class="btn-success">➕ Add Phrase</button>
+      </div>
+      
+      <hr>
+      
+      <div class="section">
+        <strong>Custom Phrases:</strong> <span id="customPhrasesCount" class="badge">0</span>
+        <div id="customPhrasesList" class="phrases-list"></div>
+      </div>
+      
+      <hr>
+      
+      <div class="section">
+        <strong>Default Phrases:</strong> <span id="defaultPhrasesCount" class="badge">0</span>
+        <div class="help">From farming_phrases.txt</div>
+        <div id="defaultPhrasesList" class="phrases-list"></div>
+      </div>
+      
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+  
+  <!-- Analytics Modal -->
+  <div id="analyticsModal" class="modal">
+    <div class="modal-content">
+      <h3>📊 Analytics & Statistics</h3>
+      
+      <div class="analytics-grid">
+        <div class="analytics-card">
+          <div class="analytics-label">Messages Today</div>
+          <div class="analytics-value" id="analyticsToday">0</div>
+        </div>
+        
+        <div class="analytics-card">
+          <div class="analytics-label">Total Messages</div>
+          <div class="analytics-value" id="analyticsTotal">0</div>
+        </div>
+        
+        <div class="analytics-card">
+          <div class="analytics-label">Status</div>
+          <div class="analytics-value" id="analyticsStatus">Inactive</div>
+        </div>
+      </div>
+      
+      <hr>
+      
+      <div class="help">Statistics track all messages sent by AutoChat</div>
+      
+      <button id="resetStats" class="btn-danger">🗑️ Reset Statistics</button>
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+  
+  <script src="popup-enhanced.js"></script>
+</body>
+</html>

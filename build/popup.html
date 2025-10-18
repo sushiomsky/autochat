@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>AutoChat</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      width: 380px; 
+      padding: 14px; 
+      margin: 0;
+    }
+    h2 { 
+      margin: 0 0 12px 0; 
+      font-size: 18px; 
+      color: #333;
+    }
+    button { 
+      width: 100%; 
+      margin: 6px 0; 
+      padding: 10px; 
+      border: none;
+      border-radius: 4px;
+      background: #4CAF50;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    button.secondary {
+      background: #2196F3;
+    }
+    button.secondary:hover {
+      background: #0b7dda;
+    }
+    button.danger {
+      background: #f44336;
+    }
+    button.danger:hover {
+      background: #da190b;
+    }
+    label { 
+      display: block; 
+      margin-top: 10px; 
+      font-size: 13px;
+      font-weight: 500;
+      color: #555;
+    }
+    input[type="text"], input[type="number"], textarea { 
+      width: 100%; 
+      box-sizing: border-box; 
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    .status { 
+      font-size: 12px; 
+      color: #666; 
+      margin: 6px 0;
+      padding: 6px 8px;
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+    .status.success { 
+      color: #2e7d32; 
+      background: #e8f5e9;
+      font-weight: 500;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .row input {
+      margin-top: 0;
+    }
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .help {
+      font-size: 11px;
+      color: #888;
+      margin-top: 2px;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #e0e0e0;
+      margin: 14px 0;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal.show {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      max-height: 600px;
+      overflow-y: auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .modal h3 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+    }
+    .phrase-item {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding: 8px;
+      background: #f5f5f5;
+      border-radius: 4px;
+      align-items: center;
+    }
+    .phrase-text {
+      flex: 1;
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .phrase-actions {
+      display: flex;
+      gap: 4px;
+    }
+    .btn-small {
+      padding: 4px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      border: none;
+      border-radius: 3px;
+      background: #2196F3;
+      color: white;
+    }
+    .btn-small.delete {
+      background: #f44336;
+    }
+    .btn-small:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <h2>💬 AutoChat</h2>
+  
+  <button id="markInput">🎯 Mark Chat Input Field</button>
+  <div id="inputStatus" class="status">No input field marked</div>
+  
+  <hr>
+  
+  <label>Messages (one per line):
+    <textarea id="messageList" placeholder="Hello!&#10;How are you?&#10;Nice to meet you"></textarea>
+    <div class="help">Enter multiple messages, one per line</div>
+  </label>
+  
+  <div style="display: flex; gap: 6px; margin-top: 6px;">
+    <button id="loadDefaultPhrases" class="secondary" style="flex: 1;">📚 Load Default Phrases</button>
+    <button id="managePhrases" class="secondary" style="flex: 1;">✏️ Manage Phrases</button>
+  </div>
+  <div id="phrasesStatus" class="status" style="display: none;"></div>
+  
+  <label>Send Mode:
+    <select id="sendMode">
+      <option value="random">Random order</option>
+      <option value="sequential">Sequential order</option>
+    </select>
+  </label>
+  
+  <label>Time Interval (seconds):</label>
+  <div class="row">
+    <div style="flex: 1;">
+      <label style="margin-top: 0;">Min:
+        <input id="minInterval" type="number" min="1" max="3600" value="60">
+      </label>
+    </div>
+    <div style="flex: 1;">
+      <label style="margin-top: 0;">Max:
+        <input id="maxInterval" type="number" min="1" max="3600" value="120">
+      </label>
+    </div>
+  </div>
+  <div class="help">Random interval between min and max seconds</div>
+  
+  <hr>
+  
+  <button id="startAutoSend">▶️ Start Auto-Send</button>
+  <button id="stopAutoSend" class="danger">⏹️ Stop Auto-Send</button>
+  <button id="sendOnce" class="secondary">📤 Send Random Message Once</button>
+  
+  <!-- Phrase Manager Modal -->
+  <div id="phraseModal" class="modal">
+    <div class="modal-content">
+      <h3>📝 Manage Phrases</h3>
+      
+      <div style="margin-bottom: 12px;">
+        <label>Add New Phrase:
+          <textarea id="newPhraseInput" placeholder="Type a new phrase here..." style="min-height: 60px;"></textarea>
+        </label>
+        <button id="addNewPhrase" class="secondary" style="margin-top: 6px;">➕ Add Phrase</button>
+      </div>
+      
+      <hr>
+      
+      <div style="margin-bottom: 12px;">
+        <strong>Custom Phrases:</strong> <span id="customPhrasesCount" style="color: #666;">0</span>
+      </div>
+      <div id="customPhrasesList" style="max-height: 200px; overflow-y: auto; margin-bottom: 12px;"></div>
+      
+      <hr>
+      
+      <div style="margin-bottom: 12px;">
+        <strong>Default Phrases:</strong> <span id="defaultPhrasesCount" style="color: #666;">0</span>
+        <div class="help">From farming_phrases.txt</div>
+      </div>
+      <div id="defaultPhrasesList" style="max-height: 200px; overflow-y: auto; margin-bottom: 12px;"></div>
+      
+      <button id="closeModal" style="margin-top: 12px;">Close</button>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
