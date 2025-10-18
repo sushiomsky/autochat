@@ -6,6 +6,7 @@
 .DS_Store
 Thumbs.db
 *:Zone.Identifier
+*.identifier
 
 # Editor files
 .vscode/
