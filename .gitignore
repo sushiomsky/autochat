@@ -5,6 +5,7 @@
 # System files
 .DS_Store
 Thumbs.db
+*:Zone.Identifier
 
 # Editor files
 .vscode/
