@@ -91,8 +91,14 @@
       <span class="shortcut-key">Ctrl+P</span> Pause
     </div>
     
+    <!-- License Badge -->
+    <div id="licenseBadge" class="license-badge">
+      <span id="licenseText">Free</span>
+      <button id="upgradeBtn" class="upgrade-btn">⭐ Upgrade to Pro</button>
+    </div>
+    
     <!-- Version -->
-    <div class="version">v4.0 Enhanced Edition</div>
+    <div class="version">v4.1 Professional Edition</div>
   </div>
   
   <!-- Settings Modal -->
@@ -230,6 +236,80 @@
     </div>
   </div>
   
+  <!-- License Activation Modal -->
+  <div id="licenseModal" class="modal">
+    <div class="modal-content">
+      <h3>🔑 Activate License</h3>
+      
+      <div class="section">
+        <label>License Key:
+          <input type="text" id="licenseKeyInput" placeholder="XXXXX-XXXXX-XXXXX-XXXXX" maxlength="29">
+        </label>
+        <div class="help">Enter your AutoChat Pro license key</div>
+      </div>
+      
+      <div id="licenseError" class="status error" style="display: none;"></div>
+      <div id="licenseSuccess" class="status success" style="display: none;"></div>
+      
+      <div class="btn-row">
+        <button id="activateLicense" class="btn-success">✅ Activate</button>
+        <button id="buyLicense" class="btn-primary">💳 Buy License</button>
+      </div>
+      
+      <hr>
+      
+      <div class="section">
+        <strong>Current License:</strong>
+        <div id="currentLicenseInfo" class="license-info">
+          <p><strong>Tier:</strong> <span id="currentTier">Free</span></p>
+          <p><strong>Features:</strong> <span id="currentFeatures">Basic</span></p>
+          <p id="expirationInfo" style="display: none;"><strong>Expires:</strong> <span id="expirationDate"></span></p>
+        </div>
+      </div>
+      
+      <button id="deactivateLicense" class="btn-danger" style="display: none;">🗑️ Deactivate License</button>
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+  
+  <!-- Pro Feature Prompt Modal -->
+  <div id="proFeatureModal" class="modal">
+    <div class="modal-content pro-prompt">
+      <h3>⭐ Unlock Pro Feature</h3>
+      
+      <div class="pro-feature-info">
+        <div class="pro-icon">🚀</div>
+        <h4 id="proFeatureName"></h4>
+        <p id="proFeatureDescription"></p>
+      </div>
+      
+      <div class="pro-benefits">
+        <strong>AutoChat Pro includes:</strong>
+        <ul>
+          <li>✨ Advanced scheduling (specific dates/times)</li>
+          <li>☁️ Cloud sync across devices</li>
+          <li>📚 100+ message templates</li>
+          <li>📊 Enhanced analytics & exports</li>
+          <li>🎨 Custom themes</li>
+          <li>🔗 Webhook integrations</li>
+          <li>🎯 Priority support</li>
+        </ul>
+      </div>
+      
+      <div class="pricing-inline">
+        <strong>Only $4.99/month</strong> or <strong>$39/year</strong> (save 34%)
+      </div>
+      
+      <div class="btn-row">
+        <button id="upgradeNow" class="btn-success btn-large">⭐ Upgrade to Pro</button>
+        <button id="learnMore" class="btn-secondary">📖 Learn More</button>
+      </div>
+      
+      <button class="close-modal btn-secondary">Maybe Later</button>
+    </div>
+  </div>
+  
+  <script type="module" src="src/licensing.js"></script>
   <script src="popup-enhanced.js"></script>
 </body>
 </html>
