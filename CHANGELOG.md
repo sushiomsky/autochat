@@ -2,6 +2,46 @@
 
 All notable changes to AutoChat will be documented in this file.
 
+## [4.1.0] - 2025-10-19 - Professional Edition
+
+### Added
+- **Dark Mode**: Toggle between light and dark themes with smooth transitions
+- **Keyboard Shortcuts**: Ctrl+S (start), Ctrl+X (stop), Ctrl+P (pause), Escape (close modals)
+- **Pause/Resume**: Temporarily halt auto-send without stopping completely
+- **Analytics Export**: Export all data and settings as JSON backup
+- **Build System**: Professional npm-based build pipeline with scripts
+- **Testing Suite**: Jest-based tests with >80% coverage goal
+- **CI/CD Pipeline**: GitHub Actions for automated testing and releases
+- **Security Enhancements**: Input validation, XSS protection, rate limiting
+- **Performance Optimizations**: Debounced auto-save, lazy loading
+- **Accessibility**: ARIA labels, focus management, keyboard navigation
+- **Developer Tools**: ESLint, Prettier, EditorConfig
+- **Documentation**: CONTRIBUTING.md, RELEASE_NOTES, SCREENSHOTS guide
+
+### Changed
+- Auto-save now debounced (1 second delay) for better performance
+- Improved theme persistence across sessions
+- Enhanced modal scrolling and rendering
+- Better error messages and user feedback
+- Optimized phrase list rendering
+
+### Technical
+- Added `package.json` with comprehensive dev dependencies
+- Created `src/` directory for utility modules
+- Added `tests/` directory with unit and integration tests
+- Created `scripts/` for build automation
+- Added `.github/workflows/` for CI/CD
+- Implemented debounce utility for performance
+- Added security validation utilities
+- Created rate limiter class
+
+### Developer Experience
+- New commands: `npm run build`, `npm test`, `npm run lint`
+- Watch mode: `npm run watch` for auto-rebuild
+- Package command: `npm run package` for distribution
+- Format command: `npm run format` for code styling
+- Test coverage: `npm run test:coverage`
+
 ## [4.0.0] - 2025-10-18 - Enhanced Edition
 
 ### Added

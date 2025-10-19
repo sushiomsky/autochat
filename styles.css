@@ -1,5 +1,31 @@
 /* AutoChat Enhanced Styles */
 
+:root {
+  /* Light mode colors */
+  --bg-primary: #f5f7fa;
+  --bg-secondary: #ffffff;
+  --text-primary: #2c3e50;
+  --text-secondary: #34495e;
+  --text-tertiary: #95a5a6;
+  --border-color: #e0e6ed;
+  --shadow: rgba(0, 0, 0, 0.08);
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  --gradient-danger: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+  --gradient-secondary: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+[data-theme="dark"] {
+  /* Dark mode colors */
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --text-primary: #eaeaea;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+  --border-color: #374151;
+  --shadow: rgba(0, 0, 0, 0.3);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -11,7 +37,9 @@ body {
   width: 420px;
   max-height: 600px;
   overflow-y: auto;
-  background: #f5f7fa;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container {
@@ -24,14 +52,17 @@ h2 {
   margin: 0 0 16px 0;
   font-size: 20px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 h3 {
   margin: 0 0 16px 0;
   font-size: 18px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 label {
@@ -39,14 +70,33 @@ label {
   margin-top: 12px;
   font-size: 13px;
   font-weight: 500;
-  color: #34495e;
+  color: var(--text-secondary);
 }
 
 .help {
   font-size: 11px;
-  color: #95a5a6;
+  color: var(--text-tertiary);
   margin-top: 4px;
   line-height: 1.4;
+}
+
+/* Theme Toggle */
+
+.theme-toggle {
+  cursor: pointer;
+  font-size: 20px;
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: transform 0.2s ease;
+  width: auto;
+  margin: 0;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: none;
 }
 
 /* Buttons */
@@ -113,12 +163,13 @@ select {
   width: 100%;
   padding: 10px;
   margin-top: 6px;
-  border: 2px solid #e0e6ed;
+  border: 2px solid var(--border-color);
   border-radius: 6px;
   font-family: inherit;
   font-size: 13px;
   transition: border-color 0.2s ease;
-  background: white;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 input:focus,
@@ -164,8 +215,8 @@ label:has(input[type="checkbox"]) {
   display: flex;
   align-items: center;
   padding: 10px;
-  background: white;
-  border: 2px solid #e0e6ed;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -180,10 +231,10 @@ label:has(input[type="checkbox"]):hover {
 
 .status {
   font-size: 12px;
-  color: #7f8c8d;
+  color: var(--text-tertiary);
   padding: 8px 12px;
-  background: white;
-  border: 2px solid #e0e6ed;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
   border-radius: 6px;
   margin: 8px 0;
   text-align: center;
@@ -209,9 +260,9 @@ label:has(input[type="checkbox"]):hover {
   gap: 8px;
   margin-bottom: 16px;
   padding: 12px;
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px var(--shadow);
 }
 
 .stat-item {
@@ -221,7 +272,7 @@ label:has(input[type="checkbox"]):hover {
 
 .stat-label {
   font-size: 11px;
-  color: #95a5a6;
+  color: var(--text-tertiary);
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -231,7 +282,7 @@ label:has(input[type="checkbox"]):hover {
 .stat-value {
   font-size: 18px;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 /* Notifications */
@@ -290,7 +341,7 @@ label:has(input[type="checkbox"]):hover {
 }
 
 .modal-content {
-  background: white;
+  background: var(--bg-secondary);
   padding: 24px;
   border-radius: 12px;
   max-width: 500px;
@@ -324,7 +375,7 @@ label:has(input[type="checkbox"]):hover {
   overflow-y: auto;
   margin-top: 12px;
   padding: 8px;
-  background: #f8f9fa;
+  background: var(--bg-primary);
   border-radius: 6px;
 }
 
@@ -334,8 +385,8 @@ label:has(input[type="checkbox"]):hover {
   align-items: center;
   padding: 10px;
   margin-bottom: 8px;
-  background: white;
-  border: 1px solid #e0e6ed;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   transition: all 0.2s ease;
 }
@@ -348,7 +399,7 @@ label:has(input[type="checkbox"]):hover {
 .phrase-text {
   flex: 1;
   font-size: 12px;
-  color: #2c3e50;
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -429,7 +480,7 @@ label:has(input[type="checkbox"]):hover {
 
 hr {
   border: none;
-  border-top: 2px solid #e0e6ed;
+  border-top: 2px solid var(--border-color);
   margin: 16px 0;
 }
 
@@ -438,9 +489,78 @@ hr {
 .version {
   text-align: center;
   font-size: 11px;
-  color: #95a5a6;
+  color: var(--text-tertiary);
   margin-top: 16px;
   padding: 8px;
+}
+
+/* Keyboard Shortcuts */
+
+.shortcuts-info {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 8px;
+  padding: 8px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.shortcut-key {
+  display: inline-block;
+  padding: 2px 6px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 10px;
+  margin: 0 2px;
+}
+
+/* Pause Button */
+
+.btn-warning {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  color: white;
+}
+
+/* Loading Spinner */
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.6s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Accessibility */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
 }
 
 /* Scrollbar */

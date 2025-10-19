@@ -7,7 +7,10 @@
 </head>
 <body>
   <div class="container">
-    <h2>💬 AutoChat Enhanced</h2>
+    <h2>
+      <span>💬 AutoChat Enhanced</span>
+      <button id="themeToggle" class="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+    </h2>
     
     <!-- Notification -->
     <div id="notification" class="notification"></div>
@@ -73,9 +76,20 @@
     
     <!-- Control Buttons -->
     <button id="startAutoSend" class="btn-success">▶️ Start Auto-Send</button>
+    <button id="pauseAutoSend" class="btn-warning" style="display: none;">⏸️ Pause</button>
     <button id="stopAutoSend" class="btn-danger">⏹️ Stop Auto-Send</button>
-    <button id="sendOnce" class="btn-secondary">📤 Send Once</button>
-    <button id="openAnalytics" class="btn-secondary">📊 Analytics</button>
+    <div class="btn-row">
+      <button id="sendOnce" class="btn-secondary">📤 Send Once</button>
+      <button id="openAnalytics" class="btn-secondary">📊 Analytics</button>
+      <button id="exportAnalytics" class="btn-secondary">💾 Export Data</button>
+    </div>
+    
+    <div class="shortcuts-info">
+      <strong>Keyboard Shortcuts:</strong>
+      <span class="shortcut-key">Ctrl+S</span> Start
+      <span class="shortcut-key">Ctrl+X</span> Stop
+      <span class="shortcut-key">Ctrl+P</span> Pause
+    </div>
     
     <!-- Version -->
     <div class="version">v4.0 Enhanced Edition</div>
@@ -206,6 +220,10 @@
       <hr>
       
       <div class="help">Statistics track all messages sent by AutoChat</div>
+      
+      <hr>
+      
+      <div class="help">Recent activity and errors will be logged here in future updates</div>
       
       <button id="resetStats" class="btn-danger">🗑️ Reset Statistics</button>
       <button class="close-modal btn-primary">Close</button>

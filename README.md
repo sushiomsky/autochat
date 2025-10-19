@@ -119,6 +119,18 @@ All settings are automatically saved:
 
 ## Version
 
+**v4.1 Professional Edition** - Latest release with:
+- 🌙 Dark mode support with theme toggle
+- ⌨️ Keyboard shortcuts (Ctrl+S/X/P)
+- ⏸️ Pause/Resume functionality
+- 💾 Analytics export (JSON backup)
+- 🧪 Comprehensive test suite (Jest)
+- 🔧 Professional build system (npm)
+- 🔒 Enhanced security (input validation, XSS protection)
+- ⚡ Performance optimizations (debouncing, lazy loading)
+- ♿ Accessibility improvements (ARIA labels, focus management)
+- 📚 Complete developer documentation
+
 **v4.0 Enhanced Edition** - Major upgrade with:
 - Typing simulation and anti-detection features
 - Analytics and statistics tracking
@@ -130,9 +142,37 @@ All settings are automatically saved:
 
 **v3.0** - Complete rewrite focused on message automation
 
+## Release Notes
+
+See [RELEASE_NOTES_v4.1.md](RELEASE_NOTES_v4.1.md) for full changelog.
+
+## Roadmap
+
+### v4.2 (Planned)
+- [ ] Firefox port (WebExtensions)
+- [ ] Multi-language support (i18n)
+- [ ] Advanced scheduling (specific dates/times)
+- [ ] Webhook integration
+- [ ] Better error logging UI
+- [ ] Performance monitoring dashboard
+
+### v5.0 (Future)
+- [ ] Cloud sync (optional)
+- [ ] Message templates library
+- [ ] AI-powered message generation
+- [ ] Team collaboration features
+
 ## License
 
-MIT License - Feel free to use and modify
+MIT License - Feel free to use and modify. See [LICENSE](LICENSE) for details.
+
+## Keyboard Shortcuts
+
+Quick access to common actions:
+- **Ctrl+S**: Start Auto-Send
+- **Ctrl+X**: Stop Auto-Send
+- **Ctrl+P**: Pause/Resume Auto-Send
+- **Escape**: Close open modals
 
 ## Configuration Options
 
@@ -156,6 +196,11 @@ MIT License - Feel free to use and modify
 - `{random_number}` - Random number 0-99
 - `{timestamp}` - Unix timestamp
 
+### Theme
+- **Light Mode**: Default clean interface
+- **Dark Mode**: Eye-friendly dark theme (click 🌙 icon)
+- **Auto-Persist**: Theme preference saved across sessions
+
 ### Analytics
 - Messages sent today (resets at midnight)
 - Total messages sent (all-time)
@@ -175,8 +220,55 @@ MIT License - Feel free to use and modify
 6. Set daily limits to prevent excessive sending
 7. Configure active hours to match normal usage patterns
 
+## Development
+
+### Setup
+```bash
+git clone https://github.com/yourusername/autochat.git
+cd autochat
+npm install
+```
+
+### Commands
+```bash
+npm test              # Run tests
+npm run lint          # Check code style
+npm run format        # Format code
+npm run build         # Development build
+npm run build:prod    # Production build
+npm run watch         # Watch mode
+npm run package       # Create .zip for store
+```
+
+### Testing
+```bash
+npm test              # Run all tests
+npm run test:watch    # Watch mode
+npm run test:coverage # With coverage report
+```
+
+### Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### File Structure
+```
+autochat/
+├── src/                    # Source utilities
+├── tests/                  # Test suite
+├── scripts/                # Build scripts
+├── content-enhanced.js     # Main automation logic
+├── popup-enhanced.js       # UI controller
+├── popup-enhanced.html     # User interface
+├── background.js           # Service worker
+├── styles.css              # Styling (with dark mode)
+└── manifest.json           # Extension config
+```
+
 ## Support
 
-For issues or questions, please open an issue on the repository.
+For issues or questions:
+- **Issues**: [GitHub Issues](https://github.com/yourusername/autochat/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/autochat/discussions)
+- **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ---
