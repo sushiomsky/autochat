@@ -126,3 +126,74 @@ export function importJSON() {
     input.click();
   });
 }
+
+/**
+ * Rate limiter class to prevent abuse
+ */
+export class RateLimiter {
+  constructor(maxAttempts = 5, windowMs = 60000) {
+    this.maxAttempts = maxAttempts;
+    this.windowMs = windowMs;
+    this.attempts = new Map();
+  }
+
+  /**
+   * Check if action is allowed
+   * @param {string} key - Unique identifier for the action
+   * @returns {boolean} - True if allowed
+   */
+  isAllowed(key) {
+    const now = Date.now();
+    const userAttempts = this.attempts.get(key) || [];
+
+    // Remove old attempts outside the window
+    const recentAttempts = userAttempts.filter(
+      timestamp => now - timestamp < this.windowMs
+    );
+
+    if (recentAttempts.length >= this.maxAttempts) {
+      return false;
+    }
+
+    // Record this attempt
+    recentAttempts.push(now);
+    this.attempts.set(key, recentAttempts);
+    return true;
+  }
+
+  /**
+   * Reset attempts for a key
+   * @param {string} key - Unique identifier
+   */
+  reset(key) {
+    this.attempts.delete(key);
+  }
+
+  /**
+   * Get remaining attempts
+   * @param {string} key - Unique identifier
+   * @returns {number} - Remaining attempts
+   */
+  getRemainingAttempts(key) {
+    const now = Date.now();
+    const userAttempts = this.attempts.get(key) || [];
+    const recentAttempts = userAttempts.filter(
+      timestamp => now - timestamp < this.windowMs
+    );
+    return Math.max(0, this.maxAttempts - recentAttempts.length);
+  }
+
+  /**
+   * Get time until next attempt allowed (in ms)
+   * @param {string} key - Unique identifier
+   * @returns {number} - Milliseconds until next attempt
+   */
+  getTimeUntilReset(key) {
+    const now = Date.now();
+    const userAttempts = this.attempts.get(key) || [];
+    if (userAttempts.length === 0) return 0;
+    
+    const oldestAttempt = Math.min(...userAttempts);
+    return Math.max(0, this.windowMs - (now - oldestAttempt));
+  }
+}

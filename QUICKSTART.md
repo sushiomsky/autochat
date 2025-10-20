@@ -5,7 +5,7 @@
 ### Installation
 
 1. **Download the extension**
-   - Clone from GitHub: `git clone https://github.com/yourusername/autochat.git`
+   - Clone from GitHub: `git clone https://github.com/sushiomsky/autochat.git`
    - Or download the latest release .zip
 
 2. **Load in Chrome**
@@ -35,7 +35,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/autochat.git
+git clone https://github.com/sushiomsky/autochat.git
 cd autochat
 
 # Install dependencies

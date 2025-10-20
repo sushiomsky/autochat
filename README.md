@@ -224,7 +224,7 @@ Quick access to common actions:
 
 ### Setup
 ```bash
-git clone https://github.com/yourusername/autochat.git
+git clone https://github.com/sushiomsky/autochat.git
 cd autochat
 npm install
 ```
@@ -267,8 +267,8 @@ autochat/
 ## Support
 
 For issues or questions:
-- **Issues**: [GitHub Issues](https://github.com/yourusername/autochat/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/autochat/discussions)
+- **Issues**: [GitHub Issues](https://github.com/sushiomsky/autochat/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/sushiomsky/autochat/discussions)
 - **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ---

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AutoChat - Auto Message Sender",
-  "version": "4.1",
+  "version": "4.1.0",
   "description": "Professional automated message sender with dark mode, keyboard shortcuts, typing simulation, anti-detection, analytics, and smart scheduling.",
   "permissions": ["scripting", "activeTab", "storage"],
   "host_permissions": ["<all_urls>"],
@@ -26,5 +26,8 @@
       "resources": ["farming_phrases.txt"],
       "matches": ["<all_urls>"]
     }
-  ]
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
 }

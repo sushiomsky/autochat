@@ -25,12 +25,12 @@ Thank you for your interest in contributing! This document provides guidelines a
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/yourusername/autochat.git
+   git clone https://github.com/sushiomsky/autochat.git
    cd autochat
    ```
 3. **Add upstream remote**:
    ```bash
-   git remote add upstream https://github.com/original/autochat.git
+   git remote add upstream https://github.com/sushiomsky/autochat.git
    ```
 
 ## Development Setup

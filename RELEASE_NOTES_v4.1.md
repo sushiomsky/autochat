@@ -200,7 +200,7 @@ No action required! All your existing settings will work with v4.1.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/autochat.git
+git clone https://github.com/sushiomsky/autochat.git
 cd autochat
 
 # Install dependencies
@@ -273,8 +273,8 @@ This release includes significant improvements to developer experience and code 
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/autochat/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/autochat/discussions)
+- **Issues**: [GitHub Issues](https://github.com/sushiomsky/autochat/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/sushiomsky/autochat/discussions)
 - **Email**: support@autochat.dev (future)
 
 ---

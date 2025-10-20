@@ -3,7 +3,8 @@
     "browser": true,
     "es2021": true,
     "webextensions": true,
-    "jest": true
+    "jest": true,
+    "node": true
   },
   "extends": [
     "eslint:recommended",
@@ -13,6 +14,21 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
+  "overrides": [
+    {
+      "files": ["scripts/**/*.js"],
+      "env": {
+        "node": true,
+        "browser": false
+      }
+    },
+    {
+      "files": ["build/**/*.js", "dist/**/*.js"],
+      "rules": {
+        "no-unused-vars": "off"
+      }
+    }
+  ],
   "rules": {
     "no-console": "off",
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],

@@ -1,0 +1,10 @@
+# Build output
+build/
+dist/
+coverage/
+
+# Dependencies
+node_modules/
+
+# Generated files
+*.min.js

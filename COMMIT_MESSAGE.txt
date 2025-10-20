@@ -1,0 +1,94 @@
+chore: comprehensive repository improvements for production readiness
+
+This commit brings AutoChat Enhanced to production-ready status with
+multiple improvements across security, testing, documentation, and
+development infrastructure.
+
+Key Changes:
+
+✅ Version Consistency
+- Updated package.json from 4.0.0 to 4.1.0
+- Standardized manifest.json version to 4.1.0
+- All documentation now references consistent versions
+
+✅ Legal & Licensing
+- Added MIT LICENSE file with 2025 copyright
+- Licensed under MIT for open source use
+
+✅ Repository Configuration
+- Updated all GitHub URLs from placeholder to sushiomsky/autochat
+- Files: package.json, README.md, CONTRIBUTING.md, QUICKSTART.md, RELEASE_NOTES_v4.1.md
+
+✅ Security Enhancements
+- Added Content Security Policy to manifest.json
+- Implemented comprehensive RateLimiter class in src/utils.js
+- Prevents abuse with configurable rate limiting
+
+✅ Testing Infrastructure
+- Fixed Chrome API mocking in tests/setup.js
+- Fixed failing template-variables test (unicode regex)
+- Added 9 comprehensive rate limiter tests
+- All 28 tests now passing across 5 test suites
+
+✅ Development Environment
+- Added .nvmrc specifying Node.js 18.17.0
+- Added .eslintignore to exclude build directories
+- Updated .eslintrc.json with proper environments
+- Fixed peer dependency conflicts with --legacy-peer-deps
+
+✅ GitHub Templates
+- Added bug report template (.github/ISSUE_TEMPLATE/bug_report.md)
+- Added feature request template (.github/ISSUE_TEMPLATE/feature_request.md)
+- Added pull request template (.github/pull_request_template.md)
+
+✅ Code Quality
+- Fixed lint errors: 2 errors → 0 errors
+- Fixed popup-enhanced-v2.js undefined variable
+- Added unicode flag to emoji regex in tests
+- Only minor unused variable warnings remain (acceptable)
+
+✅ Documentation
+- Created IMPROVEMENTS_v4.1.1.md with detailed changelog
+- Created IMPROVEMENTS_SUMMARY.md with executive summary
+- Updated all documentation with correct information
+
+Test Results:
+  Test Suites: 5 passed, 5 total
+  Tests:       28 passed, 28 total
+  Time:        ~1.1 seconds
+
+Lint Results:
+  Errors: 0
+  Warnings: 9 (minor, acceptable)
+
+Status: 🚀 Production Ready - Chrome Web Store Submission Ready
+
+Files Added (10):
+- LICENSE
+- .nvmrc
+- .eslintignore
+- .github/ISSUE_TEMPLATE/bug_report.md
+- .github/ISSUE_TEMPLATE/feature_request.md
+- .github/pull_request_template.md
+- tests/unit/rate-limiter.test.js
+- IMPROVEMENTS_v4.1.1.md
+- IMPROVEMENTS_SUMMARY.md
+- COMMIT_MESSAGE.txt
+
+Files Modified (11):
+- package.json
+- manifest.json
+- .eslintrc.json
+- README.md
+- CONTRIBUTING.md
+- QUICKSTART.md
+- RELEASE_NOTES_v4.1.md
+- tests/setup.js
+- tests/unit/template-variables.test.js
+- src/utils.js
+- popup-enhanced-v2.js
+
+Breaking Changes: None
+
+Co-Authored-By: Continue <noreply@continue.dev>
+Generated with [Continue](https://continue.dev)

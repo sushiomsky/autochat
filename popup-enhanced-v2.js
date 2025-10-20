@@ -345,7 +345,7 @@ async function updateStats() {
       }
     }
   } catch (e) {
-    console.error('[Popup] Failed to get stats:', error);
+    console.error('[Popup] Failed to get stats:', e);
   }
 }
 

@@ -22,7 +22,7 @@ describe('Template Variables', () => {
 
   test('should replace {time} variable', () => {
     const result = processTemplateVariables('Current time is {time}');
-    expect(result).toMatch(/Current time is \d+:\d+:\d+/);
+    expect(result).toMatch(/Current time is \d+:\d+:\d+( (AM|PM))?/);
   });
 
   test('should replace {date} variable', () => {
@@ -32,7 +32,7 @@ describe('Template Variables', () => {
 
   test('should replace {random_emoji} variable', () => {
     const result = processTemplateVariables('Hello {random_emoji}');
-    expect(result).toMatch(/Hello [😊😎👍🎉✨🔥💪🌟😄🎯]/);
+    expect(result).toMatch(/Hello [😊😎👍🎉✨🔥💪🌟😄🎯]/u);
   });
 
   test('should replace {random_number} variable', () => {
@@ -47,7 +47,7 @@ describe('Template Variables', () => {
 
   test('should replace multiple variables in one string', () => {
     const result = processTemplateVariables('{time} - {date} - {random_number}');
-    expect(result).toMatch(/\d+:\d+:\d+ - \d+\/\d+\/\d+ - \d+/);
+    expect(result).toMatch(/\d+:\d+:\d+( (AM|PM))? - \d+\/\d+\/\d+ - \d+/);
   });
 
   test('should handle text without variables', () => {
