@@ -94,7 +94,7 @@ export class CategoryManager {
     this.categories = this.categories.filter(c => c.id !== categoryId);
     
     // Remove category from phrases
-    this.phrases.forEach((phrase, id) => {
+    this.phrases.forEach((phrase, _id) => {
       if (phrase.category === categoryId) {
         phrase.category = 'uncategorized';
       }

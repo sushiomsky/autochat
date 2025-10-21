@@ -281,7 +281,7 @@ export class GifPicker {
    * @param {number} limit - Number of results
    * @returns {Promise<Array>} GIF results
    */
-  async search(query, limit = 20) {
+  async search(query, _limit = 20) {
     // Note: This requires a Giphy API key
     // For demo purposes, return mock data
     return this.getMockGifs(query);
@@ -292,7 +292,7 @@ export class GifPicker {
    * @param {number} limit - Number of results
    * @returns {Promise<Array>} GIF results
    */
-  async getTrending(limit = 20) {
+  async getTrending(_limit = 20) {
     return this.getMockGifs('trending');
   }
 
