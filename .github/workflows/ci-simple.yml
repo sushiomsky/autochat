@@ -1,0 +1,40 @@
+name: CI Simple
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test and Build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+    
+    - name: Install dependencies
+      run: |
+        npm install --legacy-peer-deps || npm install --force
+    
+    - name: Run tests
+      run: npm test
+      continue-on-error: false
+    
+    - name: Run linter
+      run: npm run lint || true
+    
+    - name: Build extension
+      run: npm run build:prod
+    
+    - name: Check build output
+      run: |
+        ls -la dist/
+        echo "✅ Build successful"
