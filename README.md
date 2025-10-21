@@ -119,7 +119,16 @@ All settings are automatically saved:
 
 ## Version
 
-**v4.1 Professional Edition** - Latest release with:
+**v4.2 Feature Complete Edition** - Latest release with:
+- 🔔 **Browser Notifications**: Desktop alerts for all events
+- 👁️ **Message Preview**: Test messages before sending with dry-run mode
+- 📁 **Phrase Categories**: Organize messages with 10 default categories and custom tags
+- ⚡ **Command Palette**: Instant access to all features with Ctrl+K
+- 😊 **Emoji Picker**: 300+ emojis organized and searchable
+- 🧪 **75 Tests Passing**: Comprehensive test coverage
+- 📚 **Complete API**: Well-documented module APIs
+
+**v4.1 Professional Edition** - Previous release with:
 - 🌙 Dark mode support with theme toggle
 - ⌨️ Keyboard shortcuts (Ctrl+S/X/P)
 - ⏸️ Pause/Resume functionality
@@ -144,16 +153,23 @@ All settings are automatically saved:
 
 ## Release Notes
 
-See [RELEASE_NOTES_v4.1.md](RELEASE_NOTES_v4.1.md) for full changelog.
+See [RELEASE_NOTES_v4.2.md](RELEASE_NOTES_v4.2.md) for v4.2 changelog.
+See [RELEASE_NOTES_v4.1.md](RELEASE_NOTES_v4.1.md) for v4.1 changelog.
 
 ## Roadmap
 
-### v4.2 (Planned)
+### v4.3 (Next)
+- [ ] UI integration for all v4.2 features
+- [ ] Visual improvements and animations
+- [ ] User onboarding tutorial
+- [ ] More keyboard shortcuts
+- [ ] Analytics dashboard with charts
+
+### v4.4 (Planned)
 - [ ] Firefox port (WebExtensions)
 - [ ] Multi-language support (i18n)
-- [ ] Advanced scheduling (specific dates/times)
+- [ ] Advanced scheduling calendar
 - [ ] Webhook integration
-- [ ] Better error logging UI
 - [ ] Performance monitoring dashboard
 
 ### v5.0 (Future)
@@ -169,10 +185,13 @@ MIT License - Feel free to use and modify. See [LICENSE](LICENSE) for details.
 ## Keyboard Shortcuts
 
 Quick access to common actions:
+- **Ctrl+K**: Open Command Palette (NEW!)
 - **Ctrl+S**: Start Auto-Send
 - **Ctrl+X**: Stop Auto-Send
 - **Ctrl+P**: Pause/Resume Auto-Send
 - **Escape**: Close open modals
+- **↑↓**: Navigate command palette
+- **Enter**: Execute selected command
 
 ## Configuration Options
 

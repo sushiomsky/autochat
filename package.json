@@ -1,6 +1,6 @@
 {
   "name": "autochat-enhanced",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "description": "Advanced automated message sender with typing simulation, anti-detection, and smart scheduling",
   "main": "background.js",
   "scripts": {
