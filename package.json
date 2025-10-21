@@ -53,8 +53,14 @@
     "coverageDirectory": "coverage",
     "collectCoverageFrom": [
       "src/**/*.js",
-      "!src/**/*.test.js"
+      "!src/**/*.test.js",
+      "!node_modules/**"
     ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/tests/"
+    ],
+    "coverageReporters": ["text", "lcov", "html"],
     "testMatch": [
       "**/tests/**/*.test.js"
     ]

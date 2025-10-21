@@ -34,7 +34,7 @@ jobs:
       run: npm run format:check || echo "Formatting check completed"
     
     - name: Run tests
-      run: npm run test:coverage
+      run: npm test
     
     # Codecov disabled - uncomment to enable
     # - name: Upload coverage to Codecov
