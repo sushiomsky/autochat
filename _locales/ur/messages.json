@@ -1,0 +1,346 @@
+{
+  "extName": {
+    "message": "آٹو چیٹ - خودکار پیغام بھیجنے والا",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "نوٹیفیکیشن، پیش منظر موڈ، زمرہ جات، کمانڈ پیلیٹ، ایموجی چنندہ، ڈارک موڈ، اور جدید آٹومیشن خصوصیات کے ساتھ پیشہ ورانہ خودکار پیغام بھیجنے والا۔",
+    "description": "Extension description"
+  },
+  "appTitle": {
+    "message": "آٹو چیٹ بہتر"
+  },
+  "markInputBtn": {
+    "message": "چیٹ ان پٹ فیلڈ کو نشان زد کریں"
+  },
+  "inputStatusNone": {
+    "message": "کوئی ان پٹ فیلڈ نشان زد نہیں"
+  },
+  "inputStatusMarked": {
+    "message": "ان پٹ فیلڈ نشان زد ہے"
+  },
+  "sendMethod": {
+    "message": "بھیجنے کا طریقہ:"
+  },
+  "sendMethodEnter": {
+    "message": "انٹر کلید دبائیں"
+  },
+  "sendMethodClick": {
+    "message": "بھیجیں بٹن پر کلک کریں"
+  },
+  "markSendButton": {
+    "message": "بھیجیں بٹن کو نشان زد کریں"
+  },
+  "sendButtonHelp": {
+    "message": "اگر آپ \"بھیجیں بٹن پر کلک کریں\" کا انتخاب کرتے ہیں، تو براہ کرم بٹن کو نشان زد کریں۔"
+  },
+  "messagesLabel": {
+    "message": "پیغامات (ہر لائن میں ایک):"
+  },
+  "messagesPlaceholder": {
+    "message": "ہیلو!\nآپ کیسے ہیں؟\n{time} - آپ سے مل کر خوشی ہوئی\nبے ترتیب نمبر: {random_number}"
+  },
+  "messagesHelp": {
+    "message": "متغیرات کے لیے {time}، {date}، {random_emoji}، {random_number} استعمال کریں"
+  },
+  "loadPhrasesBtn": {
+    "message": "جملے لوڈ کریں"
+  },
+  "manageBtn": {
+    "message": "منظم کریں"
+  },
+  "settingsBtn": {
+    "message": "ترتیبات"
+  },
+  "helpBtn": {
+    "message": "مدد"
+  },
+  "sendMode": {
+    "message": "بھیجنے کا موڈ:"
+  },
+  "sendModeRandom": {
+    "message": "بے ترتیب ترتیب"
+  },
+  "sendModeSequential": {
+    "message": "ترتیب وار"
+  },
+  "timeInterval": {
+    "message": "وقت کا وقفہ (سیکنڈ):"
+  },
+  "minInterval": {
+    "message": "کم از کم:"
+  },
+  "maxInterval": {
+    "message": "زیادہ سے زیادہ:"
+  },
+  "intervalHelp": {
+    "message": "کم از کم اور زیادہ سے زیادہ سیکنڈ کے درمیان بے ترتیب وقفہ"
+  },
+  "startAutoSend": {
+    "message": "خودکار بھیجنا شروع کریں"
+  },
+  "pauseAutoSend": {
+    "message": "روکیں"
+  },
+  "stopAutoSend": {
+    "message": "خودکار بھیجنا بند کریں"
+  },
+  "sendOnce": {
+    "message": "ایک بار بھیجیں"
+  },
+  "preview": {
+    "message": "پیش منظر"
+  },
+  "emoji": {
+    "message": "ایموجی"
+  },
+  "categories": {
+    "message": "زمرہ جات"
+  },
+  "analytics": {
+    "message": "تجزیات"
+  },
+  "export": {
+    "message": "برآمد کریں"
+  },
+  "statsToday": {
+    "message": "آج"
+  },
+  "statsTotal": {
+    "message": "کل"
+  },
+  "statsStatus": {
+    "message": "حالت"
+  },
+  "statusActive": {
+    "message": "فعال"
+  },
+  "statusInactive": {
+    "message": "غیر فعال"
+  },
+  "keyboardShortcuts": {
+    "message": "کی بورڈ شارٹ کٹس:"
+  },
+  "shortcutCommands": {
+    "message": "احکام"
+  },
+  "shortcutStart": {
+    "message": "شروع"
+  },
+  "shortcutStop": {
+    "message": "بند کریں"
+  },
+  "shortcutPause": {
+    "message": "روکیں"
+  },
+  "version": {
+    "message": "v4.3 پیشہ ورانہ ایڈیشن"
+  },
+  "advancedSettings": {
+    "message": "جدید ترتیبات"
+  },
+  "typingSimulation": {
+    "message": "ٹائپنگ سمیولیشن (40-80 WPM)"
+  },
+  "typingSimulationHelp": {
+    "message": "حقیقی انسانی ٹائپنگ کی رفتار کی نقل کرتا ہے"
+  },
+  "variableDelays": {
+    "message": "متغیر تاخیر (0.5-2s سوچنے کا وقت)"
+  },
+  "variableDelaysHelp": {
+    "message": "انسانی نظر آنے کے لیے ٹائپنگ سے پہلے بے ترتیب تاخیر"
+  },
+  "antiRepetition": {
+    "message": "تکرار مخالف"
+  },
+  "antiRepetitionHelp": {
+    "message": "ایک ہی پیغام بار بار بھیجنے سے بچیں"
+  },
+  "templateVariables": {
+    "message": "ٹیمپلیٹ متغیرات"
+  },
+  "templateVariablesHelp": {
+    "message": "{time}، {date}، {random_emoji}، وغیرہ کو فعال کریں"
+  },
+  "notificationsEnabled": {
+    "message": "ڈیسک ٹاپ نوٹیفیکیشنز"
+  },
+  "notificationsHelp": {
+    "message": "واقعات کے لیے براؤزر نوٹیفیکیشن دکھائیں"
+  },
+  "notificationSound": {
+    "message": "نوٹیفیکیشن آواز"
+  },
+  "notificationSoundHelp": {
+    "message": "نوٹیفیکیشن کے ساتھ آواز چلائیں"
+  },
+  "analyticsEnabled": {
+    "message": "استعمال کے تجزیات"
+  },
+  "analyticsHelp": {
+    "message": "استعمال کے اعداد و شمار کو ٹریک کریں (تمام ڈیٹا مقامی رہتا ہے)"
+  },
+  "dailyLimit": {
+    "message": "یومیہ پیغام کی حد:"
+  },
+  "dailyLimitHelp": {
+    "message": "روزانہ X پیغامات کے بعد خودکار طور پر بند ہو جائیں (0 = کوئی حد نہیں)"
+  },
+  "activeHours": {
+    "message": "صرف فعال اوقات"
+  },
+  "activeHoursStart": {
+    "message": "شروع (گھنٹہ):"
+  },
+  "activeHoursEnd": {
+    "message": "اختتام (گھنٹہ):"
+  },
+  "activeHoursHelp": {
+    "message": "صرف مخصوص گھنٹوں کے دوران پیغامات بھیجیں (24 گھنٹے فارمیٹ)"
+  },
+  "exportSettings": {
+    "message": "برآمد کریں"
+  },
+  "importSettings": {
+    "message": "درآمد کریں"
+  },
+  "closeBtn": {
+    "message": "بند کریں"
+  },
+  "managePhrases": {
+    "message": "جملے منظم کریں"
+  },
+  "addNewPhrase": {
+    "message": "نیا جملہ شامل کریں:"
+  },
+  "addNewPlaceholder": {
+    "message": "یہاں ایک نیا جملہ ٹائپ کریں..."
+  },
+  "addPhraseBtn": {
+    "message": "جملہ شامل کریں"
+  },
+  "customPhrases": {
+    "message": "اپنی مرضی کے جملے:"
+  },
+  "defaultPhrases": {
+    "message": "ڈیفالٹ جملے:"
+  },
+  "defaultPhrasesHelp": {
+    "message": "farming_phrases.txt سے"
+  },
+  "analyticsTitle": {
+    "message": "تجزیات اور اعداد و شمار"
+  },
+  "analyticsMessagesToday": {
+    "message": "آج کے پیغامات"
+  },
+  "analyticsTotalMessages": {
+    "message": "کل پیغامات"
+  },
+  "analyticsStatus": {
+    "message": "حالت"
+  },
+  "analyticsDescription": {
+    "message": "اعداد و شمار آٹو چیٹ کے ذریعے بھیجے گئے تمام پیغامات کو ٹریک کرتے ہیں"
+  },
+  "resetStats": {
+    "message": "اعداد و شمار دوبارہ ترتیب دیں"
+  },
+  "previewTitle": {
+    "message": "پیغام کا پیش منظر"
+  },
+  "dryRunMode": {
+    "message": "ڈرائی رن موڈ (بھیجے بغیر ٹیسٹ کریں)"
+  },
+  "categoriesTitle": {
+    "message": "جملے کے زمرہ جات"
+  },
+  "commandPalettePlaceholder": {
+    "message": "ایک کمانڈ ٹائپ کریں... (Ctrl+K)"
+  },
+  "emojiSearchPlaceholder": {
+    "message": "ایموجیز تلاش کریں..."
+  },
+  "themeToggle": {
+    "message": "ڈارک موڈ ٹوگل کریں"
+  },
+  "noCustomPhrases": {
+    "message": "ابھی تک کوئی اپنی مرضی کے جملے نہیں۔ اوپر ایک شامل کریں!"
+  },
+  "noDefaultPhrases": {
+    "message": "کوئی ڈیفالٹ جملے لوڈ نہیں ہوئے"
+  },
+  "phraseDeleted": {
+    "message": "جملہ حذف ہو گیا"
+  },
+  "phraseAdded": {
+    "message": "جملہ شامل ہو گیا!"
+  },
+  "phraseExists": {
+    "message": "یہ جملہ پہلے سے موجود ہے یا خالی ہے"
+  },
+  "enterPhrase": {
+    "message": "براہ کرم ایک جملہ درج کریں"
+  },
+  "settingsExported": {
+    "message": "ترتیبات برآمد ہو گئیں!"
+  },
+  "settingsImported": {
+    "message": "ترتیبات درآمد ہو گئیں! صفحہ دوبارہ لوڈ کریں۔"
+  },
+  "settingsImportFailed": {
+    "message": "ترتیبات درآمد کرنے میں ناکام"
+  },
+  "statsReset": {
+    "message": "اعداد و شمار دوبارہ ترتیب دیے گئے"
+  },
+  "statsResetConfirm": {
+    "message": "تمام اعداد و شمار دوبارہ ترتیب دیں؟ یہ کالعدم نہیں کیا جا سکتا۔"
+  },
+  "messageSent": {
+    "message": "پیغام بھیج دیا گیا"
+  },
+  "enterMessages": {
+    "message": "براہ کرم کم از کم ایک پیغام درج کریں"
+  },
+  "markSendButtonFirst": {
+    "message": "براہ کرم بھیجیں بٹن کو نشان زد کریں یا طریقہ کو انٹر میں تبدیل کریں۔"
+  },
+  "sendFailed": {
+    "message": "بھیجنے میں ناکام۔ پہلے ان پٹ فیلڈ کو نشان زد کریں۔"
+  },
+  "autoSendStarted": {
+    "message": "خودکار بھیجنا شروع ہو گیا! موڈ:"
+  },
+  "autoSendStartFailed": {
+    "message": "شروع کرنے میں ناکام۔ پہلے ان پٹ فیلڈ کو نشان زد کریں۔"
+  },
+  "autoSendStopped": {
+    "message": "خودکار بھیجنا بند ہو گیا"
+  },
+  "phrasesLoaded": {
+    "message": "جملے لوڈ ہو گئے"
+  },
+  "customPhrasesLoaded": {
+    "message": "اپنی مرضی"
+  },
+  "defaultPhrasesLoaded": {
+    "message": "ڈیفالٹ"
+  },
+  "noPhrasesAvailable": {
+    "message": "لوڈ کرنے کے لیے کوئی جملے دستیاب نہیں"
+  },
+  "minMaxIntervalError": {
+    "message": "کم از کم وقفہ زیادہ سے زیادہ وقفہ سے کم یا برابر ہونا چاہیے"
+  },
+  "noActiveTab": {
+    "message": "کوئی فعال ٹیب نہیں ملا!"
+  },
+  "contentScriptFailed": {
+    "message": "مواد اسکرپٹ تک پہنچنے میں ناکام۔ براہ کرم صفحہ دوبارہ لوڈ کریں۔"
+  },
+  "deleteConfirm": {
+    "message": "یہ جملہ حذف کریں؟"
+  }
+}

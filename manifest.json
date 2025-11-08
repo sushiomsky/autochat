@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "AutoChat - Auto Message Sender",
+  "name": "__MSG_extName__",
   "version": "4.2.0",
-  "description": "Professional automated message sender with notifications, preview mode, categories, command palette, emoji picker, dark mode, and advanced automation features.",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
   "permissions": ["scripting", "activeTab", "storage"],
   "host_permissions": ["<all_urls>"],
   "action": {

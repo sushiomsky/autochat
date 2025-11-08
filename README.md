@@ -13,8 +13,9 @@ A powerful Chrome extension that automatically sends messages to chat applicatio
 - ⏱️ **Smart Timing**: Set min/max intervals with random timing between sends
 - 💾 **Auto-Save**: All settings automatically persist between sessions
 - 🌐 **Universal**: Works on any chat website (Discord, WhatsApp Web, Telegram, etc.)
+- 🌍 **Multi-Language**: Full internationalization with English and Urdu (اردو) support
 
-### Advanced Features (v4.0)
+### Advanced Features (v4.0+)
 - ⌨️ **Typing Simulation**: Realistic typing speed (40-80 WPM) with character-by-character animation
 - 🎭 **Anti-Detection**: Variable delays, anti-repetition, and human-like behavior patterns
 - 📊 **Analytics Dashboard**: Track messages sent today, total messages, and activity status
@@ -27,6 +28,7 @@ A powerful Chrome extension that automatically sends messages to chat applicatio
 - 💾 **Import/Export**: Backup and restore all settings
 - 🎨 **Modern UI**: Beautiful gradient design with intuitive controls
 - 📛 **Status Badge**: Visual indicator when auto-send is active
+- 🌍 **i18n Support**: Full localization with RTL support for Urdu and other languages
 
 ## Installation
 
@@ -119,7 +121,13 @@ All settings are automatically saved:
 
 ## Version
 
-**v4.2 Feature Complete Edition** - Latest release with:
+**v4.3 Localization Edition** - Current release with:
+- 🌍 **Internationalization**: Full i18n support with English and Urdu (اردو)
+- ↔️ **RTL Support**: Complete Right-to-Left layout for Arabic script languages
+- 🔄 **Language Switcher**: Easy language selection with live updates
+- 🎨 **Localized Fonts**: Beautiful Urdu/Nastaliq font rendering
+
+**v4.2 Feature Complete Edition** - Previous release with:
 - 🔔 **Browser Notifications**: Desktop alerts for all events
 - 👁️ **Message Preview**: Test messages before sending with dry-run mode
 - 📁 **Phrase Categories**: Organize messages with 10 default categories and custom tags
@@ -153,24 +161,25 @@ All settings are automatically saved:
 
 ## Release Notes
 
+See [LOCALIZATION.md](LOCALIZATION.md) for i18n documentation and translation guide.
 See [RELEASE_NOTES_v4.2.md](RELEASE_NOTES_v4.2.md) for v4.2 changelog.
 See [RELEASE_NOTES_v4.1.md](RELEASE_NOTES_v4.1.md) for v4.1 changelog.
 
 ## Roadmap
 
-### v4.3 (Next)
-- [ ] UI integration for all v4.2 features
+### v4.4 (Next)
+- [ ] More languages (Arabic, Spanish, French, Hindi)
 - [ ] Visual improvements and animations
 - [ ] User onboarding tutorial
 - [ ] More keyboard shortcuts
 - [ ] Analytics dashboard with charts
 
-### v4.4 (Planned)
+### v4.5 (Planned)
 - [ ] Firefox port (WebExtensions)
-- [ ] Multi-language support (i18n)
 - [ ] Advanced scheduling calendar
 - [ ] Webhook integration
 - [ ] Performance monitoring dashboard
+- [ ] Cloud sync (optional)
 
 ### v5.0 (Future)
 - [ ] Cloud sync (optional)
@@ -283,11 +292,21 @@ autochat/
 └── manifest.json           # Extension config
 ```
 
+## Localization
+
+AutoCh supports multiple languages:
+
+- **English** - Default language
+- **Urdu (اردو)** - Full RTL support with Nastaliq fonts
+
+Want to add your language? See [LOCALIZATION.md](LOCALIZATION.md) for the translation guide.
+
 ## Support
 
 For issues or questions:
 - **Issues**: [GitHub Issues](https://github.com/sushiomsky/autochat/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/sushiomsky/autochat/discussions)
 - **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Translations**: See [LOCALIZATION.md](LOCALIZATION.md)
 
 ---

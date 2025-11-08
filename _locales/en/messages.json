@@ -1,0 +1,346 @@
+{
+  "extName": {
+    "message": "AutoChat - Auto Message Sender",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Professional automated message sender with notifications, preview mode, categories, command palette, emoji picker, dark mode, and advanced automation features.",
+    "description": "Extension description"
+  },
+  "appTitle": {
+    "message": "AutoChat Enhanced"
+  },
+  "markInputBtn": {
+    "message": "Mark Chat Input Field"
+  },
+  "inputStatusNone": {
+    "message": "No input field marked"
+  },
+  "inputStatusMarked": {
+    "message": "Input field marked"
+  },
+  "sendMethod": {
+    "message": "Send Method:"
+  },
+  "sendMethodEnter": {
+    "message": "Press Enter key"
+  },
+  "sendMethodClick": {
+    "message": "Click a Send button"
+  },
+  "markSendButton": {
+    "message": "Mark Send Button"
+  },
+  "sendButtonHelp": {
+    "message": "If you choose \"Click a Send button\", please mark the button."
+  },
+  "messagesLabel": {
+    "message": "Messages (one per line):"
+  },
+  "messagesPlaceholder": {
+    "message": "Hello!\nHow are you?\n{time} - Nice to meet you\nRandom number: {random_number}"
+  },
+  "messagesHelp": {
+    "message": "Use {time}, {date}, {random_emoji}, {random_number} for variables"
+  },
+  "loadPhrasesBtn": {
+    "message": "Load Phrases"
+  },
+  "manageBtn": {
+    "message": "Manage"
+  },
+  "settingsBtn": {
+    "message": "Settings"
+  },
+  "helpBtn": {
+    "message": "Help"
+  },
+  "sendMode": {
+    "message": "Send Mode:"
+  },
+  "sendModeRandom": {
+    "message": "Random order"
+  },
+  "sendModeSequential": {
+    "message": "Sequential order"
+  },
+  "timeInterval": {
+    "message": "Time Interval (seconds):"
+  },
+  "minInterval": {
+    "message": "Min:"
+  },
+  "maxInterval": {
+    "message": "Max:"
+  },
+  "intervalHelp": {
+    "message": "Random interval between min and max seconds"
+  },
+  "startAutoSend": {
+    "message": "Start Auto-Send"
+  },
+  "pauseAutoSend": {
+    "message": "Pause"
+  },
+  "stopAutoSend": {
+    "message": "Stop Auto-Send"
+  },
+  "sendOnce": {
+    "message": "Send Once"
+  },
+  "preview": {
+    "message": "Preview"
+  },
+  "emoji": {
+    "message": "Emoji"
+  },
+  "categories": {
+    "message": "Categories"
+  },
+  "analytics": {
+    "message": "Analytics"
+  },
+  "export": {
+    "message": "Export"
+  },
+  "statsToday": {
+    "message": "Today"
+  },
+  "statsTotal": {
+    "message": "Total"
+  },
+  "statsStatus": {
+    "message": "Status"
+  },
+  "statusActive": {
+    "message": "Active"
+  },
+  "statusInactive": {
+    "message": "Inactive"
+  },
+  "keyboardShortcuts": {
+    "message": "Keyboard Shortcuts:"
+  },
+  "shortcutCommands": {
+    "message": "Commands"
+  },
+  "shortcutStart": {
+    "message": "Start"
+  },
+  "shortcutStop": {
+    "message": "Stop"
+  },
+  "shortcutPause": {
+    "message": "Pause"
+  },
+  "version": {
+    "message": "v4.3 Professional Edition"
+  },
+  "advancedSettings": {
+    "message": "Advanced Settings"
+  },
+  "typingSimulation": {
+    "message": "Typing Simulation (40-80 WPM)"
+  },
+  "typingSimulationHelp": {
+    "message": "Simulates realistic human typing speed"
+  },
+  "variableDelays": {
+    "message": "Variable Delays (0.5-2s think time)"
+  },
+  "variableDelaysHelp": {
+    "message": "Random delays before typing to appear human"
+  },
+  "antiRepetition": {
+    "message": "Anti-Repetition"
+  },
+  "antiRepetitionHelp": {
+    "message": "Avoid sending same message repeatedly"
+  },
+  "templateVariables": {
+    "message": "Template Variables"
+  },
+  "templateVariablesHelp": {
+    "message": "Enable {time}, {date}, {random_emoji}, etc."
+  },
+  "notificationsEnabled": {
+    "message": "Desktop Notifications"
+  },
+  "notificationsHelp": {
+    "message": "Show browser notifications for events"
+  },
+  "notificationSound": {
+    "message": "Notification Sound"
+  },
+  "notificationSoundHelp": {
+    "message": "Play sound with notifications"
+  },
+  "analyticsEnabled": {
+    "message": "Usage Analytics"
+  },
+  "analyticsHelp": {
+    "message": "Track usage statistics (all data stays local)"
+  },
+  "dailyLimit": {
+    "message": "Daily Message Limit:"
+  },
+  "dailyLimitHelp": {
+    "message": "Automatically stop after X messages per day (0 = no limit)"
+  },
+  "activeHours": {
+    "message": "Active Hours Only"
+  },
+  "activeHoursStart": {
+    "message": "Start (hour):"
+  },
+  "activeHoursEnd": {
+    "message": "End (hour):"
+  },
+  "activeHoursHelp": {
+    "message": "Only send messages during specified hours (24h format)"
+  },
+  "exportSettings": {
+    "message": "Export"
+  },
+  "importSettings": {
+    "message": "Import"
+  },
+  "closeBtn": {
+    "message": "Close"
+  },
+  "managePhrases": {
+    "message": "Manage Phrases"
+  },
+  "addNewPhrase": {
+    "message": "Add New Phrase:"
+  },
+  "addNewPlaceholder": {
+    "message": "Type a new phrase here..."
+  },
+  "addPhraseBtn": {
+    "message": "Add Phrase"
+  },
+  "customPhrases": {
+    "message": "Custom Phrases:"
+  },
+  "defaultPhrases": {
+    "message": "Default Phrases:"
+  },
+  "defaultPhrasesHelp": {
+    "message": "From farming_phrases.txt"
+  },
+  "analyticsTitle": {
+    "message": "Analytics & Statistics"
+  },
+  "analyticsMessagesToday": {
+    "message": "Messages Today"
+  },
+  "analyticsTotalMessages": {
+    "message": "Total Messages"
+  },
+  "analyticsStatus": {
+    "message": "Status"
+  },
+  "analyticsDescription": {
+    "message": "Statistics track all messages sent by AutoChat"
+  },
+  "resetStats": {
+    "message": "Reset Statistics"
+  },
+  "previewTitle": {
+    "message": "Message Preview"
+  },
+  "dryRunMode": {
+    "message": "Dry-run mode (test without sending)"
+  },
+  "categoriesTitle": {
+    "message": "Phrase Categories"
+  },
+  "commandPalettePlaceholder": {
+    "message": "Type a command... (Ctrl+K)"
+  },
+  "emojiSearchPlaceholder": {
+    "message": "Search emojis..."
+  },
+  "themeToggle": {
+    "message": "Toggle dark mode"
+  },
+  "noCustomPhrases": {
+    "message": "No custom phrases yet. Add one above!"
+  },
+  "noDefaultPhrases": {
+    "message": "No default phrases loaded"
+  },
+  "phraseDeleted": {
+    "message": "Phrase deleted"
+  },
+  "phraseAdded": {
+    "message": "Phrase added!"
+  },
+  "phraseExists": {
+    "message": "This phrase already exists or is empty"
+  },
+  "enterPhrase": {
+    "message": "Please enter a phrase"
+  },
+  "settingsExported": {
+    "message": "Settings exported!"
+  },
+  "settingsImported": {
+    "message": "Settings imported! Reload the page."
+  },
+  "settingsImportFailed": {
+    "message": "Failed to import settings"
+  },
+  "statsReset": {
+    "message": "Statistics reset"
+  },
+  "statsResetConfirm": {
+    "message": "Reset all statistics? This cannot be undone."
+  },
+  "messageSent": {
+    "message": "Message sent"
+  },
+  "enterMessages": {
+    "message": "Please enter at least one message"
+  },
+  "markSendButtonFirst": {
+    "message": "Please mark a Send button or switch method to Enter."
+  },
+  "sendFailed": {
+    "message": "Failed to send. Mark an input field first."
+  },
+  "autoSendStarted": {
+    "message": "Auto-send started! Mode:"
+  },
+  "autoSendStartFailed": {
+    "message": "Failed to start. Mark an input field first."
+  },
+  "autoSendStopped": {
+    "message": "Auto-send stopped"
+  },
+  "phrasesLoaded": {
+    "message": "phrases loaded"
+  },
+  "customPhrasesLoaded": {
+    "message": "custom"
+  },
+  "defaultPhrasesLoaded": {
+    "message": "default"
+  },
+  "noPhrasesAvailable": {
+    "message": "No phrases available to load"
+  },
+  "minMaxIntervalError": {
+    "message": "Min interval must be ≤ max interval"
+  },
+  "noActiveTab": {
+    "message": "No active tab found!"
+  },
+  "contentScriptFailed": {
+    "message": "Failed to reach content script. Please reload the page."
+  },
+  "deleteConfirm": {
+    "message": "Delete this phrase?"
+  }
+}

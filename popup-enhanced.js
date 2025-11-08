@@ -155,8 +155,20 @@ async function updateStats() {
     if (stats) {
       elements.messagesSentToday.textContent = stats.messagesSentToday || 0;
       elements.totalMessages.textContent = stats.totalMessagesSent || 0;
-      elements.autoSendStatus.textContent = stats.isAutoSendActive ? '🟢 Active' : '⚪ Inactive';
+      
+      // Use localized status if available
+      const statusText = stats.isAutoSendActive ? 
+        (typeof t === 'function' ? t('statusActive') : 'Active') : 
+        (typeof t === 'function' ? t('statusInactive') : 'Inactive');
+      const statusIcon = stats.isAutoSendActive ? '🟢' : '⚪';
+      elements.autoSendStatus.textContent = `${statusIcon} ${statusText}`;
       elements.autoSendStatus.className = 'status ' + (stats.isAutoSendActive ? 'success' : '');
+      
+      // Update analytics modal if visible
+      const analyticsStatus = document.getElementById('analyticsStatus');
+      if (analyticsStatus) {
+        analyticsStatus.textContent = statusText;
+      }
     }
   } catch (e) {
     console.error('[Popup] Failed to get stats:', e);
@@ -608,6 +620,37 @@ elements.templateVariables?.addEventListener('change', saveSettings);
 elements.activeHours?.addEventListener('change', saveSettings);
 elements.activeHoursStart?.addEventListener('change', saveSettings);
 elements.activeHoursEnd?.addEventListener('change', saveSettings);
+
+// ===== LOCALIZATION =====
+
+// Language selector
+const languageSelect = document.getElementById('languageSelect');
+if (languageSelect) {
+  // Load saved language
+  chrome.storage.local.get(['locale'], (data) => {
+    const savedLocale = data.locale || chrome.i18n.getUILanguage().split('-')[0];
+    if (languageSelect.querySelector(`option[value="${savedLocale}"]`)) {
+      languageSelect.value = savedLocale;
+    }
+  });
+
+  // Handle language change
+  languageSelect.addEventListener('change', (e) => {
+    const newLocale = e.target.value;
+    chrome.storage.local.set({ locale: newLocale }, () => {
+      showNotification('Language changed! Please reload the extension.', true);
+      // Reload after 1.5 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    });
+  });
+}
+
+// Initialize localization on load
+if (typeof localizePopup === 'function') {
+  localizePopup();
+}
 
 // ===== INITIALIZATION =====
 

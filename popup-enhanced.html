@@ -12,6 +12,14 @@
       <button id="themeToggle" class="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
     </h2>
 
+    <!-- Language Selector -->
+    <div class="language-selector">
+      <select id="languageSelect">
+        <option value="en">English</option>
+        <option value="ur">اردو (Urdu)</option>
+      </select>
+    </div>
+
     <!-- Notification -->
     <div id="notification" class="notification"></div>
 
@@ -356,6 +364,7 @@
     <div class="loading-text">Loading...</div>
   </div>
 
+  <script src="src/popup-i18n.js"></script>
   <script type="module" src="popup-enhanced.js"></script>
 </body>
 </html>
