@@ -27,14 +27,14 @@ async function sendMessageToContent(msg) {
     showNotification('No active tab found!', false);
     return null;
   }
-
+  
   try {
     return await chrome.tabs.sendMessage(tab.id, msg);
   } catch (err) {
     console.log('[Popup] Reinjecting content script...');
     await ensureContentScript(tab.id);
     await new Promise(r => setTimeout(r, 500));
-
+    
     try {
       return await chrome.tabs.sendMessage(tab.id, msg);
     } catch (err2) {
@@ -54,12 +54,7 @@ const elements = {
   sendMode: document.getElementById('sendMode'),
   minInterval: document.getElementById('minInterval'),
   maxInterval: document.getElementById('maxInterval'),
-
-  // Send method
-  sendMethod: document.getElementById('sendMethod'),
-  markSendButton: document.getElementById('markSendButton'),
-  sendButtonStatus: document.getElementById('sendButtonStatus'),
-
+  
   // Advanced Settings
   dailyLimit: document.getElementById('dailyLimit'),
   typingSimulation: document.getElementById('typingSimulation'),
@@ -69,24 +64,24 @@ const elements = {
   activeHours: document.getElementById('activeHours'),
   activeHoursStart: document.getElementById('activeHoursStart'),
   activeHoursEnd: document.getElementById('activeHoursEnd'),
-
+  
   // Analytics
   messagesSentToday: document.getElementById('messagesSentToday'),
   totalMessages: document.getElementById('totalMessages'),
   autoSendStatus: document.getElementById('autoSendStatus'),
-
+  
   // Modals
   settingsModal: document.getElementById('settingsModal'),
   phraseModal: document.getElementById('phraseModal'),
   analyticsModal: document.getElementById('analyticsModal'),
-
+  
   // Phrase management
   customPhrasesList: document.getElementById('customPhrasesList'),
   defaultPhrasesList: document.getElementById('defaultPhrasesList'),
   customPhrasesCount: document.getElementById('customPhrasesCount'),
   defaultPhrasesCount: document.getElementById('defaultPhrasesCount'),
   newPhraseInput: document.getElementById('newPhraseInput'),
-
+  
   // Notifications
   notification: document.getElementById('notification')
 };
@@ -103,7 +98,7 @@ function showNotification(message, isSuccess = true) {
   const notification = elements.notification;
   notification.textContent = message;
   notification.className = 'notification ' + (isSuccess ? 'success' : 'error') + ' show';
-
+  
   setTimeout(() => {
     notification.classList.remove('show');
   }, 3000);
@@ -114,7 +109,7 @@ function showNotification(message, isSuccess = true) {
 async function updateInputStatus() {
   const tab = await getActiveTab();
   if (!tab?.id) return;
-
+  
   try {
     const response = await chrome.tabs.sendMessage(tab.id, { action: 'getChatInputSelector' });
     if (response && response.selector) {
@@ -128,22 +123,6 @@ async function updateInputStatus() {
     elements.inputStatus.textContent = 'No input field marked';
     elements.inputStatus.className = 'status';
   }
-
-  // Update send method UI
-  chrome.storage.local.get(['sendMethod', 'sendButtonSelector'], (data) => {
-    const method = data.sendMethod || 'enter';
-    if (elements.sendMethod) elements.sendMethod.value = method;
-    if (elements.markSendButton) {
-      elements.markSendButton.style.display = method === 'click' ? 'inline-block' : 'none';
-    }
-    if (elements.sendButtonStatus) {
-      if (method === 'click') {
-        elements.sendButtonStatus.textContent = data.sendButtonSelector ? '✅ Send button marked' : 'If you choose "Click a Send button", please mark the button.';
-      } else {
-        elements.sendButtonStatus.textContent = '';
-      }
-    }
-  });
 }
 
 async function updateStats() {
@@ -151,7 +130,7 @@ async function updateStats() {
     const stats = await new Promise((resolve) => {
       chrome.runtime.sendMessage({ action: 'getStats' }, resolve);
     });
-
+    
     if (stats) {
       elements.messagesSentToday.textContent = stats.messagesSentToday || 0;
       elements.totalMessages.textContent = stats.totalMessagesSent || 0;
@@ -219,7 +198,7 @@ function renderPhrasesList() {
   // Custom phrases
   elements.customPhrasesCount.textContent = customPhrases.length;
   elements.customPhrasesList.innerHTML = '';
-
+  
   if (customPhrases.length === 0) {
     elements.customPhrasesList.innerHTML = '<div class="help" style="text-align: center; padding: 20px;">No custom phrases yet. Add one above!</div>';
   } else {
@@ -235,11 +214,11 @@ function renderPhrasesList() {
       elements.customPhrasesList.appendChild(item);
     });
   }
-
+  
   // Default phrases
   elements.defaultPhrasesCount.textContent = defaultPhrases.length;
   elements.defaultPhrasesList.innerHTML = '';
-
+  
   if (defaultPhrases.length === 0) {
     elements.defaultPhrasesList.innerHTML = '<div class="help" style="text-align: center; padding: 20px;">No default phrases loaded</div>';
   } else {
@@ -251,7 +230,7 @@ function renderPhrasesList() {
       `;
       elements.defaultPhrasesList.appendChild(item);
     });
-
+    
     if (defaultPhrases.length > 50) {
       const more = document.createElement('div');
       more.className = 'help';
@@ -261,7 +240,7 @@ function renderPhrasesList() {
       elements.defaultPhrasesList.appendChild(more);
     }
   }
-
+  
   // Delete button handlers
   elements.customPhrasesList.querySelectorAll('.btn-small.delete').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -283,25 +262,6 @@ document.getElementById('markInput')?.addEventListener('click', async () => {
   window.close();
 });
 
-// Send method change
-elements.sendMethod?.addEventListener('change', (e) => {
-  const method = e.target.value;
-  chrome.storage.local.set({ sendMethod: method }, () => {
-    if (elements.markSendButton) {
-      elements.markSendButton.style.display = method === 'click' ? 'inline-block' : 'none';
-    }
-    if (elements.sendButtonStatus) {
-      elements.sendButtonStatus.textContent = method === 'click' ? 'If you choose "Click a Send button", please mark the button.' : '';
-    }
-  });
-});
-
-// Mark send button
-elements.markSendButton?.addEventListener('click', async () => {
-  await sendMessageToContent({ action: 'startMarkingSendButtonMode' });
-  window.close();
-});
-
 // Send message once
 document.getElementById('sendOnce')?.addEventListener('click', async () => {
   const messages = getMessages();
@@ -309,21 +269,13 @@ document.getElementById('sendOnce')?.addEventListener('click', async () => {
     showNotification('Please enter at least one message', false);
     return;
   }
-
-  const { sendMethod, sendButtonSelector } = await new Promise(resolve => {
-    chrome.storage.local.get(['sendMethod', 'sendButtonSelector'], resolve);
-  });
-  if ((sendMethod || 'enter') === 'click' && !sendButtonSelector) {
-    showNotification('Please mark a Send button or switch method to Enter.', false);
-    return;
-  }
-
+  
   const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-  const response = await sendMessageToContent({
-    action: 'sendMessage',
+  const response = await sendMessageToContent({ 
+    action: 'sendMessage', 
     text: randomMsg
   });
-
+  
   if (response && response.ok) {
     showNotification('Message sent: ' + randomMsg.substring(0, 30) + '...', true);
     updateStats();
@@ -339,25 +291,16 @@ document.getElementById('startAutoSend')?.addEventListener('click', async () => 
     showNotification('Please enter at least one message', false);
     return;
   }
-
+  
   const mode = elements.sendMode.value;
   const minInterval = parseInt(elements.minInterval.value) || 60;
   const maxInterval = parseInt(elements.maxInterval.value) || 120;
-
+  
   if (minInterval > maxInterval) {
     showNotification('Min interval must be ≤ max interval', false);
     return;
   }
-
-  // Validate send method if needed
-  const { sendMethod, sendButtonSelector } = await new Promise(resolve => {
-    chrome.storage.local.get(['sendMethod', 'sendButtonSelector'], resolve);
-  });
-  if ((sendMethod || 'enter') === 'click' && !sendButtonSelector) {
-    showNotification('Please mark a Send button or switch method to Enter.', false);
-    return;
-  }
-
+  
   // Build config object
   const config = {
     mode,
@@ -370,16 +313,15 @@ document.getElementById('startAutoSend')?.addEventListener('click', async () => 
     templateVariablesEnabled: elements.templateVariables.checked,
     activeHoursEnabled: elements.activeHours.checked,
     activeHoursStart: parseInt(elements.activeHoursStart.value) || 9,
-    activeHoursEnd: parseInt(elements.activeHoursEnd.value) || 22,
-    sendMethod: (sendMethod || 'enter')
+    activeHoursEnd: parseInt(elements.activeHoursEnd.value) || 22
   };
-
-  const response = await sendMessageToContent({
-    action: 'startAutoSend',
+  
+  const response = await sendMessageToContent({ 
+    action: 'startAutoSend', 
     messages,
     config
   });
-
+  
   if (response && response.ok) {
     showNotification(`Auto-send started! Mode: ${mode}, ${minInterval}-${maxInterval}s`, true);
     updateStats();
@@ -399,13 +341,13 @@ document.getElementById('stopAutoSend')?.addEventListener('click', async () => {
 document.getElementById('loadDefaultPhrases')?.addEventListener('click', async () => {
   await loadDefaultPhrasesFromFile();
   await loadCustomPhrases();
-
+  
   const allPhrases = [...customPhrases, ...defaultPhrases];
   if (allPhrases.length === 0) {
     showNotification('No phrases available to load', false);
     return;
   }
-
+  
   elements.messageList.value = allPhrases.join('\n');
   chrome.storage.local.set({ messageList: elements.messageList.value });
   showNotification(`Loaded ${allPhrases.length} phrases (${customPhrases.length} custom + ${defaultPhrases.length} default)`, true);
@@ -453,7 +395,7 @@ document.getElementById('addNewPhrase')?.addEventListener('click', () => {
     showNotification('Please enter a phrase', false);
     return;
   }
-
+  
   if (addCustomPhrase(phrase)) {
     elements.newPhraseInput.value = '';
     renderPhrasesList();
@@ -479,7 +421,7 @@ document.getElementById('exportSettings')?.addEventListener('click', () => {
       settings: data,
       exportDate: new Date().toISOString()
     };
-
+    
     const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -487,7 +429,7 @@ document.getElementById('exportSettings')?.addEventListener('click', () => {
     a.download = `autochat-settings-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-
+    
     showNotification('Settings exported!', true);
   });
 });
@@ -497,11 +439,11 @@ document.getElementById('importSettings')?.addEventListener('click', () => {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = '.json';
-
+  
   input.onchange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
+    
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -518,7 +460,7 @@ document.getElementById('importSettings')?.addEventListener('click', () => {
     };
     reader.readAsText(file);
   };
-
+  
   input.click();
 });
 
@@ -558,16 +500,16 @@ function loadSettings() {
     if (data.minInterval) elements.minInterval.value = data.minInterval;
     if (data.maxInterval) elements.maxInterval.value = data.maxInterval;
     if (data.dailyLimit) elements.dailyLimit.value = data.dailyLimit;
-
+    
     elements.typingSimulation.checked = data.typingSimulation !== false;
     elements.variableDelays.checked = data.variableDelays !== false;
     elements.antiRepetition.checked = data.antiRepetition !== false;
     elements.templateVariables.checked = data.templateVariables !== false;
     elements.activeHours.checked = data.activeHours || false;
-
+    
     if (data.activeHoursStart) elements.activeHoursStart.value = data.activeHoursStart;
     if (data.activeHoursEnd) elements.activeHoursEnd.value = data.activeHoursEnd;
-
+    
     // Show/hide active hours inputs
     const hoursInputs = document.getElementById('activeHoursInputs');
     if (hoursInputs) {
@@ -591,7 +533,7 @@ function saveSettings() {
     activeHoursStart: elements.activeHoursStart.value,
     activeHoursEnd: elements.activeHoursEnd.value
   };
-
+  
   chrome.storage.local.set(settings);
 }
 
@@ -617,7 +559,7 @@ elements.activeHoursEnd?.addEventListener('change', saveSettings);
   loadSettings();
   await loadDefaultPhrasesFromFile();
   await loadCustomPhrases();
-
+  
   // Auto-load phrases if empty
   chrome.storage.local.get(['messageList'], async (data) => {
     if (!data.messageList || data.messageList.trim() === '') {
@@ -628,7 +570,7 @@ elements.activeHoursEnd?.addEventListener('change', saveSettings);
       }
     }
   });
-
+  
   // Update stats every 5 seconds
   setInterval(updateStats, 5000);
 })();
