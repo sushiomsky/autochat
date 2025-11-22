@@ -1,0 +1,346 @@
+{
+  "extName": {
+    "message": "AutoChat - Enviador Automático de Mensajes",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Enviador automático de mensajes profesional con notificaciones, modo de vista previa, categorías, paleta de comandos, selector de emojis, modo oscuro y funciones avanzadas de automatización.",
+    "description": "Extension description"
+  },
+  "appTitle": {
+    "message": "AutoChat Mejorado"
+  },
+  "markInputBtn": {
+    "message": "Marcar Campo de Entrada de Chat"
+  },
+  "inputStatusNone": {
+    "message": "Ningún campo de entrada marcado"
+  },
+  "inputStatusMarked": {
+    "message": "Campo de entrada marcado"
+  },
+  "sendMethod": {
+    "message": "Método de Envío:"
+  },
+  "sendMethodEnter": {
+    "message": "Presionar tecla Enter"
+  },
+  "sendMethodClick": {
+    "message": "Hacer clic en botón Enviar"
+  },
+  "markSendButton": {
+    "message": "Marcar Botón de Enviar"
+  },
+  "sendButtonHelp": {
+    "message": "Si elige \"Hacer clic en botón Enviar\", por favor marque el botón."
+  },
+  "messagesLabel": {
+    "message": "Mensajes (uno por línea):"
+  },
+  "messagesPlaceholder": {
+    "message": "¡Hola!\n¿Cómo estás?\n{time} - Encantado de conocerte\nNúmero aleatorio: {random_number}"
+  },
+  "messagesHelp": {
+    "message": "Use {time}, {date}, {random_emoji}, {random_number} para variables"
+  },
+  "loadPhrasesBtn": {
+    "message": "Cargar Frases"
+  },
+  "manageBtn": {
+    "message": "Administrar"
+  },
+  "settingsBtn": {
+    "message": "Configuración"
+  },
+  "helpBtn": {
+    "message": "Ayuda"
+  },
+  "sendMode": {
+    "message": "Modo de Envío:"
+  },
+  "sendModeRandom": {
+    "message": "Orden aleatorio"
+  },
+  "sendModeSequential": {
+    "message": "Orden secuencial"
+  },
+  "timeInterval": {
+    "message": "Intervalo de Tiempo (minutos):"
+  },
+  "minInterval": {
+    "message": "Mín:"
+  },
+  "maxInterval": {
+    "message": "Máx:"
+  },
+  "intervalHelp": {
+    "message": "Intervalo aleatorio entre minutos mínimo y máximo"
+  },
+  "startAutoSend": {
+    "message": "Iniciar Envío Automático"
+  },
+  "pauseAutoSend": {
+    "message": "Pausar"
+  },
+  "stopAutoSend": {
+    "message": "Detener Envío Automático"
+  },
+  "sendOnce": {
+    "message": "Enviar Una Vez"
+  },
+  "preview": {
+    "message": "Vista Previa"
+  },
+  "emoji": {
+    "message": "Emoji"
+  },
+  "categories": {
+    "message": "Categorías"
+  },
+  "analytics": {
+    "message": "Análisis"
+  },
+  "export": {
+    "message": "Exportar"
+  },
+  "statsToday": {
+    "message": "Hoy"
+  },
+  "statsTotal": {
+    "message": "Total"
+  },
+  "statsStatus": {
+    "message": "Estado"
+  },
+  "statusActive": {
+    "message": "Activo"
+  },
+  "statusInactive": {
+    "message": "Inactivo"
+  },
+  "keyboardShortcuts": {
+    "message": "Atajos de Teclado:"
+  },
+  "shortcutCommands": {
+    "message": "Comandos"
+  },
+  "shortcutStart": {
+    "message": "Iniciar"
+  },
+  "shortcutStop": {
+    "message": "Detener"
+  },
+  "shortcutPause": {
+    "message": "Pausar"
+  },
+  "version": {
+    "message": "v4.3 Edición Profesional"
+  },
+  "advancedSettings": {
+    "message": "Configuración Avanzada"
+  },
+  "typingSimulation": {
+    "message": "Simulación de Escritura (40-80 WPM)"
+  },
+  "typingSimulationHelp": {
+    "message": "Simula velocidad de escritura humana realista"
+  },
+  "variableDelays": {
+    "message": "Retrasos Variables (0.5-2s tiempo de pensamiento)"
+  },
+  "variableDelaysHelp": {
+    "message": "Retrasos aleatorios antes de escribir para parecer humano"
+  },
+  "antiRepetition": {
+    "message": "Anti-Repetición"
+  },
+  "antiRepetitionHelp": {
+    "message": "Evitar enviar el mismo mensaje repetidamente"
+  },
+  "templateVariables": {
+    "message": "Variables de Plantilla"
+  },
+  "templateVariablesHelp": {
+    "message": "Habilitar {time}, {date}, {random_emoji}, etc."
+  },
+  "notificationsEnabled": {
+    "message": "Notificaciones de Escritorio"
+  },
+  "notificationsHelp": {
+    "message": "Mostrar notificaciones del navegador para eventos"
+  },
+  "notificationSound": {
+    "message": "Sonido de Notificación"
+  },
+  "notificationSoundHelp": {
+    "message": "Reproducir sonido con notificaciones"
+  },
+  "analyticsEnabled": {
+    "message": "Análisis de Uso"
+  },
+  "analyticsHelp": {
+    "message": "Rastrear estadísticas de uso (todos los datos permanecen locales)"
+  },
+  "dailyLimit": {
+    "message": "Límite Diario de Mensajes:"
+  },
+  "dailyLimitHelp": {
+    "message": "Detener automáticamente después de X mensajes por día (0 = sin límite)"
+  },
+  "activeHours": {
+    "message": "Solo Horas Activas"
+  },
+  "activeHoursStart": {
+    "message": "Inicio (hora):"
+  },
+  "activeHoursEnd": {
+    "message": "Fin (hora):"
+  },
+  "activeHoursHelp": {
+    "message": "Solo enviar mensajes durante horas especificadas (formato 24h)"
+  },
+  "exportSettings": {
+    "message": "Exportar"
+  },
+  "importSettings": {
+    "message": "Importar"
+  },
+  "closeBtn": {
+    "message": "Cerrar"
+  },
+  "managePhrases": {
+    "message": "Administrar Frases"
+  },
+  "addNewPhrase": {
+    "message": "Agregar Nueva Frase:"
+  },
+  "addNewPlaceholder": {
+    "message": "Escriba una nueva frase aquí..."
+  },
+  "addPhraseBtn": {
+    "message": "Agregar Frase"
+  },
+  "customPhrases": {
+    "message": "Frases Personalizadas:"
+  },
+  "defaultPhrases": {
+    "message": "Frases Predeterminadas:"
+  },
+  "defaultPhrasesHelp": {
+    "message": "De farming_phrases.txt"
+  },
+  "analyticsTitle": {
+    "message": "Análisis y Estadísticas"
+  },
+  "analyticsMessagesToday": {
+    "message": "Mensajes Hoy"
+  },
+  "analyticsTotalMessages": {
+    "message": "Total de Mensajes"
+  },
+  "analyticsStatus": {
+    "message": "Estado"
+  },
+  "analyticsDescription": {
+    "message": "Las estadísticas rastrean todos los mensajes enviados por AutoChat"
+  },
+  "resetStats": {
+    "message": "Restablecer Estadísticas"
+  },
+  "previewTitle": {
+    "message": "Vista Previa del Mensaje"
+  },
+  "dryRunMode": {
+    "message": "Modo de prueba en seco (probar sin enviar)"
+  },
+  "categoriesTitle": {
+    "message": "Categorías de Frases"
+  },
+  "commandPalettePlaceholder": {
+    "message": "Escriba un comando... (Ctrl+K)"
+  },
+  "emojiSearchPlaceholder": {
+    "message": "Buscar emojis..."
+  },
+  "themeToggle": {
+    "message": "Alternar modo oscuro"
+  },
+  "noCustomPhrases": {
+    "message": "Aún no hay frases personalizadas. ¡Agregue una arriba!"
+  },
+  "noDefaultPhrases": {
+    "message": "No se cargaron frases predeterminadas"
+  },
+  "phraseDeleted": {
+    "message": "Frase eliminada"
+  },
+  "phraseAdded": {
+    "message": "¡Frase agregada!"
+  },
+  "phraseExists": {
+    "message": "Esta frase ya existe o está vacía"
+  },
+  "enterPhrase": {
+    "message": "Por favor ingrese una frase"
+  },
+  "settingsExported": {
+    "message": "¡Configuración exportada!"
+  },
+  "settingsImported": {
+    "message": "¡Configuración importada! Recargue la página."
+  },
+  "settingsImportFailed": {
+    "message": "No se pudo importar la configuración"
+  },
+  "statsReset": {
+    "message": "Estadísticas restablecidas"
+  },
+  "statsResetConfirm": {
+    "message": "¿Restablecer todas las estadísticas? Esto no se puede deshacer."
+  },
+  "messageSent": {
+    "message": "Mensaje enviado"
+  },
+  "enterMessages": {
+    "message": "Por favor ingrese al menos un mensaje"
+  },
+  "markSendButtonFirst": {
+    "message": "Por favor marque un botón de Enviar o cambie el método a Enter."
+  },
+  "sendFailed": {
+    "message": "Error al enviar. Marque primero un campo de entrada."
+  },
+  "autoSendStarted": {
+    "message": "¡Envío automático iniciado! Modo:"
+  },
+  "autoSendStartFailed": {
+    "message": "Error al iniciar. Marque primero un campo de entrada."
+  },
+  "autoSendStopped": {
+    "message": "Envío automático detenido"
+  },
+  "phrasesLoaded": {
+    "message": "frases cargadas"
+  },
+  "customPhrasesLoaded": {
+    "message": "personalizadas"
+  },
+  "defaultPhrasesLoaded": {
+    "message": "predeterminadas"
+  },
+  "noPhrasesAvailable": {
+    "message": "No hay frases disponibles para cargar"
+  },
+  "minMaxIntervalError": {
+    "message": "El intervalo mínimo debe ser ≤ al intervalo máximo"
+  },
+  "noActiveTab": {
+    "message": "¡No se encontró pestaña activa!"
+  },
+  "contentScriptFailed": {
+    "message": "No se pudo alcanzar el script de contenido. Por favor recargue la página."
+  },
+  "deleteConfirm": {
+    "message": "¿Eliminar esta frase?"
+  }
+}

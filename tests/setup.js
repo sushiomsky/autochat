@@ -75,6 +75,17 @@ global.chrome = {
       if (callback) callback(results);
       return Promise.resolve(results);
     })
+  },
+  i18n: {
+    getMessage: jest.fn((key, substitutions) => {
+      return key;
+    }),
+    getUILanguage: jest.fn(() => 'en'),
+    getAcceptLanguages: jest.fn((callback) => {
+      const languages = ['en'];
+      if (callback) callback(languages);
+      return Promise.resolve(languages);
+    })
   }
 };
 

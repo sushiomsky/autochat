@@ -7,7 +7,7 @@ class I18n {
   constructor() {
     this.currentLocale = chrome.i18n.getUILanguage();
     this.defaultLocale = 'en';
-    this.supportedLocales = ['en', 'ur'];
+    this.supportedLocales = ['en', 'ur', 'es'];
     
     // Load user preference
     chrome.storage.local.get(['locale'], (data) => {
@@ -67,7 +67,8 @@ class I18n {
   getSupportedLocales() {
     return [
       { code: 'en', name: 'English', nativeName: 'English' },
-      { code: 'ur', name: 'Urdu', nativeName: 'اردو' }
+      { code: 'ur', name: 'Urdu', nativeName: 'اردو' },
+      { code: 'es', name: 'Spanish', nativeName: 'Español' }
     ];
   }
 

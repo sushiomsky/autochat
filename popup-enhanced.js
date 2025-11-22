@@ -200,10 +200,28 @@ function getMessages() {
 
 async function loadDefaultPhrasesFromFile() {
   try {
-    const response = await fetch(chrome.runtime.getURL('farming_phrases.txt'));
+    // Get current locale from storage or use browser default
+    const storageData = await new Promise(resolve => {
+      chrome.storage.local.get(['locale'], resolve);
+    });
+    const locale = storageData.locale || chrome.i18n.getUILanguage().split('-')[0] || 'en';
+    
+    // Try to load language-specific phrases, fallback to English
+    let phraseFile = `farming_phrases_${locale}.txt`;
+    let response;
+    
+    try {
+      response = await fetch(chrome.runtime.getURL(phraseFile));
+      if (!response.ok) throw new Error('File not found');
+    } catch (err) {
+      console.log(`[AutoChat] ${phraseFile} not found, falling back to English`);
+      phraseFile = 'farming_phrases_en.txt';
+      response = await fetch(chrome.runtime.getURL(phraseFile));
+    }
+    
     const text = await response.text();
     defaultPhrases = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    console.log(`[AutoChat] Loaded ${defaultPhrases.length} default phrases`);
+    console.log(`[AutoChat] Loaded ${defaultPhrases.length} default phrases from ${phraseFile}`);
     return defaultPhrases;
   } catch (error) {
     console.error('[AutoChat] Error loading default phrases:', error);
