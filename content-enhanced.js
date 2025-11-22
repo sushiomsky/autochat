@@ -13,8 +13,8 @@ let highlightOverlay = null;
 let messageList = [];
 let currentMessageIndex = 0;
 let sendMode = 'random';
-let minInterval = 60;
-let maxInterval = 120;
+let minInterval = 1; // minutes
+let maxInterval = 2; // minutes
 let recentMessages = []; // Anti-repetition tracking
 let messagesSentToday = 0;
 let totalMessagesSent = 0;
@@ -26,6 +26,8 @@ let activeHoursEnabled = false;
 let activeHoursStart = 9;
 let activeHoursEnd = 22;
 let templateVariablesEnabled = true;
+let sendConfirmTimeoutMs = 3000; // default 3s
+let messageContainerSelector = null;
 
 // ===== HELPER FUNCTIONS =====
 
@@ -64,25 +66,133 @@ function processTemplateVariables(text) {
     .replace(/\{timestamp\}/g, Date.now().toString());
 }
 
-// Add realistic typos occasionally (5% chance)
-function addTypo(text) {
-  if (Math.random() > 0.05) return text; // 95% no typo
-
-  const words = text.split(' ');
-  if (words.length < 2) return text;
-
-  const wordIndex = Math.floor(Math.random() * words.length);
-  const word = words[wordIndex];
-  if (word.length < 3) return text;
-
-  // Simple typo: swap two adjacent characters
-  const charIndex = Math.floor(Math.random() * (word.length - 1));
-  const chars = word.split('');
-  [chars[charIndex], chars[charIndex + 1]] = [chars[charIndex + 1], chars[charIndex]];
-  words[wordIndex] = chars.join('');
-
-  return words.join(' ');
+// Simple sleep helper
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
 }
+
+// Confirm that the message was actually sent by checking that the
+// input no longer contains the expected text. Returns true if cleared.
+async function confirmMessageSent(inputEl, expectedText, timeoutMs = 3000) {
+  const check = () => {
+    try {
+      if (!inputEl) return true; // if input gone, assume sent
+      if (inputEl.tagName === 'INPUT' || inputEl.tagName === 'TEXTAREA') {
+        return String(inputEl.value || '').trim() !== String(expectedText || '').trim();
+      }
+      if (inputEl.contentEditable === 'true' || inputEl.getAttribute('contenteditable') === 'true') {
+        return String(inputEl.textContent || '').trim() !== String(expectedText || '').trim();
+      }
+      return true;
+    } catch (e) {
+      return true;
+    }
+  };
+
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    if (check()) return true;
+    // small delay between checks
+    // some apps clear input asynchronously after server ack
+    // so poll for up to timeoutMs
+    // eslint-disable-next-line no-await-in-loop
+    await sleep(200);
+  }
+
+  // If input still contains the text, try a MutationObserver to watch for the message appearing in DOM
+  if (!check()) {
+    return new Promise((resolve) => {
+      const obsTimeout = setTimeout(() => {
+        if (observer) observer.disconnect();
+        // final fallback: check within message container if available
+        if (messageContainerSelector) {
+          const container = document.querySelector(messageContainerSelector);
+          if (container && findMessageInDOMWithin(container, expectedText)) {
+            resolve(true);
+            return;
+          }
+        }
+        resolve(check() || findMessageInDOM(expectedText));
+      }, 1000);
+
+      const observer = new MutationObserver((mutations) => {
+        if (check()) {
+          clearTimeout(obsTimeout);
+          observer.disconnect();
+          resolve(true);
+          return;
+        }
+
+        // If a message container is marked, we will observe mutations on it (see observeTarget below)
+        for (const m of mutations) {
+          for (const node of Array.from(m.addedNodes || [])) {
+            if (node.nodeType !== 1) continue;
+            const txt = (node.textContent || '').trim();
+            if (!txt) continue;
+            if (txt.includes(String(expectedText).trim()) || String(expectedText).trim().includes(txt)) {
+              clearTimeout(obsTimeout);
+              observer.disconnect();
+              resolve(true);
+              return;
+            }
+          }
+        }
+      });
+
+      const observeTarget = messageContainerSelector ? document.querySelector(messageContainerSelector) || document.body : document.body;
+      observer.observe(observeTarget, { childList: true, subtree: true });
+    });
+  }
+
+  return true;
+}
+
+// Try to detect the message in the DOM (heuristic). Returns true if found.
+function findMessageInDOM(expectedText) {
+  if (!expectedText) return false;
+  const norm = String(expectedText).trim();
+  // Check common chat container selectors first for efficiency
+  const selectors = [
+    '.message', '.msg', '.message-text', '.bubble', '.chat-message', '.text', '.reply', '.chat__message'
+  ];
+
+  for (const sel of selectors) {
+    const els = document.querySelectorAll(sel);
+    for (const el of els) {
+      if (!el) continue;
+      const txt = (el.textContent || '').trim();
+      if (!txt) continue;
+      if (txt.includes(norm) || norm.includes(txt)) return true;
+    }
+  }
+
+  // Fallback: scan generic text-bearing elements (limited for performance)
+  const candidates = document.querySelectorAll('div, p, span, li');
+  let checked = 0;
+  for (const el of candidates) {
+    if (checked++ > 200) break; // limit scan
+    const txt = (el.textContent || '').trim();
+    if (!txt) continue;
+    if (txt.includes(norm) || norm.includes(txt)) return true;
+  }
+
+  return false;
+}
+
+// Find message in specific container (more efficient)
+function findMessageInDOMWithin(container, expectedText) {
+  if (!container || !expectedText) return false;
+  const norm = String(expectedText).trim();
+  const candidates = container.querySelectorAll('div, p, span, li');
+  for (const el of candidates) {
+    const txt = (el.textContent || '').trim();
+    if (!txt) continue;
+    if (txt.includes(norm) || norm.includes(txt)) return true;
+  }
+  return false;
+}
+
+// Note: typo-insertion feature removed to reduce unused helper warnings.
 
 // Check if within active hours
 function isWithinActiveHours() {
@@ -102,6 +212,18 @@ function checkDailyLimit() {
   if (dailyLimit === 0) return true; // No limit
   return messagesSentToday < dailyLimit;
 }
+
+// Load send confirmation timeout from storage (seconds -> ms)
+chrome.storage.local.get(['sendConfirmTimeout'], (data) => {
+  if (data && data.sendConfirmTimeout) {
+    const val = parseInt(data.sendConfirmTimeout, 10);
+    if (!isNaN(val) && val > 0) sendConfirmTimeoutMs = val * 1000;
+  }
+  if (data && data.messageContainerSelector) {
+    messageContainerSelector = data.messageContainerSelector;
+    console.log('[AutoChat] Loaded messageContainerSelector:', messageContainerSelector);
+  }
+});
 
 // ===== VISUAL HIGHLIGHTING =====
 
@@ -282,6 +404,66 @@ function startMarkingSendButtonMode() {
   document.addEventListener('click', clickHandler, true);
 }
 
+function startMarkingMessageContainerMode() {
+  markingSendButtonMode = false; // not marking button now
+  console.log('[AutoChat] Click on a message container element to mark it');
+
+  const indicator = document.createElement('div');
+  indicator.id = 'autochat-marking-indicator-msg-container';
+  indicator.style.cssText = `
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: #ff9800;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    z-index: 1000000;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  `;
+  indicator.textContent = '📌 Click on a message container (chat list)';
+  document.body.appendChild(indicator);
+
+  const hoverHandler = (e) => {
+    if (!indicator) return;
+    const target = e.target;
+    // Highlight potential container-like nodes
+    if (target && target.nodeType === 1) {
+      createButtonHighlight(target);
+    } else {
+      removeHighlight();
+    }
+  };
+
+  const clickHandler = (e) => {
+    const target = e.target;
+    if (!target || target.nodeType !== 1) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    messageContainerSelector = getElementSelector(target);
+    console.log('[AutoChat] Message container marked:', messageContainerSelector);
+    chrome.storage.local.set({ messageContainerSelector });
+
+    document.removeEventListener('mouseover', hoverHandler, true);
+    document.removeEventListener('click', clickHandler, true);
+    removeHighlight();
+
+    const ind = document.getElementById('autochat-marking-indicator-msg-container');
+    if (ind) {
+      ind.textContent = '✅ Message container marked!';
+      ind.style.background = '#28a745';
+      setTimeout(() => ind.remove(), 1500);
+    }
+  };
+
+  document.addEventListener('mouseover', hoverHandler, true);
+  document.addEventListener('click', clickHandler, true);
+}
+
 function isClickableButton(el) {
   if (!el) return false;
   if (el.matches('button, [role="button"], input[type="submit"], input[type="button"], .btn, .send')) return true;
@@ -373,15 +555,30 @@ async function sendMessage(text, retries = 3) {
     let sent = false;
 
     if (sendMethod === 'enter') {
-      const enterEvent = new KeyboardEvent('keydown', {
-        key: 'Enter',
-        code: 'Enter',
-        keyCode: 13,
-        which: 13,
-        bubbles: true,
-        cancelable: true
-      });
-      inputEl.dispatchEvent(enterEvent);
+      // Dispatch a realistic sequence of keyboard events (keydown, keypress, keyup)
+      // Many web apps listen for keydown/keypress/keyup; dispatch multiple to increase compatibility.
+      const evtOpts = { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true };
+      const down = new KeyboardEvent('keydown', evtOpts);
+      const press = new KeyboardEvent('keypress', evtOpts);
+      const up = new KeyboardEvent('keyup', evtOpts);
+
+      inputEl.dispatchEvent(down);
+      inputEl.dispatchEvent(press);
+      inputEl.dispatchEvent(up);
+
+      // Also try to submit a surrounding form if present (some sites use form submit)
+      const form = inputEl.closest('form');
+      if (form) {
+        // Prefer a visible submit button
+        const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+        if (submitBtn) {
+          try { submitBtn.click(); }
+          catch (e) { /* ignore */ }
+        } else {
+          try { form.requestSubmit ? form.requestSubmit() : form.submit(); } catch (e) { /* ignore */ }
+        }
+      }
+
       sent = true;
     } else if (sendMethod === 'click') {
       // If specific send button was marked, click it
@@ -389,22 +586,52 @@ async function sendMessage(text, retries = 3) {
       if (sendButtonSelector) {
         btn = document.querySelector(sendButtonSelector);
       }
-      if (!btn) {
-        // Heuristic: look around the input for send-like buttons
+
+      // Broader heuristics: search nearby, then search document for common patterns
+      const tryFindButtonNear = () => {
         const parent = inputEl.closest('form') || inputEl.parentElement;
-        if (parent) {
-          const buttons = parent.querySelectorAll('button, [role="button"], input[type="submit"], input[type="button"]');
-          for (const b of buttons) {
-            const btnText = (b.textContent || '').toLowerCase();
-            const label = (b.getAttribute('aria-label') || '').toLowerCase();
-            if (btnText.includes('send') || btnText.includes('submit') || label.includes('send')) {
-              btn = b; break;
-            }
+        if (!parent) return null;
+        const candidates = parent.querySelectorAll('button, [role="button"], input[type="submit"], input[type="button"]');
+        for (const b of candidates) {
+          const btnText = (b.textContent || '').toLowerCase();
+          const label = (b.getAttribute('aria-label') || '').toLowerCase();
+          const dataTest = (b.getAttribute('data-testid') || '').toLowerCase();
+          if (btnText.includes('send') || btnText.includes('submit') || label.includes('send') || dataTest.includes('send')) {
+            return b;
+          }
+        }
+        return null;
+      };
+
+      if (!btn) btn = tryFindButtonNear();
+
+      if (!btn) {
+        // Global search fallback: look for buttons with common send labels
+        const allButtons = document.querySelectorAll('button, [role="button"], input[type="submit"], input[type="button"]');
+        for (const b of allButtons) {
+          const txt = (b.textContent || '').toLowerCase();
+          const label = (b.getAttribute('aria-label') || '').toLowerCase();
+          const dataTest = (b.getAttribute('data-testid') || '').toLowerCase();
+          if (txt.includes('send') || txt.includes('senden') || txt.includes('submit') || label.includes('send') || dataTest.includes('send')) {
+            btn = b; break;
           }
         }
       }
+
+      // As last resort, check for svg/icon buttons near the input (some UIs use icon-only buttons)
+      if (!btn) {
+        const parent = inputEl.closest('form') || inputEl.parentElement;
+        if (parent) {
+          const svgs = parent.querySelectorAll('svg');
+          for (const s of svgs) {
+            const candidate = s.closest('button, [role="button"]');
+            if (candidate) { btn = candidate; break; }
+          }
+        }
+      }
+
       if (btn) {
-        btn.click();
+        try { btn.click(); } catch (e) { /* some sites block synthetic clicks; ignore */ }
         sent = true;
       } else {
         console.warn('[AutoChat] Send button not found for click method');
@@ -412,22 +639,37 @@ async function sendMessage(text, retries = 3) {
     }
 
     if (!sent && sendMethod === 'click') {
-      // Fallback: try Enter if click method failed
-      const enterEvent = new KeyboardEvent('keydown', {
-        key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true
-      });
-      inputEl.dispatchEvent(enterEvent);
+      // Fallback: try full Enter sequence if click method failed
+      const evtOpts = { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true };
+      inputEl.dispatchEvent(new KeyboardEvent('keydown', evtOpts));
+      inputEl.dispatchEvent(new KeyboardEvent('keypress', evtOpts));
+      inputEl.dispatchEvent(new KeyboardEvent('keyup', evtOpts));
       sent = true;
     }
 
     if (sent) {
-      messagesSentToday++;
-      totalMessagesSent++;
-      chrome.runtime.sendMessage({ action: 'incrementMessageCount' });
-      console.log('[AutoChat] Message sent:', text);
+      // Wait and confirm the message was actually sent (input cleared)
+      const confirmed = await confirmMessageSent(inputEl, text, sendConfirmTimeoutMs);
+      if (confirmed) {
+        messagesSentToday++;
+        totalMessagesSent++;
+        chrome.runtime.sendMessage({ action: 'incrementMessageCount' });
+        console.log('[AutoChat] Message confirmed sent:', text);
+        return true;
+      }
+
+      console.warn('[AutoChat] Message not confirmed (input still contains text)');
+      if (retries > 0) {
+        console.log('[AutoChat] Retrying send...', retries, 'attempts left');
+        await sleep(1000);
+        return sendMessage(text, retries - 1);
+      }
+
+      console.error('[AutoChat] Failed to confirm send after retries:', text);
+      return false;
     }
 
-    return sent;
+    return false;
   } catch (e) {
     console.error('[AutoChat] Error:', e);
     if (retries > 0) {
@@ -476,9 +718,11 @@ function getNextMessage() {
 
 // ===== SCHEDULING =====
 
+// minInterval / maxInterval are stored in minutes in the UI.
+// Convert to milliseconds here (minutes -> ms).
 function getRandomInterval() {
-  const min = minInterval * 1000;
-  const max = maxInterval * 1000;
+  const min = minInterval * 60 * 1000;
+  const max = maxInterval * 60 * 1000;
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
@@ -509,7 +753,7 @@ async function scheduleNextMessage() {
   await sendMessage(message);
 
   const nextInterval = getRandomInterval();
-  console.log(`[AutoChat] Next message in ${(nextInterval/1000).toFixed(1)}s`);
+  console.log(`[AutoChat] Next message in ${(nextInterval/60000).toFixed(2)}m`);
 
   autoSendInterval = setTimeout(() => {
     scheduleNextMessage();
@@ -539,8 +783,8 @@ function startAutoSend(messages, config = {}) {
   // Apply configuration
   messageList = messages;
   sendMode = config.mode || 'random';
-  minInterval = config.minInterval || 60;
-  maxInterval = config.maxInterval || 120;
+  minInterval = config.minInterval || 1;
+  maxInterval = config.maxInterval || 2;
   dailyLimit = config.dailyLimit || 0;
   enableTypingSimulation = config.enableTypingSimulation !== false;
   enableVariableDelays = config.enableVariableDelays !== false;
@@ -553,7 +797,7 @@ function startAutoSend(messages, config = {}) {
   currentMessageIndex = 0;
   recentMessages = [];
 
-  console.log(`[AutoChat] Starting auto-send (${sendMode} mode, ${minInterval}-${maxInterval}s interval)`);
+  console.log(`[AutoChat] Starting auto-send (${sendMode} mode, ${minInterval}-${maxInterval}m interval)`);
 
   // Update badge
   chrome.runtime.sendMessage({ action: 'updateBadge', active: true });
@@ -564,6 +808,11 @@ function startAutoSend(messages, config = {}) {
 
   return true;
 }
+
+  // Allow startAutoSend to also receive updated sendConfirmTimeout in config
+  // (already handled above by reading config when set), but if someone calls
+  // startAutoSend with a config containing sendConfirmTimeout, apply it here
+  // Note: this code path is executed when content script receives startAutoSend message.
 
 function stopAutoSend() {
   if (autoSendInterval) {
@@ -621,6 +870,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     sendResponse({ ok: true });
   }
 
+  if (msg.action === 'startMarkingMessageContainerMode') {
+    startMarkingMessageContainerMode();
+    sendResponse({ ok: true });
+  }
+
   if (msg.action === 'getChatInputSelector') {
     sendResponse({ selector: chatInputSelector });
   }
@@ -652,3 +906,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
   return true;
 });
+
+// Export helpers for unit tests (Node/jest environment)
+try {
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { confirmMessageSent, findMessageInDOM, sleep };
+  }
+} catch (e) {
+  // ignore
+}

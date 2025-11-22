@@ -245,7 +245,6 @@ function localizeSettingsModal() {
   // Daily limit
   const dailyLimitLabel = modal.querySelector('label:has(#dailyLimit)');
   if (dailyLimitLabel) {
-    const input = dailyLimitLabel.querySelector('#dailyLimit');
     dailyLimitLabel.childNodes[0].textContent = t('dailyLimit') + ' ';
   }
   const dailyLimitHelp = modal.querySelector('#dailyLimit').closest('label').nextElementSibling;

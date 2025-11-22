@@ -65,7 +65,7 @@
     "message": "Sequential order"
   },
   "timeInterval": {
-    "message": "Time Interval (seconds):"
+    "message": "Time Interval (minutes):"
   },
   "minInterval": {
     "message": "Min:"
@@ -74,7 +74,7 @@
     "message": "Max:"
   },
   "intervalHelp": {
-    "message": "Random interval between min and max seconds"
+    "message": "Random interval between min and max minutes"
   },
   "startAutoSend": {
     "message": "Start Auto-Send"

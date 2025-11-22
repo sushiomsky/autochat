@@ -1,5 +1,12 @@
 // Jest setup file for Chrome extension testing
 
+// polyfill TextEncoder/TextDecoder for environments where they're not present (CI/jsdom)
+if (typeof global.TextEncoder === 'undefined' || typeof global.TextDecoder === 'undefined') {
+  const { TextEncoder, TextDecoder } = require('util');
+  global.TextEncoder = TextEncoder;
+  global.TextDecoder = TextDecoder;
+}
+
 // Create comprehensive chrome mock
 global.chrome = {
   storage: {
@@ -40,6 +47,11 @@ global.chrome = {
     getURL: jest.fn((path) => `chrome-extension://test/${path}`),
     lastError: null,
     id: 'test-extension-id'
+    ,
+    onMessage: {
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
   },
   tabs: {
     query: jest.fn((queryInfo, callback) => {
