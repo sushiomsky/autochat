@@ -72,6 +72,7 @@ const elements = {
   activeHours: document.getElementById('activeHours'),
   activeHoursStart: document.getElementById('activeHoursStart'),
   activeHoursEnd: document.getElementById('activeHoursEnd'),
+  sendConfirmTimeout: document.getElementById('sendConfirmTimeout'),
 
   // Analytics
   messagesSentToday: document.getElementById('messagesSentToday'),
@@ -161,6 +162,17 @@ async function updateInputStatus() {
   });
 }
 
+// ===== ENHANCED STATS ANIMATIONS =====
+
+function updateStatWithAnimation(elementId, value) {
+  const element = document.getElementById(elementId);
+  if (element && element.textContent !== value.toString()) {
+    element.textContent = value;
+    element.classList.add('updated');
+    setTimeout(() => element.classList.remove('updated'), 500);
+  }
+}
+
 async function updateStats() {
   try {
     const stats = await new Promise((resolve) => {
@@ -168,8 +180,13 @@ async function updateStats() {
     });
 
     if (stats) {
-      elements.messagesSentToday.textContent = stats.messagesSentToday || 0;
-      elements.totalMessages.textContent = stats.totalMessagesSent || 0;
+      // Use animated stat updates
+      updateStatWithAnimation('messagesSentToday', stats.messagesSentToday || 0);
+      updateStatWithAnimation('totalMessages', stats.totalMessagesSent || 0);
+      
+      // Update analytics modal stats
+      updateStatWithAnimation('analyticsToday', stats.messagesSentToday || 0);
+      updateStatWithAnimation('analyticsTotal', stats.totalMessagesSent || 0);
       
       // Use localized status if available
       const statusText = stats.isAutoSendActive ? 
@@ -662,6 +679,7 @@ elements.templateVariables?.addEventListener('change', saveSettings);
 elements.activeHours?.addEventListener('change', saveSettings);
 elements.activeHoursStart?.addEventListener('change', saveSettings);
 elements.activeHoursEnd?.addEventListener('change', saveSettings);
+elements.sendConfirmTimeout?.addEventListener('change', saveSettings);
 
 // ===== LOCALIZATION =====
 
@@ -693,6 +711,396 @@ if (languageSelect) {
 if (typeof localizePopup === 'function') {
   localizePopup();
 }
+
+// ===== COMMAND PALETTE =====
+
+const commandPalette = document.getElementById('commandPalette');
+const commandSearch = document.getElementById('commandSearch');
+const commandResults = document.getElementById('commandResults');
+
+const commands = [
+  { name: 'Start Auto-Send', icon: '▶️', desc: 'Begin sending messages', shortcut: 'Ctrl+S', action: () => document.getElementById('startAutoSend')?.click() },
+  { name: 'Stop Auto-Send', icon: '⏹️', desc: 'Stop sending messages', shortcut: 'Ctrl+X', action: () => document.getElementById('stopAutoSend')?.click() },
+  { name: 'Pause/Resume', icon: '⏸️', desc: 'Pause or resume', shortcut: 'Ctrl+P', action: () => document.getElementById('pauseAutoSend')?.click() },
+  { name: 'Send Once', icon: '📤', desc: 'Send one message now', shortcut: '', action: () => document.getElementById('sendOnce')?.click() },
+  { name: 'Mark Input Field', icon: '🎯', desc: 'Mark chat input', shortcut: '', action: () => document.getElementById('markInput')?.click() },
+  { name: 'Preview Messages', icon: '👁️', desc: 'Preview messages', shortcut: '', action: () => document.getElementById('previewMessage')?.click() },
+  { name: 'Open Settings', icon: '⚙️', desc: 'Advanced settings', shortcut: '', action: () => document.getElementById('openSettings')?.click() },
+  { name: 'Open Analytics', icon: '📊', desc: 'View statistics', shortcut: '', action: () => document.getElementById('openAnalytics')?.click() },
+  { name: 'Manage Phrases', icon: '✏️', desc: 'Edit phrases', shortcut: '', action: () => document.getElementById('managePhrases')?.click() },
+  { name: 'Load Phrases', icon: '📚', desc: 'Load default phrases', shortcut: '', action: () => document.getElementById('loadDefaultPhrases')?.click() },
+  { name: 'Categories', icon: '📁', desc: 'Browse categories', shortcut: '', action: () => document.getElementById('openCategories')?.click() },
+  { name: 'Emoji Picker', icon: '😊', desc: 'Insert emoji', shortcut: '', action: () => document.getElementById('openEmoji')?.click() },
+  { name: 'Export Settings', icon: '💾', desc: 'Backup settings', shortcut: '', action: () => document.getElementById('exportSettings')?.click() },
+  { name: 'Toggle Theme', icon: '🌙', desc: 'Dark/Light mode', shortcut: '', action: () => document.getElementById('themeToggle')?.click() }
+];
+
+let selectedCommandIndex = 0;
+
+function renderCommands(filter = '') {
+  const filtered = commands.filter(cmd => 
+    cmd.name.toLowerCase().includes(filter.toLowerCase()) ||
+    cmd.desc.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  commandResults.innerHTML = '';
+  
+  if (filtered.length === 0) {
+    commandResults.innerHTML = '<div class="help" style="padding: 20px; text-align: center;">No commands found</div>';
+    return;
+  }
+
+  filtered.forEach((cmd, index) => {
+    const item = document.createElement('div');
+    item.className = 'command-item' + (index === 0 ? ' selected' : '');
+    item.innerHTML = `
+      <div class="command-icon">${cmd.icon}</div>
+      <div class="command-info">
+        <div class="command-name">${cmd.name}</div>
+        <div class="command-desc">${cmd.desc}</div>
+      </div>
+      ${cmd.shortcut ? `<div class="command-shortcut">${cmd.shortcut}</div>` : ''}
+    `;
+    item.addEventListener('click', () => {
+      cmd.action();
+      closeCommandPalette();
+    });
+    commandResults.appendChild(item);
+  });
+
+  selectedCommandIndex = 0;
+}
+
+function openCommandPalette() {
+  commandPalette.style.display = 'flex';
+  commandSearch.value = '';
+  commandSearch.focus();
+  renderCommands();
+}
+
+function closeCommandPalette() {
+  commandPalette.style.display = 'none';
+}
+
+commandSearch?.addEventListener('input', (e) => {
+  renderCommands(e.target.value);
+});
+
+commandSearch?.addEventListener('keydown', (e) => {
+  const items = commandResults.querySelectorAll('.command-item');
+  
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    selectedCommandIndex = Math.min(selectedCommandIndex + 1, items.length - 1);
+    items.forEach((item, i) => item.classList.toggle('selected', i === selectedCommandIndex));
+    items[selectedCommandIndex]?.scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    selectedCommandIndex = Math.max(selectedCommandIndex - 1, 0);
+    items.forEach((item, i) => item.classList.toggle('selected', i === selectedCommandIndex));
+    items[selectedCommandIndex]?.scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    items[selectedCommandIndex]?.click();
+  } else if (e.key === 'Escape') {
+    closeCommandPalette();
+  }
+});
+
+commandPalette?.addEventListener('click', (e) => {
+  if (e.target === commandPalette) {
+    closeCommandPalette();
+  }
+});
+
+// ===== EMOJI PICKER =====
+
+const emojiPicker = document.getElementById('emojiPicker');
+const emojiSearch = document.getElementById('emojiSearch');
+const emojiTabs = document.getElementById('emojiTabs');
+const emojiContent = document.getElementById('emojiContent');
+
+const emojiCategories = {
+  'Smileys': ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳'],
+  'Gestures': ['👍', '👎', '👊', '✊', '🤛', '🤜', '🤞', '✌️', '🤟', '🤘', '👌', '🤏', '👈', '👉', '👆', '👇', '☝️', '👋', '🤚', '🖐️', '✋', '🖖', '👏', '🙌', '👐', '🤲', '🤝', '🙏'],
+  'Hearts': ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❤️‍🔥', '❤️‍🩹', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '♥️'],
+  'Animals': ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋'],
+  'Food': ['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🌽', '🥕', '🧄', '🧅', '🥔', '🍠', '🥐', '🍞', '🥖'],
+  'Sports': ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛼', '🛷'],
+  'Objects': ['⌚', '📱', '💻', '⌨️', '🖥️', '🖨️', '🖱️', '💾', '💿', '📀', '🎥', '📷', '📹', '📞', '☎️', '📟', '📠', '📺', '📻', '🎙️', '🎚️', '🎛️', '🧭', '⏱️', '⏲️', '⏰', '🕰️', '⌛', '⏳', '📡'],
+  'Symbols': ['💯', '🔥', '✨', '🌟', '⭐', '💫', '💥', '💢', '💦', '💨', '🕳️', '💬', '👁️‍🗨️', '🗨️', '🗯️', '💭', '💤', '✅', '✔️', '☑️', '❌', '❎', '➕', '➖', '✖️', '➗', '♾️', '‼️', '⁉️', '❓']
+};
+
+let currentEmojiCategory = 'Smileys';
+
+function renderEmojiTabs() {
+  emojiTabs.innerHTML = '';
+  Object.keys(emojiCategories).forEach(category => {
+    const tab = document.createElement('button');
+    tab.className = 'emoji-tab' + (category === currentEmojiCategory ? ' active' : '');
+    tab.textContent = emojiCategories[category][0];
+    tab.title = category;
+    tab.addEventListener('click', () => {
+      currentEmojiCategory = category;
+      renderEmojiTabs();
+      renderEmojis();
+    });
+    emojiTabs.appendChild(tab);
+  });
+}
+
+function renderEmojis(filter = '') {
+  emojiContent.innerHTML = '';
+  
+  let emojis = emojiCategories[currentEmojiCategory] || [];
+  
+  if (filter) {
+    emojis = Object.values(emojiCategories).flat();
+  }
+  
+  emojis.forEach(emoji => {
+    const item = document.createElement('button');
+    item.className = 'emoji-item';
+    item.textContent = emoji;
+    item.addEventListener('click', () => {
+      // Insert emoji into message list at cursor position
+      const textarea = elements.messageList;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+      textarea.value = text.substring(0, start) + emoji + text.substring(end);
+      textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+      textarea.focus();
+      saveSettings();
+      showNotification('Emoji inserted!', true);
+    });
+    emojiContent.appendChild(item);
+  });
+}
+
+function openEmojiPicker() {
+  emojiPicker.style.display = 'block';
+  emojiSearch.value = '';
+  renderEmojiTabs();
+  renderEmojis();
+}
+
+function closeEmojiPicker() {
+  emojiPicker.style.display = 'none';
+}
+
+emojiSearch?.addEventListener('input', (e) => {
+  renderEmojis(e.target.value);
+});
+
+document.getElementById('openEmoji')?.addEventListener('click', openEmojiPicker);
+
+// Close emoji picker when clicking outside
+document.addEventListener('click', (e) => {
+  if (emojiPicker && emojiPicker.style.display === 'block') {
+    if (!emojiPicker.contains(e.target) && e.target.id !== 'openEmoji') {
+      closeEmojiPicker();
+    }
+  }
+});
+
+// ===== MESSAGE PREVIEW =====
+
+const previewModal = document.getElementById('previewModal');
+const previewContent = document.getElementById('previewContent');
+
+function renderPreview() {
+  const messages = elements.messageList.value.split('\n').filter(m => m.trim());
+  previewContent.innerHTML = '';
+  
+  if (messages.length === 0) {
+    previewContent.innerHTML = '<div class="preview-empty">No messages to preview. Add some messages first!</div>';
+    return;
+  }
+  
+  // Show first 10 messages with variables processed
+  messages.slice(0, 10).forEach(message => {
+    const item = document.createElement('div');
+    item.className = 'preview-item';
+    
+    // Process template variables for preview
+    const processed = message
+      .replace(/{time}/g, '<span class="preview-variable">12:34 PM</span>')
+      .replace(/{date}/g, '<span class="preview-variable">Nov 22, 2025</span>')
+      .replace(/{random_emoji}/g, '<span class="preview-variable">😊</span>')
+      .replace(/{random_number}/g, '<span class="preview-variable">42</span>')
+      .replace(/{timestamp}/g, '<span class="preview-variable">1732298400</span>');
+    
+    item.innerHTML = processed;
+    previewContent.appendChild(item);
+  });
+  
+  if (messages.length > 10) {
+    const more = document.createElement('div');
+    more.className = 'help';
+    more.style.textAlign = 'center';
+    more.style.padding = '12px';
+    more.textContent = `+ ${messages.length - 10} more messages...`;
+    previewContent.appendChild(more);
+  }
+}
+
+document.getElementById('previewMessage')?.addEventListener('click', () => {
+  renderPreview();
+  previewModal.classList.add('show');
+});
+
+// ===== CATEGORIES =====
+
+const categoriesModal = document.getElementById('categoriesModal');
+const categoriesContent = document.getElementById('categoriesContent');
+
+const categories = [
+  { name: 'Greetings', icon: '👋', count: 0 },
+  { name: 'Questions', icon: '❓', count: 0 },
+  { name: 'Funny', icon: '😂', count: 0 },
+  { name: 'Friendly', icon: '🤝', count: 0 },
+  { name: 'Professional', icon: '💼', count: 0 },
+  { name: 'Casual', icon: '😎', count: 0 },
+  { name: 'Emojis', icon: '🎨', count: 0 },
+  { name: 'Time', icon: '⏰', count: 0 },
+  { name: 'Random', icon: '🎲', count: 0 },
+  { name: 'Custom', icon: '✨', count: customPhrases.length }
+];
+
+function renderCategories() {
+  categoriesContent.innerHTML = '';
+  
+  categories.forEach(category => {
+    const card = document.createElement('div');
+    card.className = 'category-card';
+    card.innerHTML = `
+      <span class="category-icon">${category.icon}</span>
+      <div class="category-name">${category.name}</div>
+      <div class="category-count">${category.count} phrases</div>
+    `;
+    card.addEventListener('click', () => {
+      showNotification(`Category: ${category.name}`, true);
+      // In future: filter phrases by category
+    });
+    categoriesContent.appendChild(card);
+  });
+}
+
+document.getElementById('openCategories')?.addEventListener('click', () => {
+  categories[categories.length - 1].count = customPhrases.length;
+  renderCategories();
+  categoriesModal.classList.add('show');
+});
+
+// ===== ONBOARDING =====
+
+const onboardingModal = document.getElementById('onboardingModal');
+let currentOnboardingStep = 1;
+const totalOnboardingSteps = 5;
+
+function showOnboardingStep(step) {
+  document.querySelectorAll('.onboarding-step').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.onboarding-step[data-step="${step}"]`)?.classList.add('active');
+  document.getElementById('onboardingStep').textContent = `${step} / ${totalOnboardingSteps}`;
+  
+  const prevBtn = document.getElementById('onboardingPrev');
+  const nextBtn = document.getElementById('onboardingNext');
+  
+  if (prevBtn) prevBtn.disabled = step === 1;
+  if (nextBtn) nextBtn.textContent = step === totalOnboardingSteps ? 'Finish' : 'Next →';
+}
+
+document.getElementById('onboardingPrev')?.addEventListener('click', () => {
+  if (currentOnboardingStep > 1) {
+    currentOnboardingStep--;
+    showOnboardingStep(currentOnboardingStep);
+  }
+});
+
+document.getElementById('onboardingNext')?.addEventListener('click', () => {
+  if (currentOnboardingStep < totalOnboardingSteps) {
+    currentOnboardingStep++;
+    showOnboardingStep(currentOnboardingStep);
+  } else {
+    // Finish onboarding
+    const dontShow = document.getElementById('dontShowAgain')?.checked;
+    if (dontShow) {
+      chrome.storage.local.set({ onboardingCompleted: true });
+    }
+    onboardingModal.classList.remove('show');
+  }
+});
+
+// Show onboarding on first launch
+chrome.storage.local.get(['onboardingCompleted'], (data) => {
+  if (!data.onboardingCompleted) {
+    setTimeout(() => {
+      currentOnboardingStep = 1;
+      showOnboardingStep(1);
+      onboardingModal.classList.add('show');
+    }, 1000);
+  }
+});
+
+// ===== KEYBOARD SHORTCUTS =====
+
+document.addEventListener('keydown', (e) => {
+  // Ctrl+K for command palette
+  if (e.ctrlKey && e.key === 'k') {
+    e.preventDefault();
+    openCommandPalette();
+  }
+  
+  // Escape to close modals/overlays
+  if (e.key === 'Escape') {
+    closeCommandPalette();
+    closeEmojiPicker();
+    document.querySelectorAll('.modal.show').forEach(modal => modal.classList.remove('show'));
+  }
+  
+  // Ctrl+S to start
+  if (e.ctrlKey && e.key === 's') {
+    e.preventDefault();
+    document.getElementById('startAutoSend')?.click();
+  }
+  
+  // Ctrl+X to stop
+  if (e.ctrlKey && e.key === 'x') {
+    e.preventDefault();
+    document.getElementById('stopAutoSend')?.click();
+  }
+  
+  // Ctrl+P to pause
+  if (e.ctrlKey && e.key === 'p') {
+    e.preventDefault();
+    document.getElementById('pauseAutoSend')?.click();
+  }
+});
+
+// ===== THEME PERSISTENCE & ANIMATION =====
+
+const themeToggle = document.getElementById('themeToggle');
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+  chrome.storage.local.set({ theme });
+}
+
+themeToggle?.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  setTheme(newTheme);
+  showNotification(`${newTheme === 'dark' ? 'Dark' : 'Light'} mode enabled`, true);
+});
+
+// Load saved theme
+chrome.storage.local.get(['theme'], (data) => {
+  if (data.theme) {
+    setTheme(data.theme);
+  }
+});
 
 // ===== INITIALIZATION =====
 
