@@ -47,6 +47,11 @@ global.chrome = {
     getURL: jest.fn((path) => `chrome-extension://test/${path}`),
     lastError: null,
     id: 'test-extension-id'
+    ,
+    onMessage: {
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
   },
   tabs: {
     query: jest.fn((queryInfo, callback) => {
