@@ -74,6 +74,11 @@ const elements = {
   activeHoursEnd: document.getElementById('activeHoursEnd'),
   sendConfirmTimeout: document.getElementById('sendConfirmTimeout'),
 
+  // Mention Detection
+  mentionDetectionEnabled: document.getElementById('mentionDetectionEnabled'),
+  mentionKeywords: document.getElementById('mentionKeywords'),
+  mentionReplyMessages: document.getElementById('mentionReplyMessages'),
+
   // Analytics
   messagesSentToday: document.getElementById('messagesSentToday'),
   totalMessages: document.getElementById('totalMessages'),
@@ -619,8 +624,11 @@ function loadSettings() {
     'templateVariables',
     'activeHours',
     'activeHoursStart',
-    'activeHoursEnd'
-    ,'sendConfirmTimeout'
+    'activeHoursEnd',
+    'sendConfirmTimeout',
+    'mentionDetectionEnabled',
+    'mentionKeywords',
+    'mentionReplyMessages'
   ], (data) => {
     if (data.messageList) elements.messageList.value = data.messageList;
     if (data.sendMode) elements.sendMode.value = data.sendMode;
@@ -638,6 +646,15 @@ function loadSettings() {
     if (data.activeHoursEnd) elements.activeHoursEnd.value = data.activeHoursEnd;
     if (data.sendConfirmTimeout) elements.sendConfirmTimeout.value = data.sendConfirmTimeout;
 
+    // Mention detection settings
+    elements.mentionDetectionEnabled.checked = data.mentionDetectionEnabled || false;
+    if (data.mentionKeywords && Array.isArray(data.mentionKeywords)) {
+      elements.mentionKeywords.value = data.mentionKeywords.join('\n');
+    }
+    if (data.mentionReplyMessages && Array.isArray(data.mentionReplyMessages)) {
+      elements.mentionReplyMessages.value = data.mentionReplyMessages.join('\n');
+    }
+
     // Show/hide active hours inputs
     const hoursInputs = document.getElementById('activeHoursInputs');
     if (hoursInputs) {
@@ -647,6 +664,17 @@ function loadSettings() {
 }
 
 function saveSettings() {
+  // Parse mention keywords and reply messages
+  const mentionKeywords = elements.mentionKeywords.value
+    .split('\n')
+    .map(k => k.trim())
+    .filter(k => k.length > 0);
+  
+  const mentionReplyMessages = elements.mentionReplyMessages.value
+    .split('\n')
+    .map(m => m.trim())
+    .filter(m => m.length > 0);
+
   const settings = {
     messageList: elements.messageList.value,
     sendMode: elements.sendMode.value,
@@ -659,8 +687,11 @@ function saveSettings() {
     templateVariables: elements.templateVariables.checked,
     activeHours: elements.activeHours.checked,
     activeHoursStart: elements.activeHoursStart.value,
-    activeHoursEnd: elements.activeHoursEnd.value
-    ,sendConfirmTimeout: elements.sendConfirmTimeout ? elements.sendConfirmTimeout.value : 3
+    activeHoursEnd: elements.activeHoursEnd.value,
+    sendConfirmTimeout: elements.sendConfirmTimeout ? elements.sendConfirmTimeout.value : 3,
+    mentionDetectionEnabled: elements.mentionDetectionEnabled.checked,
+    mentionKeywords: mentionKeywords,
+    mentionReplyMessages: mentionReplyMessages
   };
 
   chrome.storage.local.set(settings);
@@ -680,6 +711,57 @@ elements.activeHours?.addEventListener('change', saveSettings);
 elements.activeHoursStart?.addEventListener('change', saveSettings);
 elements.activeHoursEnd?.addEventListener('change', saveSettings);
 elements.sendConfirmTimeout?.addEventListener('change', saveSettings);
+
+// Mention detection settings
+elements.mentionDetectionEnabled?.addEventListener('change', async () => {
+  saveSettings();
+  
+  // Notify content script to start/stop mention detection
+  const keywords = elements.mentionKeywords.value
+    .split('\n')
+    .map(k => k.trim())
+    .filter(k => k.length > 0);
+  
+  const replyMessages = elements.mentionReplyMessages.value
+    .split('\n')
+    .map(m => m.trim())
+    .filter(m => m.length > 0);
+
+  if (elements.mentionDetectionEnabled.checked) {
+    if (keywords.length === 0) {
+      showNotification('⚠️ Please add at least one keyword to watch for mentions', false);
+      elements.mentionDetectionEnabled.checked = false;
+      saveSettings();
+      return;
+    }
+    if (replyMessages.length === 0) {
+      showNotification('⚠️ Please add at least one reply message', false);
+      elements.mentionDetectionEnabled.checked = false;
+      saveSettings();
+      return;
+    }
+
+    const response = await sendMessageToContent({
+      action: 'startMentionDetection',
+      keywords: keywords,
+      replyMessages: replyMessages
+    });
+    
+    if (response && response.ok) {
+      showNotification('✅ Mention detection enabled', true);
+    } else {
+      showNotification('⚠️ Please mark a message container first', false);
+      elements.mentionDetectionEnabled.checked = false;
+      saveSettings();
+    }
+  } else {
+    await sendMessageToContent({ action: 'stopMentionDetection' });
+    showNotification('🛑 Mention detection disabled', true);
+  }
+});
+
+elements.mentionKeywords?.addEventListener('input', saveSettings);
+elements.mentionReplyMessages?.addEventListener('input', saveSettings);
 
 // ===== LOCALIZATION =====
 
