@@ -31,6 +31,7 @@ A powerful Chrome extension that automatically sends messages to chat applicatio
 - 📛 **Status Badge**: Visual indicator when auto-send is active
 - 🌍 **i18n Support**: Full localization with RTL support for Urdu and other languages
 - 🗣️ **Smart Phrase Loading**: Automatically loads phrases in your preferred language with English fallback
+- 🎯 **Mention Detection**: Auto-reply when someone mentions you in chat (NEW!)
 
 ## Installation
 
@@ -80,6 +81,17 @@ A powerful Chrome extension that automatically sends messages to chat applicatio
 - Regular reminders or notifications
 - Testing chat applications
 - Automated responses in controlled environments
+- **Auto-reply when mentioned**: Respond automatically when someone tags you with @mention
+
+### Using Mention Detection (NEW!)
+
+1. **Mark the message container** (📌 Mark Message Container button)
+2. **Open Settings** (⚙️ Settings button)
+3. **Enable "Auto-Reply to Mentions"**
+4. **Add keywords to watch** (e.g., @username, your name)
+5. **Add reply messages** (e.g., "Thanks!", "I'm here!")
+
+The extension will now automatically reply when someone mentions you. See [MENTION_DETECTION_FEATURE.md](MENTION_DETECTION_FEATURE.md) for detailed documentation.
 
 ## Settings Persistence
 

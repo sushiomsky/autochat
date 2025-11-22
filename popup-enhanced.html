@@ -212,6 +212,28 @@
 
       <hr>
 
+      <h4>🎯 Mention Detection</h4>
+
+      <label>
+        <input type="checkbox" id="mentionDetectionEnabled">
+        👤 Auto-Reply to Mentions
+      </label>
+      <div class="help">Automatically reply when someone mentions you in chat</div>
+
+      <label>
+        Keywords to Watch (one per line):
+        <textarea id="mentionKeywords" rows="3" placeholder="@username&#10;your name&#10;hey you"></textarea>
+      </label>
+      <div class="help">Messages containing these keywords will trigger auto-reply</div>
+
+      <label>
+        Reply Messages (one per line):
+        <textarea id="mentionReplyMessages" rows="3" placeholder="Thanks for mentioning me!&#10;Hello! I'm here.&#10;Hi! What's up?"></textarea>
+      </label>
+      <div class="help">Random reply will be selected from this list</div>
+
+      <hr>
+
       <div class="btn-row">
         <button id="exportSettings" class="btn-secondary">📥 Export</button>
         <button id="importSettings" class="btn-secondary">📤 Import</button>
