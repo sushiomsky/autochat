@@ -1579,3 +1579,163 @@ button[data-ripple]:active::after {
 .loading-state {
   animation: breathe 1.5s ease-in-out infinite;
 }
+
+/* Account Profile Selector */
+
+.account-selector {
+  margin: 10px 0;
+  padding: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  color: white;
+}
+
+.account-selector label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.account-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.account-controls select {
+  flex: 1;
+  padding: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.account-controls .btn-icon {
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 5px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.account-controls .btn-icon:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* Account List */
+
+.account-list {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.account-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+  transition: all 0.3s ease;
+}
+
+.account-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.account-item.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-left-color: #38ef7d;
+}
+
+.account-item-name {
+  flex: 1;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.account-item-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  margin-left: 8px;
+  background: rgba(56, 239, 125, 0.2);
+  border: 1px solid rgba(56, 239, 125, 0.5);
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #38ef7d;
+}
+
+.account-item.active .account-item-badge {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
+}
+
+.account-item-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.account-item-actions button {
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.account-item-actions button:hover {
+  background: white;
+  transform: scale(1.05);
+}
+
+.account-item-actions .btn-danger-small {
+  color: #ee0979;
+}
+
+.account-item-actions .btn-danger-small:hover {
+  background: #ffebf0;
+}
+
+/* Dark mode adjustments */
+
+body.dark-mode .account-selector {
+  background: linear-gradient(135deg, #434343 0%, #000000 100%);
+}
+
+body.dark-mode .account-controls select {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .account-item {
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+  color: white;
+}
+
+body.dark-mode .account-item-actions button {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .account-item-actions button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

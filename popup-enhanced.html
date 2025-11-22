@@ -21,6 +21,17 @@
       </select>
     </div>
 
+    <!-- Account Profile Selector -->
+    <div class="account-selector">
+      <label>👤 Account Profile:</label>
+      <div class="account-controls">
+        <select id="accountSelect">
+          <option value="default">Default Account</option>
+        </select>
+        <button id="manageAccounts" class="btn-icon" title="Manage Accounts">⚙️</button>
+      </div>
+    </div>
+
     <!-- Notification -->
     <div id="notification" class="notification"></div>
 
@@ -305,6 +316,36 @@
       <div class="help">Recent activity and errors will be logged here in future updates</div>
 
       <button id="resetStats" class="btn-danger">🗑️ Reset Statistics</button>
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Account Management Modal -->
+  <div id="accountModal" class="modal">
+    <div class="modal-content">
+      <h3>👥 Manage Account Profiles</h3>
+
+      <div class="section">
+        <label>Create New Profile:
+          <input type="text" id="newAccountName" placeholder="e.g., Casino Account 1" maxlength="50">
+        </label>
+        <button id="createAccount" class="btn-success">➕ Create Profile</button>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <strong>Saved Profiles:</strong>
+        <div id="accountList" class="account-list"></div>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <p class="help">Each profile stores separate settings: messages, keywords, intervals, and preferences.</p>
+        <p class="help">Use profiles to manage multiple casino accounts or different automation scenarios.</p>
+      </div>
+
       <button class="close-modal btn-primary">Close</button>
     </div>
   </div>

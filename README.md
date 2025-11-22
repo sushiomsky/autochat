@@ -31,7 +31,8 @@ A powerful Chrome extension that automatically sends messages to chat applicatio
 - 📛 **Status Badge**: Visual indicator when auto-send is active
 - 🌍 **i18n Support**: Full localization with RTL support for Urdu and other languages
 - 🗣️ **Smart Phrase Loading**: Automatically loads phrases in your preferred language with English fallback
-- 🎯 **Mention Detection**: Auto-reply when someone mentions you in chat (NEW!)
+- 🎯 **Mention Detection**: Auto-reply when someone mentions you in chat
+- 👥 **Multi-Account Support**: Manage multiple profiles with separate settings (NEW!)
 
 ## Installation
 
@@ -83,7 +84,7 @@ A powerful Chrome extension that automatically sends messages to chat applicatio
 - Automated responses in controlled environments
 - **Auto-reply when mentioned**: Respond automatically when someone tags you with @mention
 
-### Using Mention Detection (NEW!)
+### Using Mention Detection
 
 1. **Mark the message container** (📌 Mark Message Container button)
 2. **Open Settings** (⚙️ Settings button)
@@ -92,6 +93,17 @@ A powerful Chrome extension that automatically sends messages to chat applicatio
 5. **Add reply messages** (e.g., "Thanks!", "I'm here!")
 
 The extension will now automatically reply when someone mentions you. See [MENTION_DETECTION_FEATURE.md](MENTION_DETECTION_FEATURE.md) for detailed documentation.
+
+### Using Multi-Account Support (NEW!)
+
+Perfect for managing multiple casino accounts or different automation scenarios!
+
+1. **Click the ⚙️ button** next to "Account Profile" dropdown
+2. **Create new profile** with a descriptive name (e.g., "Casino Account 1")
+3. **Configure settings** for this profile (messages, keywords, intervals)
+4. **Switch between profiles** using the dropdown
+
+Each profile stores completely separate settings. See [MULTI_ACCOUNT_FEATURE.md](MULTI_ACCOUNT_FEATURE.md) for detailed documentation.
 
 ## Settings Persistence
 

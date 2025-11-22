@@ -79,6 +79,13 @@ const elements = {
   mentionKeywords: document.getElementById('mentionKeywords'),
   mentionReplyMessages: document.getElementById('mentionReplyMessages'),
 
+  // Account Management
+  accountSelect: document.getElementById('accountSelect'),
+  manageAccounts: document.getElementById('manageAccounts'),
+  newAccountName: document.getElementById('newAccountName'),
+  createAccount: document.getElementById('createAccount'),
+  accountList: document.getElementById('accountList'),
+
   // Analytics
   messagesSentToday: document.getElementById('messagesSentToday'),
   totalMessages: document.getElementById('totalMessages'),
@@ -88,6 +95,7 @@ const elements = {
   settingsModal: document.getElementById('settingsModal'),
   phraseModal: document.getElementById('phraseModal'),
   analyticsModal: document.getElementById('analyticsModal'),
+  accountModal: document.getElementById('accountModal'),
 
   // Phrase management
   customPhrasesList: document.getElementById('customPhrasesList'),
@@ -104,6 +112,13 @@ const elements = {
 
 let defaultPhrases = [];
 let customPhrases = [];
+let currentAccount = 'default';
+let accounts = {
+  default: {
+    name: 'Default Account',
+    settings: {}
+  }
+};
 
 // ===== NOTIFICATIONS =====
 
@@ -609,6 +624,240 @@ document.getElementById('resetStats')?.addEventListener('click', () => {
   }
 });
 
+// ===== ACCOUNT MANAGEMENT =====
+
+async function loadAccounts() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['accounts', 'currentAccount'], (data) => {
+      if (data.accounts) {
+        accounts = data.accounts;
+      }
+      if (data.currentAccount) {
+        currentAccount = data.currentAccount;
+      }
+      resolve();
+    });
+  });
+}
+
+function saveAccounts() {
+  chrome.storage.local.set({ accounts, currentAccount });
+}
+
+function updateAccountSelect() {
+  elements.accountSelect.innerHTML = '';
+  
+  Object.keys(accounts).forEach(accountId => {
+    const account = accounts[accountId];
+    const option = document.createElement('option');
+    option.value = accountId;
+    option.textContent = account.name;
+    if (accountId === currentAccount) {
+      option.selected = true;
+    }
+    elements.accountSelect.appendChild(option);
+  });
+}
+
+function updateAccountList() {
+  elements.accountList.innerHTML = '';
+  
+  Object.keys(accounts).forEach(accountId => {
+    const account = accounts[accountId];
+    const isActive = accountId === currentAccount;
+    
+    const item = document.createElement('div');
+    item.className = 'account-item' + (isActive ? ' active' : '');
+    
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'account-item-name';
+    nameSpan.textContent = account.name;
+    
+    if (isActive) {
+      const badge = document.createElement('span');
+      badge.className = 'account-item-badge';
+      badge.textContent = 'ACTIVE';
+      nameSpan.appendChild(badge);
+    }
+    
+    const actions = document.createElement('div');
+    actions.className = 'account-item-actions';
+    
+    if (!isActive) {
+      const switchBtn = document.createElement('button');
+      switchBtn.textContent = '🔄 Switch';
+      switchBtn.onclick = () => switchAccount(accountId);
+      actions.appendChild(switchBtn);
+    }
+    
+    const exportBtn = document.createElement('button');
+    exportBtn.textContent = '📥 Export';
+    exportBtn.onclick = () => exportAccount(accountId);
+    actions.appendChild(exportBtn);
+    
+    if (accountId !== 'default') {
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'btn-danger-small';
+      deleteBtn.textContent = '🗑️';
+      deleteBtn.onclick = () => deleteAccount(accountId);
+      actions.appendChild(deleteBtn);
+    }
+    
+    item.appendChild(nameSpan);
+    item.appendChild(actions);
+    elements.accountList.appendChild(item);
+  });
+}
+
+function switchAccount(accountId) {
+  if (!accounts[accountId]) {
+    showNotification('❌ Account not found', false);
+    return;
+  }
+  
+  // Save current account settings before switching
+  const currentSettings = getCurrentSettings();
+  accounts[currentAccount].settings = currentSettings;
+  
+  // Switch to new account
+  currentAccount = accountId;
+  saveAccounts();
+  
+  // Load new account settings
+  if (accounts[accountId].settings && Object.keys(accounts[accountId].settings).length > 0) {
+    chrome.storage.local.set(accounts[accountId].settings, () => {
+      loadSettings();
+      updateAccountSelect();
+      updateAccountList();
+      showNotification(`✅ Switched to: ${accounts[accountId].name}`, true);
+    });
+  } else {
+    loadSettings();
+    updateAccountSelect();
+    updateAccountList();
+    showNotification(`✅ Switched to: ${accounts[accountId].name}`, true);
+  }
+}
+
+function getCurrentSettings() {
+  const mentionKeywords = elements.mentionKeywords.value
+    .split('\n')
+    .map(k => k.trim())
+    .filter(k => k.length > 0);
+  
+  const mentionReplyMessages = elements.mentionReplyMessages.value
+    .split('\n')
+    .map(m => m.trim())
+    .filter(m => m.length > 0);
+  
+  return {
+    messageList: elements.messageList.value,
+    sendMode: elements.sendMode.value,
+    minInterval: elements.minInterval.value,
+    maxInterval: elements.maxInterval.value,
+    dailyLimit: elements.dailyLimit.value,
+    typingSimulation: elements.typingSimulation.checked,
+    variableDelays: elements.variableDelays.checked,
+    antiRepetition: elements.antiRepetition.checked,
+    templateVariables: elements.templateVariables.checked,
+    activeHours: elements.activeHours.checked,
+    activeHoursStart: elements.activeHoursStart.value,
+    activeHoursEnd: elements.activeHoursEnd.value,
+    sendConfirmTimeout: elements.sendConfirmTimeout ? elements.sendConfirmTimeout.value : 3,
+    mentionDetectionEnabled: elements.mentionDetectionEnabled.checked,
+    mentionKeywords: mentionKeywords,
+    mentionReplyMessages: mentionReplyMessages
+  };
+}
+
+function exportAccount(accountId) {
+  const account = accounts[accountId];
+  if (!account) return;
+  
+  // Get current settings if this is the active account
+  if (accountId === currentAccount) {
+    account.settings = getCurrentSettings();
+  }
+  
+  const dataStr = JSON.stringify({
+    name: account.name,
+    settings: account.settings,
+    exportDate: new Date().toISOString()
+  }, null, 2);
+  
+  const dataBlob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `autochat-${account.name.toLowerCase().replace(/\s+/g, '-')}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+  
+  showNotification(`📥 Exported: ${account.name}`, true);
+}
+
+function deleteAccount(accountId) {
+  if (accountId === 'default') {
+    showNotification('❌ Cannot delete default account', false);
+    return;
+  }
+  
+  if (accountId === currentAccount) {
+    showNotification('❌ Cannot delete active account', false);
+    return;
+  }
+  
+  const account = accounts[accountId];
+  if (confirm(`Delete account "${account.name}"? This cannot be undone.`)) {
+    delete accounts[accountId];
+    saveAccounts();
+    updateAccountSelect();
+    updateAccountList();
+    showNotification(`🗑️ Deleted: ${account.name}`, true);
+  }
+}
+
+// Account modal and UI handlers
+elements.manageAccounts?.addEventListener('click', () => {
+  updateAccountList();
+  elements.accountModal.style.display = 'flex';
+});
+
+elements.createAccount?.addEventListener('click', () => {
+  const name = elements.newAccountName.value.trim();
+  if (!name) {
+    showNotification('❌ Please enter an account name', false);
+    return;
+  }
+  
+  if (name.length > 50) {
+    showNotification('❌ Name too long (max 50 characters)', false);
+    return;
+  }
+  
+  // Generate unique ID
+  const accountId = 'account_' + Date.now();
+  
+  accounts[accountId] = {
+    name: name,
+    settings: {}
+  };
+  
+  saveAccounts();
+  updateAccountSelect();
+  updateAccountList();
+  elements.newAccountName.value = '';
+  
+  showNotification(`✅ Created: ${name}`, true);
+});
+
+elements.accountSelect?.addEventListener('change', (e) => {
+  const selectedAccount = e.target.value;
+  if (selectedAccount !== currentAccount) {
+    switchAccount(selectedAccount);
+  }
+});
+
 // ===== LOAD/SAVE SETTINGS =====
 
 function loadSettings() {
@@ -664,36 +913,13 @@ function loadSettings() {
 }
 
 function saveSettings() {
-  // Parse mention keywords and reply messages
-  const mentionKeywords = elements.mentionKeywords.value
-    .split('\n')
-    .map(k => k.trim())
-    .filter(k => k.length > 0);
+  const settings = getCurrentSettings();
   
-  const mentionReplyMessages = elements.mentionReplyMessages.value
-    .split('\n')
-    .map(m => m.trim())
-    .filter(m => m.length > 0);
-
-  const settings = {
-    messageList: elements.messageList.value,
-    sendMode: elements.sendMode.value,
-    minInterval: elements.minInterval.value,
-    maxInterval: elements.maxInterval.value,
-    dailyLimit: elements.dailyLimit.value,
-    typingSimulation: elements.typingSimulation.checked,
-    variableDelays: elements.variableDelays.checked,
-    antiRepetition: elements.antiRepetition.checked,
-    templateVariables: elements.templateVariables.checked,
-    activeHours: elements.activeHours.checked,
-    activeHoursStart: elements.activeHoursStart.value,
-    activeHoursEnd: elements.activeHoursEnd.value,
-    sendConfirmTimeout: elements.sendConfirmTimeout ? elements.sendConfirmTimeout.value : 3,
-    mentionDetectionEnabled: elements.mentionDetectionEnabled.checked,
-    mentionKeywords: mentionKeywords,
-    mentionReplyMessages: mentionReplyMessages
-  };
-
+  // Save to current account
+  accounts[currentAccount].settings = settings;
+  saveAccounts();
+  
+  // Also save to storage for immediate use
   chrome.storage.local.set(settings);
 }
 
@@ -1187,6 +1413,8 @@ chrome.storage.local.get(['theme'], (data) => {
 // ===== INITIALIZATION =====
 
 (async function init() {
+  await loadAccounts();
+  updateAccountSelect();
   await updateInputStatus();
   await updateStats();
   loadSettings();
