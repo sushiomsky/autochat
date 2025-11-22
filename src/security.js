@@ -8,7 +8,6 @@
  * @returns {string} - Sanitized HTML
  */
 export function sanitizeHTML(html) {
-  const allowedTags = ['b', 'i', 'em', 'strong', 'span'];
   const div = document.createElement('div');
   div.textContent = html;
   

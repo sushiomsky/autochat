@@ -115,7 +115,7 @@ async function confirmMessageSent(inputEl, expectedText, timeoutMs = 3000) {
         resolve(check() || findMessageInDOM(expectedText));
       }, 1000);
 
-      let observer = new MutationObserver((mutations) => {
+      const observer = new MutationObserver((mutations) => {
         if (check()) {
           clearTimeout(obsTimeout);
           observer.disconnect();
@@ -123,8 +123,7 @@ async function confirmMessageSent(inputEl, expectedText, timeoutMs = 3000) {
           return;
         }
 
-        // If a message container is marked, observe it more specifically
-        const scope = messageContainerSelector ? document.querySelector(messageContainerSelector) : document.body;
+        // If a message container is marked, we will observe mutations on it (see observeTarget below)
         for (const m of mutations) {
           for (const node of Array.from(m.addedNodes || [])) {
             if (node.nodeType !== 1) continue;
@@ -193,25 +192,7 @@ function findMessageInDOMWithin(container, expectedText) {
   return false;
 }
 
-// Add realistic typos occasionally (5% chance)
-function addTypo(text) {
-  if (Math.random() > 0.05) return text; // 95% no typo
-
-  const words = text.split(' ');
-  if (words.length < 2) return text;
-
-  const wordIndex = Math.floor(Math.random() * words.length);
-  const word = words[wordIndex];
-  if (word.length < 3) return text;
-
-  // Simple typo: swap two adjacent characters
-  const charIndex = Math.floor(Math.random() * (word.length - 1));
-  const chars = word.split('');
-  [chars[charIndex], chars[charIndex + 1]] = [chars[charIndex + 1], chars[charIndex]];
-  words[wordIndex] = chars.join('');
-
-  return words.join(' ');
-}
+// Note: typo-insertion feature removed to reduce unused helper warnings.
 
 // Check if within active hours
 function isWithinActiveHours() {

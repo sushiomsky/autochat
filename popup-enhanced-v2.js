@@ -1,6 +1,7 @@
 /* popup-enhanced-v2.js — Enhanced AutoChat UI with all improvements
-   Includes: dark mode, keyboard shortcuts, pause/resume, debouncing, security
+  Includes: dark mode, keyboard shortcuts, pause/resume, debouncing, security
 */
+/* eslint-disable no-unused-vars */
 
 // ===== IMPORTS & CONSTANTS =====
 

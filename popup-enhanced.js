@@ -1,6 +1,7 @@
 /* popup-enhanced.js — Enhanced AutoChat UI
-   Advanced controls with analytics, settings, and smart features
+  Advanced controls with analytics, settings, and smart features
 */
+/* global t, localizePopup */
 
 // ===== UTILITY FUNCTIONS =====
 
@@ -97,7 +98,6 @@ const elements = {
 
 let defaultPhrases = [];
 let customPhrases = [];
-let currentTab = 'basic'; // basic, advanced, analytics
 
 // ===== NOTIFICATIONS =====
 
