@@ -50,6 +50,8 @@ async function sendMessageToContent(msg) {
 const elements = {
   // Basic
   inputStatus: document.getElementById('inputStatus'),
+  markMessageContainer: document.getElementById('markMessageContainer'),
+  messageContainerStatus: document.getElementById('messageContainerStatus'),
   messageList: document.getElementById('messageList'),
   sendMode: document.getElementById('sendMode'),
   minInterval: document.getElementById('minInterval'),
@@ -128,6 +130,19 @@ async function updateInputStatus() {
     elements.inputStatus.textContent = 'No input field marked';
     elements.inputStatus.className = 'status';
   }
+
+  // Update message container status
+  chrome.storage.local.get(['messageContainerSelector'], (data) => {
+    if (elements.messageContainerStatus) {
+      if (data && data.messageContainerSelector) {
+        elements.messageContainerStatus.textContent = '✅ Message container marked';
+        elements.messageContainerStatus.className = 'status success';
+      } else {
+        elements.messageContainerStatus.textContent = 'No message container marked';
+        elements.messageContainerStatus.className = 'status';
+      }
+    }
+  });
 
   // Update send method UI
   chrome.storage.local.get(['sendMethod', 'sendButtonSelector'], (data) => {
@@ -295,6 +310,12 @@ document.getElementById('markInput')?.addEventListener('click', async () => {
   window.close();
 });
 
+// Mark message container
+elements.markMessageContainer?.addEventListener('click', async () => {
+  await sendMessageToContent({ action: 'startMarkingMessageContainerMode' });
+  window.close();
+});
+
 // Send method change
 elements.sendMethod?.addEventListener('change', (e) => {
   const method = e.target.value;
@@ -353,8 +374,8 @@ document.getElementById('startAutoSend')?.addEventListener('click', async () => 
   }
 
   const mode = elements.sendMode.value;
-  const minInterval = parseInt(elements.minInterval.value) || 60;
-  const maxInterval = parseInt(elements.maxInterval.value) || 120;
+  const minInterval = parseInt(elements.minInterval.value) || 1;
+  const maxInterval = parseInt(elements.maxInterval.value) || 2;
 
   if (minInterval > maxInterval) {
     showNotification('Min interval must be ≤ max interval', false);
@@ -393,7 +414,7 @@ document.getElementById('startAutoSend')?.addEventListener('click', async () => 
   });
 
   if (response && response.ok) {
-    showNotification(`Auto-send started! Mode: ${mode}, ${minInterval}-${maxInterval}s`, true);
+    showNotification(`Auto-send started! Mode: ${mode}, ${minInterval}-${maxInterval}m`, true);
     updateStats();
   } else {
     showNotification('Failed to start. Mark an input field first.', false);
@@ -564,6 +585,7 @@ function loadSettings() {
     'activeHours',
     'activeHoursStart',
     'activeHoursEnd'
+    ,'sendConfirmTimeout'
   ], (data) => {
     if (data.messageList) elements.messageList.value = data.messageList;
     if (data.sendMode) elements.sendMode.value = data.sendMode;
@@ -579,6 +601,7 @@ function loadSettings() {
 
     if (data.activeHoursStart) elements.activeHoursStart.value = data.activeHoursStart;
     if (data.activeHoursEnd) elements.activeHoursEnd.value = data.activeHoursEnd;
+    if (data.sendConfirmTimeout) elements.sendConfirmTimeout.value = data.sendConfirmTimeout;
 
     // Show/hide active hours inputs
     const hoursInputs = document.getElementById('activeHoursInputs');
@@ -602,6 +625,7 @@ function saveSettings() {
     activeHours: elements.activeHours.checked,
     activeHoursStart: elements.activeHoursStart.value,
     activeHoursEnd: elements.activeHoursEnd.value
+    ,sendConfirmTimeout: elements.sendConfirmTimeout ? elements.sendConfirmTimeout.value : 3
   };
 
   chrome.storage.local.set(settings);
