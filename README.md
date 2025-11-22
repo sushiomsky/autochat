@@ -185,25 +185,41 @@ See [RELEASE_NOTES_v4.1.md](RELEASE_NOTES_v4.1.md) for v4.1 changelog.
 
 ## Roadmap
 
-### v4.4 (Next)
-- [ ] More languages (Arabic, Spanish, French, Hindi)
+### v4.4 (Next - Q1 2026)
+- [ ] More languages (Arabic, French, Hindi)
 - [ ] Visual improvements and animations
 - [ ] User onboarding tutorial
 - [ ] More keyboard shortcuts
-- [ ] Analytics dashboard with charts
+- [ ] Complete UI integration for v4.2 backend features
 
-### v4.5 (Planned)
+### v4.5 (Planned - Q2 2026)
 - [ ] Firefox port (WebExtensions)
 - [ ] Advanced scheduling calendar
 - [ ] Webhook integration
 - [ ] Performance monitoring dashboard
-- [ ] Cloud sync (optional)
+- [ ] Basic API for integrations
 
-### v5.0 (Future)
-- [ ] Cloud sync (optional)
-- [ ] Message templates library
-- [ ] AI-powered message generation
-- [ ] Team collaboration features
+### v5.0 (Major Release - Q3 2026)
+
+**🚀 Next major release with comprehensive feature proposals!**
+
+See detailed planning documents:
+- **[Quick Start Guide](QUICK_START_v5.0_PLANNING.md)** - Start here! 5-minute overview
+- **[Feature Suggestions](FEATURE_SUGGESTIONS_v5.0.md)** - 15 detailed feature proposals
+- **[Priority Matrix](FEATURE_PRIORITY_MATRIX.md)** - Prioritization analysis
+- **[Roadmap](ROADMAP_v5.0.md)** - Timeline and milestones
+
+**Top 5 Features Planned**:
+1. 🤖 **AI-Powered Message Generation** - Smart compose with local models
+2. 📊 **Advanced Analytics Dashboard** - Visual insights & predictive analytics
+3. 📅 **Smart Scheduling & Campaigns** - Drip sequences with AI optimization
+4. 👥 **Team Collaboration** - Shared workspaces & approval workflows
+5. ☁️ **Cloud Sync & Backup** - Encrypted multi-device sync
+
+**Timeline**: 13 months (4 development waves)  
+**Goal**: Transform AutoChat into an intelligent communication platform
+
+[**💬 Provide Feedback on v5.0 Plans**](https://github.com/sushiomsky/autochat/discussions)
 
 ## License
 
