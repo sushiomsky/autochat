@@ -1,5 +1,12 @@
 // Jest setup file for Chrome extension testing
 
+// polyfill TextEncoder/TextDecoder for environments where they're not present (CI/jsdom)
+if (typeof global.TextEncoder === 'undefined' || typeof global.TextDecoder === 'undefined') {
+  const { TextEncoder, TextDecoder } = require('util');
+  global.TextEncoder = TextEncoder;
+  global.TextDecoder = TextDecoder;
+}
+
 // Create comprehensive chrome mock
 global.chrome = {
   storage: {
