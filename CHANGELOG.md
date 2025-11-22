@@ -2,6 +2,41 @@
 
 All notable changes to AutoChat will be documented in this file.
 
+## [4.3.0] - 2025-11-22 - Multi-Language Phrases Edition
+
+### Added
+- **Multi-Language Farming Phrases**: Language-specific phrase libraries for enhanced user experience
+  - English (en): 671+ original phrases
+  - Urdu (ur): 300+ culturally adapted phrases
+  - Spanish (es): 300+ Spanish translations
+- **Smart Phrase Loading**: Automatically loads phrases based on user's selected language
+- **Language Fallback**: Falls back to English if language-specific file not found
+- **Language Detection**: Detects browser locale and region codes (e.g., en-US -> en)
+- **Comprehensive Tests**: 5 new test cases for language-specific phrase loading
+- **Documentation**: New MULTI_LANGUAGE_PHRASES.md guide for adding languages
+
+### Changed
+- Updated `loadDefaultPhrasesFromFile()` to support dynamic language loading
+- Enhanced build script to copy language-specific phrase files and locales directory
+- Updated manifest.json to include all phrase files as web_accessible_resources
+- Added Spanish option to language selector in popup UI
+- Improved i18n.js to support Spanish language
+
+### Technical
+- Created `farming_phrases_en.txt`, `farming_phrases_ur.txt`, `farming_phrases_es.txt`
+- Added `_locales/es/messages.json` with full Spanish translations
+- Updated test setup to mock chrome.i18n API
+- Enhanced build script with recursive directory copying for _locales and src
+- All 82 tests passing with new language-specific tests
+
+### Files Added
+- `farming_phrases_en.txt` - English phrases (671 lines)
+- `farming_phrases_ur.txt` - Urdu phrases (300 lines)
+- `farming_phrases_es.txt` - Spanish phrases (300 lines)
+- `_locales/es/messages.json` - Spanish UI translations
+- `tests/unit/language-phrases.test.js` - Language loading tests
+- `MULTI_LANGUAGE_PHRASES.md` - Multi-language documentation
+
 ## [4.1.0] - 2025-10-19 - Professional Edition
 
 ### Added
