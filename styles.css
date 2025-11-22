@@ -1157,10 +1157,13 @@ select:focus-visible {
   }
 }
 
-/* Improved transitions */
+/* Improved transitions - targeted for performance */
 
-* {
-  transition-property: background-color, color, border-color, transform, box-shadow;
+button, input, textarea, select, 
+.modal, .notification, .command-item, 
+.emoji-item, .category-card, .phrase-item,
+.stat-value, .analytics-card {
+  transition-property: background-color, color, border-color, transform, box-shadow, opacity;
   transition-duration: 0.2s;
   transition-timing-function: ease;
 }
@@ -1281,12 +1284,13 @@ button:disabled:hover {
   }
 }
 
-button {
+/* Ripple effect - only for buttons with data-ripple attribute */
+button[data-ripple] {
   position: relative;
   overflow: hidden;
 }
 
-button::after {
+button[data-ripple]::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -1299,7 +1303,7 @@ button::after {
   transition: width 0.6s, height 0.6s;
 }
 
-button:active::after {
+button[data-ripple]:active::after {
   width: 300px;
   height: 300px;
   opacity: 0;
@@ -1316,7 +1320,7 @@ button:active::after {
   }
 }
 
-.stat-value {
+.stat-value.shimmer-effect {
   background: linear-gradient(
     90deg,
     var(--text-primary) 0%,
@@ -1330,6 +1334,18 @@ button:active::after {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: shimmer 3s linear infinite;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .stat-value.shimmer-effect,
+  .status.success,
+  .theme-toggle:hover,
+  .command-icon:hover,
+  .badge,
+  .loading-state {
+    animation: none;
+  }
 }
 
 /* Glow effect for active status */
@@ -1494,12 +1510,6 @@ button:active::after {
 
 .attention {
   animation: attention 1s ease-in-out;
-}
-
-/* Smooth color transitions for all elements */
-
-* {
-  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 
 /* Improved dark mode transitions */
