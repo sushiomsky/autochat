@@ -2,6 +2,30 @@
  * Language-specific Phrase Loading Tests
  */
 
+// Helper function to simulate phrase loading
+const createLoadPhrasesFunction = () => {
+  return async () => {
+    const storageData = await new Promise(resolve => {
+      chrome.storage.local.get(['locale'], resolve);
+    });
+    const locale = storageData.locale || chrome.i18n.getUILanguage().split('-')[0] || 'en';
+    
+    let phraseFile = `farming_phrases_${locale}.txt`;
+    let response;
+    
+    try {
+      response = await fetch(chrome.runtime.getURL(phraseFile));
+      if (!response.ok) throw new Error('File not found');
+    } catch (err) {
+      phraseFile = 'farming_phrases_en.txt';
+      response = await fetch(chrome.runtime.getURL(phraseFile));
+    }
+    
+    const text = await response.text();
+    return text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+  };
+};
+
 describe('Language-specific Phrase Loading', () => {
   beforeEach(() => {
     // Reset chrome storage mock
@@ -24,28 +48,7 @@ describe('Language-specific Phrase Loading', () => {
 
     global.chrome.i18n.getUILanguage.mockReturnValue('en');
 
-    // Simulate loading function
-    const loadPhrases = async () => {
-      const storageData = await new Promise(resolve => {
-        chrome.storage.local.get(['locale'], resolve);
-      });
-      const locale = storageData.locale || chrome.i18n.getUILanguage().split('-')[0] || 'en';
-      
-      let phraseFile = `farming_phrases_${locale}.txt`;
-      let response;
-      
-      try {
-        response = await fetch(chrome.runtime.getURL(phraseFile));
-        if (!response.ok) throw new Error('File not found');
-      } catch (err) {
-        phraseFile = 'farming_phrases_en.txt';
-        response = await fetch(chrome.runtime.getURL(phraseFile));
-      }
-      
-      const text = await response.text();
-      return text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    };
-
+    const loadPhrases = createLoadPhrasesFunction();
     const phrases = await loadPhrases();
     
     expect(phrases).toHaveLength(3);
@@ -65,18 +68,7 @@ describe('Language-specific Phrase Loading', () => {
       callback({ locale: 'ur' });
     });
 
-    const loadPhrases = async () => {
-      const storageData = await new Promise(resolve => {
-        chrome.storage.local.get(['locale'], resolve);
-      });
-      const locale = storageData.locale || chrome.i18n.getUILanguage().split('-')[0] || 'en';
-      
-      const phraseFile = `farming_phrases_${locale}.txt`;
-      const response = await fetch(chrome.runtime.getURL(phraseFile));
-      const text = await response.text();
-      return text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    };
-
+    const loadPhrases = createLoadPhrasesFunction();
     const phrases = await loadPhrases();
     
     expect(phrases).toHaveLength(2);
@@ -96,18 +88,7 @@ describe('Language-specific Phrase Loading', () => {
       callback({ locale: 'es' });
     });
 
-    const loadPhrases = async () => {
-      const storageData = await new Promise(resolve => {
-        chrome.storage.local.get(['locale'], resolve);
-      });
-      const locale = storageData.locale || chrome.i18n.getUILanguage().split('-')[0] || 'en';
-      
-      const phraseFile = `farming_phrases_${locale}.txt`;
-      const response = await fetch(chrome.runtime.getURL(phraseFile));
-      const text = await response.text();
-      return text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    };
-
+    const loadPhrases = createLoadPhrasesFunction();
     const phrases = await loadPhrases();
     
     expect(phrases).toHaveLength(3);
@@ -135,27 +116,7 @@ describe('Language-specific Phrase Loading', () => {
       callback({ locale: 'fr' }); // French not yet supported
     });
 
-    const loadPhrases = async () => {
-      const storageData = await new Promise(resolve => {
-        chrome.storage.local.get(['locale'], resolve);
-      });
-      const locale = storageData.locale || chrome.i18n.getUILanguage().split('-')[0] || 'en';
-      
-      let phraseFile = `farming_phrases_${locale}.txt`;
-      let response;
-      
-      try {
-        response = await fetch(chrome.runtime.getURL(phraseFile));
-        if (!response.ok) throw new Error('File not found');
-      } catch (err) {
-        phraseFile = 'farming_phrases_en.txt';
-        response = await fetch(chrome.runtime.getURL(phraseFile));
-      }
-      
-      const text = await response.text();
-      return text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    };
-
+    const loadPhrases = createLoadPhrasesFunction();
     const phrases = await loadPhrases();
     
     expect(phrases).toHaveLength(2);
@@ -177,18 +138,7 @@ describe('Language-specific Phrase Loading', () => {
 
     global.chrome.i18n.getUILanguage.mockReturnValue('en-US');
 
-    const loadPhrases = async () => {
-      const storageData = await new Promise(resolve => {
-        chrome.storage.local.get(['locale'], resolve);
-      });
-      const locale = storageData.locale || chrome.i18n.getUILanguage().split('-')[0] || 'en';
-      
-      const phraseFile = `farming_phrases_${locale}.txt`;
-      const response = await fetch(chrome.runtime.getURL(phraseFile));
-      const text = await response.text();
-      return text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    };
-
+    const loadPhrases = createLoadPhrasesFunction();
     const phrases = await loadPhrases();
     
     expect(phrases).toHaveLength(1);
