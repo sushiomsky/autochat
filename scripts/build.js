@@ -17,6 +17,9 @@ if (!fs.existsSync(distDir)) {
 const filesToCopy = [
   'manifest.json',
   'farming_phrases.txt',
+  'farming_phrases_en.txt',
+  'farming_phrases_ur.txt',
+  'farming_phrases_es.txt',
   'icon16.png',
   'icon32.png',
   'icon48.png',
@@ -66,6 +69,39 @@ jsFiles.forEach((file) => {
     console.log(`✓ Processed ${file}`);
   }
 });
+
+// Copy _locales directory recursively
+function copyRecursive(src, dest) {
+  const exists = fs.existsSync(src);
+  const stats = exists && fs.statSync(src);
+  const isDirectory = exists && stats.isDirectory();
+  
+  if (isDirectory) {
+    if (!fs.existsSync(dest)) {
+      fs.mkdirSync(dest, { recursive: true });
+    }
+    fs.readdirSync(src).forEach((childItemName) => {
+      copyRecursive(path.join(src, childItemName), path.join(dest, childItemName));
+    });
+  } else {
+    fs.copyFileSync(src, dest);
+  }
+}
+
+const localesDir = path.join(__dirname, '..', '_locales');
+const localesDest = path.join(distDir, '_locales');
+if (fs.existsSync(localesDir)) {
+  copyRecursive(localesDir, localesDest);
+  console.log('✓ Copied _locales directory');
+}
+
+// Copy src directory for modular files
+const srcDir = path.join(__dirname, '..', 'src');
+const srcDest = path.join(distDir, 'src');
+if (fs.existsSync(srcDir)) {
+  copyRecursive(srcDir, srcDest);
+  console.log('✓ Copied src directory');
+}
 
 // Update manifest version
 const manifestPath = path.join(distDir, 'manifest.json');

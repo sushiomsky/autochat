@@ -24,7 +24,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["farming_phrases.txt"],
+      "resources": ["farming_phrases.txt", "farming_phrases_en.txt", "farming_phrases_ur.txt", "farming_phrases_es.txt"],
       "matches": ["<all_urls>"]
     }
   ],

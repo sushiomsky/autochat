@@ -13,7 +13,8 @@ A powerful Chrome extension that automatically sends messages to chat applicatio
 - ⏱️ **Smart Timing**: Set min/max intervals with random timing between sends
 - 💾 **Auto-Save**: All settings automatically persist between sessions
 - 🌐 **Universal**: Works on any chat website (Discord, WhatsApp Web, Telegram, etc.)
-- 🌍 **Multi-Language**: Full internationalization with English and Urdu (اردو) support
+- 🌍 **Multi-Language**: Full internationalization with English, Urdu (اردو), and Spanish (Español) support
+- 📚 **Language-Specific Phrases**: 300-671 farming phrases in each supported language
 
 ### Advanced Features (v4.0+)
 - ⌨️ **Typing Simulation**: Realistic typing speed (40-80 WPM) with character-by-character animation
@@ -29,6 +30,7 @@ A powerful Chrome extension that automatically sends messages to chat applicatio
 - 🎨 **Modern UI**: Beautiful gradient design with intuitive controls
 - 📛 **Status Badge**: Visual indicator when auto-send is active
 - 🌍 **i18n Support**: Full localization with RTL support for Urdu and other languages
+- 🗣️ **Smart Phrase Loading**: Automatically loads phrases in your preferred language with English fallback
 
 ## Installation
 
@@ -87,6 +89,21 @@ All settings are automatically saved:
 - Send mode (random/sequential)
 - Min/max interval times
 
+## Multi-Language Support
+
+AutoChat now includes language-specific farming phrase libraries:
+
+- **English (en)**: 671+ original phrases with casino and gaming humor
+- **Urdu (ur)**: 300+ culturally adapted phrases for Urdu-speaking users
+- **Spanish (es)**: 300+ Spanish translations with relevant humor
+
+The extension automatically loads phrases in your preferred language:
+1. Select your language from the dropdown in the extension
+2. Phrases load automatically based on your selection
+3. Falls back to English if your language isn't available yet
+
+For more details, see [MULTI_LANGUAGE_PHRASES.md](MULTI_LANGUAGE_PHRASES.md).
+
 ## Technical Details
 
 - Built with Chrome Extension Manifest V3
@@ -100,6 +117,7 @@ All settings are automatically saved:
 - Active hours validation with timezone support
 - Daily limit enforcement with automatic reset
 - Local storage for persistence with import/export capability
+- Language-specific phrase loading with automatic fallback
 
 ## Permissions
 
