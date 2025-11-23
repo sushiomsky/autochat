@@ -4,7 +4,12 @@
   "version": "4.2.0",
   "description": "__MSG_extDescription__",
   "default_locale": "en",
-  "permissions": ["scripting", "activeTab", "storage"],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "alarms"
+  ],
   "host_permissions": ["<all_urls>"],
   "action": {
     "default_popup": "popup-enhanced.html",

@@ -1435,3 +1435,16 @@ chrome.storage.local.get(['theme'], (data) => {
   // Update stats every 5 seconds
   setInterval(updateStats, 5000);
 })();
+
+// Profile overlay close handler
+const profileClose = document.getElementById('profile-close');
+if (profileClose) {
+    profileClose.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const overlay = document.getElementById('profile-overlay');
+        if (overlay) {
+            overlay.classList.remove('active');
+        }
+    });
+}
