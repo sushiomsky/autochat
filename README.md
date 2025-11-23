@@ -31,6 +31,8 @@ A powerful Chrome extension that automatically sends messages to chat applicatio
 - 📛 **Status Badge**: Visual indicator when auto-send is active
 - 🌍 **i18n Support**: Full localization with RTL support for Urdu and other languages
 - 🗣️ **Smart Phrase Loading**: Automatically loads phrases in your preferred language with English fallback
+- 🎯 **Mention Detection**: Auto-reply when someone mentions you in chat
+- 👥 **Multi-Account Support**: Manage multiple profiles with separate settings (NEW!)
 
 ## Installation
 
@@ -80,6 +82,28 @@ A powerful Chrome extension that automatically sends messages to chat applicatio
 - Regular reminders or notifications
 - Testing chat applications
 - Automated responses in controlled environments
+- **Auto-reply when mentioned**: Respond automatically when someone tags you with @mention
+
+### Using Mention Detection
+
+1. **Mark the message container** (📌 Mark Message Container button)
+2. **Open Settings** (⚙️ Settings button)
+3. **Enable "Auto-Reply to Mentions"**
+4. **Add keywords to watch** (e.g., @username, your name)
+5. **Add reply messages** (e.g., "Thanks!", "I'm here!")
+
+The extension will now automatically reply when someone mentions you. See [MENTION_DETECTION_FEATURE.md](MENTION_DETECTION_FEATURE.md) for detailed documentation.
+
+### Using Multi-Account Support (NEW!)
+
+Perfect for managing multiple casino accounts or different automation scenarios!
+
+1. **Click the ⚙️ button** next to "Account Profile" dropdown
+2. **Create new profile** with a descriptive name (e.g., "Casino Account 1")
+3. **Configure settings** for this profile (messages, keywords, intervals)
+4. **Switch between profiles** using the dropdown
+
+Each profile stores completely separate settings. See [MULTI_ACCOUNT_FEATURE.md](MULTI_ACCOUNT_FEATURE.md) for detailed documentation.
 
 ## Settings Persistence
 
@@ -185,25 +209,41 @@ See [RELEASE_NOTES_v4.1.md](RELEASE_NOTES_v4.1.md) for v4.1 changelog.
 
 ## Roadmap
 
-### v4.4 (Next)
-- [ ] More languages (Arabic, Spanish, French, Hindi)
+### v4.4 (Next - Q1 2026)
+- [ ] More languages (Arabic, French, Hindi)
 - [ ] Visual improvements and animations
 - [ ] User onboarding tutorial
 - [ ] More keyboard shortcuts
-- [ ] Analytics dashboard with charts
+- [ ] Complete UI integration for v4.2 backend features
 
-### v4.5 (Planned)
+### v4.5 (Planned - Q2 2026)
 - [ ] Firefox port (WebExtensions)
 - [ ] Advanced scheduling calendar
 - [ ] Webhook integration
 - [ ] Performance monitoring dashboard
-- [ ] Cloud sync (optional)
+- [ ] Basic API for integrations
 
-### v5.0 (Future)
-- [ ] Cloud sync (optional)
-- [ ] Message templates library
-- [ ] AI-powered message generation
-- [ ] Team collaboration features
+### v5.0 (Major Release - Q3 2026)
+
+**🚀 Next major release with comprehensive feature proposals!**
+
+See detailed planning documents:
+- **[Quick Start Guide](QUICK_START_v5.0_PLANNING.md)** - Start here! 5-minute overview
+- **[Feature Suggestions](FEATURE_SUGGESTIONS_v5.0.md)** - 15 detailed feature proposals
+- **[Priority Matrix](FEATURE_PRIORITY_MATRIX.md)** - Prioritization analysis
+- **[Roadmap](ROADMAP_v5.0.md)** - Timeline and milestones
+
+**Top 5 Features Planned**:
+1. 🤖 **AI-Powered Message Generation** - Smart compose with local models
+2. 📊 **Advanced Analytics Dashboard** - Visual insights & predictive analytics
+3. 📅 **Smart Scheduling & Campaigns** - Drip sequences with AI optimization
+4. 👥 **Team Collaboration** - Shared workspaces & approval workflows
+5. ☁️ **Cloud Sync & Backup** - Encrypted multi-device sync
+
+**Timeline**: 13 months (4 development waves)  
+**Goal**: Transform AutoChat into an intelligent communication platform
+
+[**💬 Provide Feedback on v5.0 Plans**](https://github.com/sushiomsky/autochat/discussions)
 
 ## License
 

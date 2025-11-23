@@ -29,6 +29,13 @@ let templateVariablesEnabled = true;
 let sendConfirmTimeoutMs = 3000; // default 3s
 let messageContainerSelector = null;
 
+// Mention detection state
+let mentionDetectionEnabled = false;
+let mentionKeywords = []; // keywords/username to watch for
+let mentionReplyMessages = []; // messages to use for replies
+let mentionObserver = null;
+let lastProcessedMessages = new Set(); // Track processed messages to avoid duplicates
+
 // ===== HELPER FUNCTIONS =====
 
 // Build unique CSS selector for element
@@ -211,6 +218,151 @@ function isWithinActiveHours() {
 function checkDailyLimit() {
   if (dailyLimit === 0) return true; // No limit
   return messagesSentToday < dailyLimit;
+}
+
+// ===== MENTION DETECTION =====
+
+// Check if a message contains any of the mention keywords
+function containsMention(text) {
+  if (!text || mentionKeywords.length === 0) return false;
+  
+  const lowerText = text.toLowerCase();
+  return mentionKeywords.some(keyword => {
+    const lowerKeyword = keyword.toLowerCase();
+    // Check for @mention or plain keyword
+    return lowerText.includes(`@${lowerKeyword}`) || lowerText.includes(lowerKeyword);
+  });
+}
+
+// Generate unique identifier for a message to avoid processing duplicates
+function getMessageId(element) {
+  const text = (element.textContent || '').trim();
+  const timestamp = element.getAttribute('data-timestamp') || element.querySelector('[data-timestamp]')?.getAttribute('data-timestamp') || '';
+  return `${text}-${timestamp}`.substring(0, 100);
+}
+
+// Handle detected mention - send auto-reply
+async function handleMentionDetected(messageElement) {
+  if (!mentionReplyMessages || mentionReplyMessages.length === 0) {
+    console.log('[AutoChat] Mention detected but no reply messages configured');
+    return;
+  }
+
+  // Check if already processed
+  const msgId = getMessageId(messageElement);
+  if (lastProcessedMessages.has(msgId)) {
+    return;
+  }
+
+  // Mark as processed
+  lastProcessedMessages.add(msgId);
+  
+  // Limit the set size to prevent memory issues
+  if (lastProcessedMessages.size > 100) {
+    const oldestEntries = Array.from(lastProcessedMessages).slice(0, 50);
+    oldestEntries.forEach(entry => lastProcessedMessages.delete(entry));
+  }
+
+  console.log('[AutoChat] Mention detected! Preparing reply...');
+
+  // Wait a moment to seem more natural
+  const replyDelay = Math.random() * 2000 + 1000; // 1-3 seconds
+  await sleep(replyDelay);
+
+  // Pick a random reply message
+  const replyMessage = mentionReplyMessages[Math.floor(Math.random() * mentionReplyMessages.length)];
+  
+  // Process template variables
+  const processedMessage = processTemplateVariables(replyMessage);
+
+  // Send the reply
+  console.log('[AutoChat] Sending auto-reply to mention:', processedMessage);
+  await sendMessage(processedMessage);
+}
+
+// Start monitoring messages for mentions
+function startMentionDetection() {
+  if (!mentionDetectionEnabled || !messageContainerSelector) {
+    console.log('[AutoChat] Cannot start mention detection: disabled or no container');
+    return;
+  }
+
+  stopMentionDetection(); // Clear any existing observer
+
+  const container = document.querySelector(messageContainerSelector);
+  if (!container) {
+    console.warn('[AutoChat] Message container not found, will retry...');
+    // Retry after a delay
+    setTimeout(startMentionDetection, 2000);
+    return;
+  }
+
+  console.log('[AutoChat] Starting mention detection...');
+
+  // Process existing messages
+  const existingMessages = container.querySelectorAll('[class*="message"], [class*="msg"], [class*="chat"]');
+  existingMessages.forEach(msg => {
+    const text = (msg.textContent || '').trim();
+    if (text) {
+      lastProcessedMessages.add(getMessageId(msg));
+    }
+  });
+
+  // Observe for new messages
+  mentionObserver = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (node.nodeType !== 1) continue; // Element nodes only
+
+        // Check if this node or its children contain messages
+        const messagesToCheck = [];
+        
+        // Check the node itself
+        if (node.textContent && node.textContent.trim()) {
+          messagesToCheck.push(node);
+        }
+
+        // Check children (common in chat apps)
+        const childMessages = node.querySelectorAll?.('[class*="message"], [class*="msg"], [class*="chat"]');
+        if (childMessages) {
+          messagesToCheck.push(...Array.from(childMessages));
+        }
+
+        // Process each potential message
+        messagesToCheck.forEach(msgElement => {
+          const text = (msgElement.textContent || '').trim();
+          if (!text) return;
+
+          const msgId = getMessageId(msgElement);
+          if (lastProcessedMessages.has(msgId)) return;
+
+          if (containsMention(text)) {
+            console.log('[AutoChat] New mention detected in:', text.substring(0, 50));
+            handleMentionDetected(msgElement);
+          } else {
+            // Mark as seen even if not a mention
+            lastProcessedMessages.add(msgId);
+          }
+        });
+      }
+    }
+  });
+
+  mentionObserver.observe(container, {
+    childList: true,
+    subtree: true
+  });
+
+  console.log('[AutoChat] Mention detection active');
+}
+
+// Stop monitoring messages
+function stopMentionDetection() {
+  if (mentionObserver) {
+    mentionObserver.disconnect();
+    mentionObserver = null;
+    console.log('[AutoChat] Mention detection stopped');
+  }
 }
 
 // Load send confirmation timeout from storage (seconds -> ms)
@@ -834,7 +986,10 @@ chrome.storage.local.get([
   'sendButtonSelector',
   'messagesSentToday',
   'totalMessagesSent',
-  'lastResetDate'
+  'lastResetDate',
+  'mentionDetectionEnabled',
+  'mentionKeywords',
+  'mentionReplyMessages'
 ], (data) => {
   if (data.chatInputSelector) {
     chatInputSelector = data.chatInputSelector;
@@ -854,6 +1009,16 @@ chrome.storage.local.get([
       messagesSentToday: 0,
       lastResetDate: today
     });
+  }
+
+  // Load mention detection settings
+  mentionDetectionEnabled = data.mentionDetectionEnabled || false;
+  mentionKeywords = data.mentionKeywords || [];
+  mentionReplyMessages = data.mentionReplyMessages || [];
+
+  // Auto-start mention detection if enabled and container is set
+  if (mentionDetectionEnabled && messageContainerSelector) {
+    setTimeout(() => startMentionDetection(), 1000);
   }
 });
 
@@ -901,6 +1066,28 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       messagesSentToday,
       totalMessagesSent,
       isActive: !!autoSendInterval
+    });
+  }
+
+  if (msg.action === 'startMentionDetection') {
+    mentionDetectionEnabled = true;
+    mentionKeywords = msg.keywords || [];
+    mentionReplyMessages = msg.replyMessages || [];
+    startMentionDetection();
+    sendResponse({ ok: true });
+  }
+
+  if (msg.action === 'stopMentionDetection') {
+    mentionDetectionEnabled = false;
+    stopMentionDetection();
+    sendResponse({ ok: true });
+  }
+
+  if (msg.action === 'getMentionStatus') {
+    sendResponse({
+      enabled: mentionDetectionEnabled,
+      keywords: mentionKeywords,
+      replyMessages: mentionReplyMessages
     });
   }
 
