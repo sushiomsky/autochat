@@ -35,16 +35,17 @@ v5.0 Development Phases
   - Language-specific phrase libraries
   - 82 tests passing
 
-### v4.4 - UI Polish 🔄
-- **Status**: In Progress (Q1 2026)
+### v4.4 - UI Polish ✅
+- **Status**: Released (November 2025)
 - **Focus**: Complete UI integration for v4.2 backend features
-- **Timeline**: December 2025 - February 2026
 - **Key Deliverables**:
-  - Notification system UI
-  - Preview modal implementation
-  - Category manager interface
-  - Command palette UI (Ctrl+K)
-  - Emoji picker modal
+  - ✅ Notification system UI with history panel
+  - ✅ Preview modal implementation
+  - ✅ Category manager interface with CRUD operations
+  - ✅ Command palette UI (Ctrl+K)
+  - ✅ Emoji picker modal
+  - ✅ Help documentation modal
+  - ✅ 119 tests passing
 
 ---
 
