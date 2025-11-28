@@ -1478,7 +1478,7 @@ function renderNotificationList() {
   // Add event listeners for mark read buttons
   notificationList.querySelectorAll('[data-mark-read]').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const id = parseInt(e.target.dataset.markRead);
+      const id = e.target.dataset.markRead;
       markNotificationAsRead(id);
     });
   });
@@ -1486,7 +1486,7 @@ function renderNotificationList() {
   // Add event listeners for delete buttons
   notificationList.querySelectorAll('[data-delete-notification]').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const id = parseInt(e.target.dataset.deleteNotification);
+      const id = e.target.dataset.deleteNotification;
       deleteNotification(id);
     });
   });

@@ -41,6 +41,12 @@ describe('NotificationManager', () => {
         this.notificationHistory = [];
         this.maxHistory = 50;
         this.unreadCount = 0;
+        this.idCounter = 0;
+      }
+
+      generateId() {
+        this.idCounter++;
+        return `${Date.now()}-${this.idCounter}`;
       }
 
       async requestPermission() {
@@ -67,7 +73,7 @@ describe('NotificationManager', () => {
 
       addToHistory(title, options = {}) {
         const historyItem = {
-          id: Date.now(),
+          id: this.generateId(),
           title,
           body: options.body || '',
           type: options.type || 'info',

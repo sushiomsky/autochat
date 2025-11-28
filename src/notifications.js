@@ -10,6 +10,7 @@ export class NotificationManager {
     this.notificationHistory = [];
     this.maxHistory = 50;
     this.unreadCount = 0;
+    this.idCounter = 0;
     this.loadSettings();
   }
 
@@ -88,13 +89,22 @@ export class NotificationManager {
   }
 
   /**
+   * Generate unique ID for notifications
+   * Uses timestamp + counter to avoid collisions
+   */
+  generateId() {
+    this.idCounter++;
+    return `${Date.now()}-${this.idCounter}`;
+  }
+
+  /**
    * Add notification to history
    * @param {string} title - Notification title
    * @param {object} options - Notification options
    */
   addToHistory(title, options = {}) {
     const historyItem = {
-      id: Date.now(),
+      id: this.generateId(),
       title,
       body: options.body || '',
       type: options.type || 'info',
