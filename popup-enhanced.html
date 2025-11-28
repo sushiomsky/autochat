@@ -9,7 +9,13 @@
   <div class="container">
     <h2>
       <span>💬 AutoChat Enhanced</span>
-      <button id="themeToggle" class="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+      <div class="header-actions">
+        <button id="openNotificationCenter" class="header-btn" title="Notification Center" aria-label="Open Notification Center">
+          🔔
+          <span id="notificationBadge" class="notification-count-badge" style="display: none;">0</span>
+        </button>
+        <button id="themeToggle" class="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+      </div>
     </h2>
 
     <!-- Language Selector -->
@@ -121,8 +127,8 @@
     </div>
     <div class="btn-row">
       <button id="openCategories" class="btn-secondary">📁 Categories</button>
-      <button id="openAnalytics" class="btn-secondary">📊 Analytics</button>
-      <button id="exportAnalytics" class="btn-secondary">💾 Export</button>
+      <button id="openCategoryManager" class="btn-secondary">⚙️ Manage</button>
+      <button id="openAnalytics" class="btn-secondary">📊 Stats</button>
     </div>
 
     <div class="shortcuts-info">
@@ -134,7 +140,7 @@
     </div>
 
     <!-- Version -->
-    <div class="version">v4.3 Professional Edition</div>
+    <div class="version">v4.4 Professional Edition</div>
   </div>
 
   <!-- Settings Modal -->
@@ -429,6 +435,111 @@
         <input type="checkbox" id="dontShowAgain">
         Don't show this again
       </label>
+    </div>
+  </div>
+
+  <!-- Notification Center Modal -->
+  <div id="notificationCenterModal" class="modal">
+    <div class="modal-content">
+      <h3>🔔 Notification Center</h3>
+      <div class="notification-header">
+        <span id="unreadBadge" class="unread-badge">0 unread</span>
+        <div class="notification-actions">
+          <button id="markAllRead" class="btn-small">✓ Mark All Read</button>
+          <button id="clearNotifications" class="btn-small delete">🗑️ Clear All</button>
+        </div>
+      </div>
+      <div id="notificationList" class="notification-list">
+        <div class="help" style="text-align: center; padding: 20px;">No notifications yet</div>
+      </div>
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Category Manager Modal -->
+  <div id="categoryManagerModal" class="modal">
+    <div class="modal-content">
+      <h3>📁 Category Manager</h3>
+      
+      <div class="section">
+        <label>Create New Category:</label>
+        <div class="input-row">
+          <input type="text" id="newCategoryName" placeholder="Category name" maxlength="30">
+          <input type="text" id="newCategoryIcon" placeholder="Icon (emoji)" maxlength="2" style="width: 60px;">
+        </div>
+        <input type="color" id="newCategoryColor" value="#667eea" style="width: 100%; height: 36px; margin-top: 8px;">
+        <button id="createCategory" class="btn-success">➕ Create Category</button>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <strong>Existing Categories:</strong>
+        <div id="categoryList" class="category-manager-list"></div>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <strong>Category Statistics:</strong>
+        <div id="categoryStats" class="category-stats"></div>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <h3>❓ Help & Documentation</h3>
+      
+      <div class="help-section">
+        <h4>🎯 Getting Started</h4>
+        <p>1. Click "Mark Chat Input Field" and select the text input on the page</p>
+        <p>2. Add your messages in the textarea (one per line)</p>
+        <p>3. Set your preferred time interval</p>
+        <p>4. Click "Start Auto-Send"!</p>
+      </div>
+
+      <div class="help-section">
+        <h4>📝 Template Variables</h4>
+        <p>Use these in your messages for dynamic content:</p>
+        <ul>
+          <li><code>{time}</code> - Current time (e.g., 2:30 PM)</li>
+          <li><code>{date}</code> - Current date</li>
+          <li><code>{datetime}</code> - Date and time combined</li>
+          <li><code>{random_emoji}</code> - Random emoji</li>
+          <li><code>{random_number}</code> - Random number (0-99)</li>
+          <li><code>{day}</code> - Day of week</li>
+          <li><code>{month}</code> - Month name</li>
+          <li><code>{year}</code> - Current year</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h4>⌨️ Keyboard Shortcuts</h4>
+        <ul>
+          <li><kbd>Ctrl+K</kbd> - Open command palette</li>
+          <li><kbd>Ctrl+S</kbd> - Start auto-send</li>
+          <li><kbd>Ctrl+X</kbd> - Stop auto-send</li>
+          <li><kbd>Ctrl+P</kbd> - Pause/Resume</li>
+          <li><kbd>Escape</kbd> - Close modals</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h4>🔧 Advanced Features</h4>
+        <ul>
+          <li><strong>Typing Simulation</strong> - Types characters one by one for realism</li>
+          <li><strong>Variable Delays</strong> - Random pauses between messages</li>
+          <li><strong>Anti-Repetition</strong> - Avoids sending same message twice in a row</li>
+          <li><strong>Active Hours</strong> - Only sends during specified hours</li>
+          <li><strong>Mention Detection</strong> - Auto-reply when mentioned</li>
+        </ul>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
     </div>
   </div>
 

@@ -2,6 +2,49 @@
 
 All notable changes to AutoChat will be documented in this file.
 
+## [4.4.0] - 2025-11-28 - UI Polish Edition
+
+### Added
+- **Notification Center**: In-app notification history panel with full CRUD operations
+  - View all notifications with icons based on type
+  - Mark notifications as read (individual or all)
+  - Delete notifications (individual or all)
+  - Unread count badge in header
+  - Time ago display for notifications
+- **Category Manager**: Full category management interface
+  - Create new categories with custom name, icon, and color
+  - Edit existing categories
+  - Delete categories
+  - Category statistics display
+- **Help Modal**: Comprehensive in-app help documentation
+  - Getting started guide
+  - Template variables reference
+  - Keyboard shortcuts reference
+  - Advanced features explanation
+- **Enhanced Header**: Added notification bell with unread badge
+- **Improved UI**: Better button layout and organization
+
+### Changed
+- Updated version to 4.4.0
+- Reorganized category display code to avoid conflicts
+- Enhanced notification module with history tracking
+- Improved button layout in control section
+
+### Technical
+- Added 10 new tests for notification history functionality (119 total tests)
+- Updated `src/notifications.js` with history management
+- Added new UI elements and styles for notification center and category manager
+- Added `header-actions` container for better header organization
+
+### Files Modified
+- `popup-enhanced.html` - Added notification center, category manager, and help modals
+- `popup-enhanced.js` - Added notification center and category manager logic
+- `styles.css` - Added styles for new UI components
+- `src/notifications.js` - Added history management functionality
+- `tests/unit/notifications.test.js` - Added 10 new tests for history functionality
+- `manifest.json` - Updated version to 4.4.0
+- `package.json` - Updated version to 4.4.0
+
 ## [4.3.0] - 2025-11-22 - Multi-Language Phrases Edition
 
 ### Added

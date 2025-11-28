@@ -1258,12 +1258,12 @@ document.getElementById('previewMessage')?.addEventListener('click', () => {
   previewModal.classList.add('show');
 });
 
-// ===== CATEGORIES =====
+// ===== CATEGORIES DISPLAY =====
 
 const categoriesModal = document.getElementById('categoriesModal');
 const categoriesContent = document.getElementById('categoriesContent');
 
-const categories = [
+const categoryDisplayItems = [
   { name: 'Greetings', icon: '👋', count: 0 },
   { name: 'Questions', icon: '❓', count: 0 },
   { name: 'Funny', icon: '😂', count: 0 },
@@ -1276,10 +1276,10 @@ const categories = [
   { name: 'Custom', icon: '✨', count: customPhrases.length }
 ];
 
-function renderCategories() {
+function renderCategoriesDisplay() {
   categoriesContent.innerHTML = '';
   
-  categories.forEach(category => {
+  categoryDisplayItems.forEach(category => {
     const card = document.createElement('div');
     card.className = 'category-card';
     card.innerHTML = `
@@ -1296,8 +1296,8 @@ function renderCategories() {
 }
 
 document.getElementById('openCategories')?.addEventListener('click', () => {
-  categories[categories.length - 1].count = customPhrases.length;
-  renderCategories();
+  categoryDisplayItems[categoryDisplayItems.length - 1].count = customPhrases.length;
+  renderCategoriesDisplay();
   categoriesModal.classList.add('show');
 });
 
@@ -1410,6 +1410,338 @@ chrome.storage.local.get(['theme'], (data) => {
   }
 });
 
+// ===== NOTIFICATION CENTER =====
+
+const notificationCenterModal = document.getElementById('notificationCenterModal');
+const notificationList = document.getElementById('notificationList');
+const notificationBadge = document.getElementById('notificationBadge');
+const unreadBadge = document.getElementById('unreadBadge');
+let notificationHistory = [];
+let unreadCount = 0;
+
+async function loadNotificationHistory() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['notificationHistory', 'unreadCount'], (data) => {
+      notificationHistory = data.notificationHistory || [];
+      unreadCount = data.unreadCount || 0;
+      updateNotificationBadge();
+      resolve();
+    });
+  });
+}
+
+function updateNotificationBadge() {
+  if (notificationBadge) {
+    if (unreadCount > 0) {
+      notificationBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+      notificationBadge.style.display = 'block';
+    } else {
+      notificationBadge.style.display = 'none';
+    }
+  }
+  if (unreadBadge) {
+    unreadBadge.textContent = `${unreadCount} unread`;
+  }
+}
+
+function renderNotificationList() {
+  if (!notificationList) return;
+  
+  if (notificationHistory.length === 0) {
+    notificationList.innerHTML = '<div class="help" style="text-align: center; padding: 20px;">No notifications yet</div>';
+    return;
+  }
+
+  notificationList.innerHTML = '';
+  notificationHistory.forEach(notification => {
+    const item = document.createElement('div');
+    item.className = 'notification-item' + (notification.read ? '' : ' unread');
+    
+    const icon = getNotificationIcon(notification.type);
+    const timeAgo = getTimeAgo(notification.timestamp);
+    
+    item.innerHTML = `
+      <div class="notification-icon">${icon}</div>
+      <div class="notification-content">
+        <div class="notification-title">${notification.title}</div>
+        <div class="notification-body">${notification.body || ''}</div>
+        <div class="notification-time">${timeAgo}</div>
+      </div>
+      <div class="notification-item-actions">
+        ${!notification.read ? `<button class="btn-small" data-mark-read="${notification.id}">✓</button>` : ''}
+        <button class="btn-small delete" data-delete-notification="${notification.id}">✕</button>
+      </div>
+    `;
+    notificationList.appendChild(item);
+  });
+
+  // Add event listeners for mark read buttons
+  notificationList.querySelectorAll('[data-mark-read]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = e.target.dataset.markRead;
+      markNotificationAsRead(id);
+    });
+  });
+
+  // Add event listeners for delete buttons
+  notificationList.querySelectorAll('[data-delete-notification]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = e.target.dataset.deleteNotification;
+      deleteNotification(id);
+    });
+  });
+}
+
+function getNotificationIcon(type) {
+  switch (type) {
+    case 'success': return '✅';
+    case 'error': return '❌';
+    case 'warning': return '⚠️';
+    case 'achievement': return '🏆';
+    case 'message-sent': return '📤';
+    default: return '🔔';
+  }
+}
+
+function getTimeAgo(timestamp) {
+  const now = new Date();
+  const then = new Date(timestamp);
+  const seconds = Math.floor((now - then) / 1000);
+  
+  if (seconds < 60) return 'Just now';
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
+}
+
+function markNotificationAsRead(id) {
+  const notification = notificationHistory.find(n => n.id === id);
+  if (notification && !notification.read) {
+    notification.read = true;
+    unreadCount = Math.max(0, unreadCount - 1);
+    saveNotificationHistory();
+    updateNotificationBadge();
+    renderNotificationList();
+  }
+}
+
+function markAllNotificationsAsRead() {
+  notificationHistory.forEach(n => n.read = true);
+  unreadCount = 0;
+  saveNotificationHistory();
+  updateNotificationBadge();
+  renderNotificationList();
+  showNotification('All notifications marked as read', true);
+}
+
+function deleteNotification(id) {
+  const index = notificationHistory.findIndex(n => n.id === id);
+  if (index !== -1) {
+    if (!notificationHistory[index].read) {
+      unreadCount = Math.max(0, unreadCount - 1);
+    }
+    notificationHistory.splice(index, 1);
+    saveNotificationHistory();
+    updateNotificationBadge();
+    renderNotificationList();
+  }
+}
+
+function clearAllNotifications() {
+  if (confirm('Clear all notifications?')) {
+    notificationHistory = [];
+    unreadCount = 0;
+    saveNotificationHistory();
+    updateNotificationBadge();
+    renderNotificationList();
+    showNotification('Notifications cleared', true);
+  }
+}
+
+function saveNotificationHistory() {
+  chrome.storage.local.set({ 
+    notificationHistory, 
+    unreadCount 
+  });
+}
+
+// Notification center event handlers
+document.getElementById('openNotificationCenter')?.addEventListener('click', async () => {
+  await loadNotificationHistory();
+  renderNotificationList();
+  notificationCenterModal.classList.add('show');
+});
+
+document.getElementById('markAllRead')?.addEventListener('click', markAllNotificationsAsRead);
+document.getElementById('clearNotifications')?.addEventListener('click', clearAllNotifications);
+
+// ===== CATEGORY MANAGER =====
+
+const categoryManagerModal = document.getElementById('categoryManagerModal');
+const categoryList = document.getElementById('categoryList');
+const categoryStats = document.getElementById('categoryStats');
+let categories = [];
+
+const defaultCategories = [
+  { id: 'greetings', name: 'Greetings', icon: '👋', color: '#667eea' },
+  { id: 'questions', name: 'Questions', icon: '❓', color: '#f093fb' },
+  { id: 'responses', name: 'Responses', icon: '💬', color: '#4facfe' },
+  { id: 'closings', name: 'Closings', icon: '👋', color: '#43e97b' },
+  { id: 'casual', name: 'Casual', icon: '😊', color: '#fa709a' },
+  { id: 'formal', name: 'Formal', icon: '🎩', color: '#667eea' },
+  { id: 'funny', name: 'Funny', icon: '😄', color: '#feca57' },
+  { id: 'supportive', name: 'Supportive', icon: '💪', color: '#48dbfb' },
+  { id: 'business', name: 'Business', icon: '💼', color: '#341f97' },
+  { id: 'personal', name: 'Personal', icon: '❤️', color: '#ee5a6f' }
+];
+
+async function loadCategories() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['categories'], (data) => {
+      categories = data.categories || defaultCategories;
+      resolve();
+    });
+  });
+}
+
+function saveCategories() {
+  chrome.storage.local.set({ categories });
+}
+
+function renderCategoryList() {
+  if (!categoryList) return;
+
+  categoryList.innerHTML = '';
+  categories.forEach((category, index) => {
+    const item = document.createElement('div');
+    item.className = 'category-manager-item';
+    item.innerHTML = `
+      <div class="category-color-dot" style="background: ${category.color}"></div>
+      <div class="category-icon-display">${category.icon}</div>
+      <div class="category-info">
+        <div class="category-manager-name">${category.name}</div>
+        <div class="category-phrase-count">ID: ${category.id}</div>
+      </div>
+      <div class="category-manager-actions">
+        <button class="btn-small" data-edit-category="${index}" title="Edit">✏️</button>
+        <button class="btn-small delete" data-delete-category="${index}" title="Delete">🗑️</button>
+      </div>
+    `;
+    categoryList.appendChild(item);
+  });
+
+  // Add event listeners
+  categoryList.querySelectorAll('[data-edit-category]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const index = parseInt(e.target.dataset.editCategory);
+      editCategory(index);
+    });
+  });
+
+  categoryList.querySelectorAll('[data-delete-category]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const index = parseInt(e.target.dataset.deleteCategory);
+      deleteCategory(index);
+    });
+  });
+}
+
+function renderCategoryStats() {
+  if (!categoryStats) return;
+
+  categoryStats.innerHTML = `
+    <div class="category-stat-card">
+      <div class="category-stat-value">${categories.length}</div>
+      <div class="category-stat-label">Total Categories</div>
+    </div>
+    <div class="category-stat-card">
+      <div class="category-stat-value">${customPhrases.length}</div>
+      <div class="category-stat-label">Custom Phrases</div>
+    </div>
+    <div class="category-stat-card">
+      <div class="category-stat-value">${defaultPhrases.length}</div>
+      <div class="category-stat-label">Default Phrases</div>
+    </div>
+    <div class="category-stat-card">
+      <div class="category-stat-value">${customPhrases.length + defaultPhrases.length}</div>
+      <div class="category-stat-label">Total Phrases</div>
+    </div>
+  `;
+}
+
+function createCategory() {
+  const name = document.getElementById('newCategoryName')?.value.trim();
+  const icon = document.getElementById('newCategoryIcon')?.value.trim() || '📁';
+  const color = document.getElementById('newCategoryColor')?.value || '#667eea';
+
+  if (!name) {
+    showNotification('Please enter a category name', false);
+    return;
+  }
+
+  const id = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  
+  if (categories.some(c => c.id === id)) {
+    showNotification('Category already exists', false);
+    return;
+  }
+
+  categories.push({ id, name, icon, color });
+  saveCategories();
+  renderCategoryList();
+  renderCategoryStats();
+
+  // Clear inputs
+  document.getElementById('newCategoryName').value = '';
+  document.getElementById('newCategoryIcon').value = '';
+  document.getElementById('newCategoryColor').value = '#667eea';
+
+  showNotification(`Category "${name}" created!`, true);
+}
+
+function editCategory(index) {
+  const category = categories[index];
+  if (!category) return;
+
+  const newName = prompt('Enter new category name:', category.name);
+  if (newName && newName.trim()) {
+    categories[index].name = newName.trim();
+    saveCategories();
+    renderCategoryList();
+    showNotification('Category updated!', true);
+  }
+}
+
+function deleteCategory(index) {
+  const category = categories[index];
+  if (!category) return;
+
+  if (confirm(`Delete category "${category.name}"?`)) {
+    categories.splice(index, 1);
+    saveCategories();
+    renderCategoryList();
+    renderCategoryStats();
+    showNotification('Category deleted!', true);
+  }
+}
+
+// Category manager event handlers
+document.getElementById('openCategoryManager')?.addEventListener('click', async () => {
+  await loadCategories();
+  renderCategoryList();
+  renderCategoryStats();
+  categoryManagerModal.classList.add('show');
+});
+
+document.getElementById('createCategory')?.addEventListener('click', createCategory);
+
+// ===== HELP MODAL =====
+
+const helpModal = document.getElementById('helpModal');
+document.getElementById('openHelp')?.addEventListener('click', () => {
+  helpModal.classList.add('show');
+});
+
 // ===== INITIALIZATION =====
 
 (async function init() {
@@ -1420,6 +1752,8 @@ chrome.storage.local.get(['theme'], (data) => {
   loadSettings();
   await loadDefaultPhrasesFromFile();
   await loadCustomPhrases();
+  await loadNotificationHistory();
+  await loadCategories();
 
   // Auto-load phrases if empty
   chrome.storage.local.get(['messageList'], async (data) => {
