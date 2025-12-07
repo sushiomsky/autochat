@@ -32,7 +32,16 @@ A powerful Chrome extension that automatically sends messages to chat applicatio
 - 🌍 **i18n Support**: Full localization with RTL support for Urdu and other languages
 - 🗣️ **Smart Phrase Loading**: Automatically loads phrases in your preferred language with English fallback
 - 🎯 **Mention Detection**: Auto-reply when someone mentions you in chat
-- 👥 **Multi-Account Support**: Manage multiple profiles with separate settings (NEW!)
+- 👥 **Multi-Account Support**: Manage multiple profiles with separate settings
+
+### New in v4.4 (UI Polish Edition) ✨
+- 🔔 **Notification Center**: In-app notification history with full management (view, mark as read, delete)
+- 📁 **Category Manager**: Create and manage custom message categories with icons and colors
+- ⌨️ **Command Palette**: Quick access to all features with Ctrl+K keyboard shortcut
+- 😊 **Emoji Picker**: Built-in emoji selector with 200+ emojis in 8 categories
+- 👁️ **Preview Mode**: Preview messages with template variables before sending
+- ❓ **Help Documentation**: Comprehensive in-app help with guides and keyboard shortcuts
+- 🎨 **Enhanced UI**: Improved button layouts, notification badges, and visual polish
 
 ## Installation
 
@@ -105,6 +114,46 @@ Perfect for managing multiple casino accounts or different automation scenarios!
 
 Each profile stores completely separate settings. See [MULTI_ACCOUNT_FEATURE.md](MULTI_ACCOUNT_FEATURE.md) for detailed documentation.
 
+### Using v4.4 UI Features
+
+#### Notification Center 🔔
+1. **Click the bell icon** (🔔) in the header
+2. **View notification history** - see all past messages, errors, and achievements
+3. **Mark as read** - individual notifications or mark all read
+4. **Delete notifications** - remove individual items or clear all
+5. **Unread badge** - shows count of unread notifications
+
+#### Command Palette ⌨️
+1. **Press Ctrl+K** or click the keyboard icon
+2. **Type to search** commands (e.g., "start", "stop", "settings")
+3. **Arrow keys** to navigate, **Enter** to execute
+4. **Quick access** to all major features without clicking through menus
+
+#### Emoji Picker 😊
+1. **Click the emoji button** (😊)
+2. **Browse categories** - Smileys, Hearts, Animals, Food, Sports, Objects, Symbols
+3. **Search emojis** with the search bar
+4. **Click to insert** - adds emoji to your message list
+
+#### Preview Mode 👁️
+1. **Click Preview button** before sending
+2. **See rendered messages** with all template variables replaced
+3. **Check first 10 messages** to verify they look correct
+4. **Test variables** like {time}, {date}, {random_emoji} before going live
+
+#### Category Manager 📁
+1. **Open Categories** from the main interface
+2. **Create custom categories** with name, icon (emoji), and color
+3. **View category statistics** - see how many phrases in each category
+4. **Organize messages** by category for better management
+
+#### Help Documentation ❓
+1. **Click Help button** (❓) for in-app assistance
+2. **Getting Started guide** - step-by-step setup instructions
+3. **Template Variables reference** - all available variables explained
+4. **Keyboard Shortcuts** - complete list of hotkeys
+5. **Advanced Features** - detailed explanations of all capabilities
+
 ## Settings Persistence
 
 All settings are automatically saved:
@@ -163,11 +212,20 @@ For more details, see [MULTI_LANGUAGE_PHRASES.md](MULTI_LANGUAGE_PHRASES.md).
 
 ## Version
 
-**v4.3 Localization Edition** - Current release with:
-- 🌍 **Internationalization**: Full i18n support with English and Urdu (اردو)
-- ↔️ **RTL Support**: Complete Right-to-Left layout for Arabic script languages
-- 🔄 **Language Switcher**: Easy language selection with live updates
-- 🎨 **Localized Fonts**: Beautiful Urdu/Nastaliq font rendering
+**v4.4.0 UI Polish Edition** - Current release with:
+- 🔔 **Notification Center**: Complete notification history management
+- 📁 **Category Manager**: Create and organize custom message categories
+- ⌨️ **Command Palette**: Quick access to all features (Ctrl+K)
+- 😊 **Emoji Picker**: Built-in emoji selection with 200+ emojis
+- 👁️ **Preview Mode**: Test messages before sending
+- ❓ **Help System**: Comprehensive in-app documentation
+- 🎨 **UI Enhancements**: Improved layouts, badges, and polish
+
+**Previous releases:**
+- **v4.3**: Multi-language support with English, Urdu (اردو), and Spanish (Español)
+- **v4.2**: Enhanced features and stability improvements  
+- **v4.1**: Dark mode, keyboard shortcuts, pause/resume
+- **v4.0**: Typing simulation, anti-detection, analytics dashboard
 
 **v4.2 Feature Complete Edition** - Previous release with:
 - 🔔 **Browser Notifications**: Desktop alerts for all events
