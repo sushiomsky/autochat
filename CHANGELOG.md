@@ -2,6 +2,62 @@
 
 All notable changes to AutoChat will be documented in this file.
 
+## [4.5.0] - 2025-12-07 - Integration Foundation
+
+### Added
+- **Webhook Integration System**: Complete webhook infrastructure for external integrations
+  - 8 event types: message_sent, campaign_started, campaign_stopped, campaign_paused, campaign_resumed, daily_limit_reached, error, milestone
+  - Webhook management UI with full CRUD operations
+  - Custom HTTP methods (POST, GET, PUT, PATCH)
+  - Custom headers support for authentication
+  - Automatic retry logic (3 attempts with exponential backoff)
+  - Statistics tracking (triggers, failures, last triggered)
+  - Test functionality for webhooks
+  - Enable/disable controls (global and per-webhook)
+- **Webhook Module** (`src/webhooks.js`): Core webhook functionality with 33 comprehensive tests
+- **Webhook Manager Modal**: Full-featured UI for webhook configuration
+  - Add, edit, delete webhooks
+  - View webhook statistics and performance
+  - Test webhooks with real payloads
+  - Enable/disable webhooks individually
+- **Background Script Integration**: Automatic webhook triggers for all events
+- **Content Script Integration**: Message-level webhook triggers with context data
+- **Documentation**: 
+  - Complete webhook guide (WEBHOOK_GUIDE.md)
+  - Integration examples for popular services (WEBHOOK_EXAMPLES.md)
+  - Templates for Slack, Discord, Teams, Telegram, and more
+
+### Changed
+- Updated version to 4.5.0
+- Enhanced background script with webhook trigger functionality
+- Enhanced content script to include webhook context in messages
+- Improved CSS with webhook-specific styling (modal-large, webhook-list, etc.)
+
+### Technical
+- Added 33 new tests for webhook functionality (total: 158 tests)
+- All tests passing with zero errors/warnings
+- Build system includes webhook module in dist
+- Linting passes with zero errors/warnings
+- Webhook system uses Promise-based API for compatibility
+- Retry logic implements exponential backoff (1s, 2s, 3s)
+- Request timeout set to 10 seconds
+- Maximum 10 webhooks per extension
+
+### Files Added
+- `src/webhooks.js` - Core webhook management module
+- `tests/unit/webhooks.test.js` - Comprehensive webhook tests
+- `WEBHOOK_GUIDE.md` - Complete webhook documentation
+- `WEBHOOK_EXAMPLES.md` - Integration examples and templates
+
+### Files Modified
+- `popup-enhanced.html` - Added webhook management modal and settings
+- `popup-enhanced.js` - Integrated webhook manager UI
+- `styles.css` - Added webhook-specific styles
+- `background.js` - Added webhook trigger functionality
+- `content-enhanced.js` - Added webhook context for messages
+- `manifest.json` - Updated version to 4.5.0
+- `package.json` - Updated version to 4.5.0
+
 ## [4.4.0] - 2025-11-28 - UI Polish Edition
 
 ### Added
