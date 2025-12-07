@@ -2,6 +2,39 @@
 
 All notable changes to AutoChat will be documented in this file.
 
+## [4.5.2] - 2025-12-07 - Firefox Support
+
+### Added
+- **Firefox Browser Support**: Full cross-browser compatibility
+  - Firefox Manifest V2 support
+  - `manifest_firefox.json` for Firefox-specific configuration
+  - Browser API compatibility layer
+  - Separate Firefox build pipeline (`npm run build:firefox`)
+  - Firefox package script (`npm run package:firefox`)
+  - Comprehensive Firefox documentation (FIREFOX.md)
+- **Build System Enhancements**:
+  - `scripts/build-firefox.js` - Firefox-specific build script
+  - Automatic `chrome.*` to `browser.*` API conversion
+  - Firefox-compatible manifest generation
+  - Separate `dist-firefox` output directory
+
+### Changed
+- Updated package.json with Firefox build commands
+- Build system now supports both Chrome and Firefox targets
+- Updated .gitignore to exclude `dist-firefox` directory
+
+### Technical
+- Firefox uses Manifest V2 (browser_action instead of action)
+- Background scripts instead of service workers for Firefox
+- Promise-based browser API namespace
+- Full feature parity with Chrome version
+
+### Documentation
+- Added FIREFOX.md with installation and development guide
+- Firefox-specific troubleshooting section
+- Browser compatibility notes
+- Migration guide from Chrome to Firefox
+
 ## [4.5.1] - 2025-12-07 - Human-Like Improvements & Donations
 
 ### Added

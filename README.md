@@ -1,6 +1,8 @@
 # AutoChat Enhanced - Advanced Automated Message Sender
 
-A powerful Chrome extension that automatically sends messages to chat applications with advanced features including typing simulation, anti-detection, analytics, and intelligent scheduling.
+A powerful browser extension that automatically sends messages to chat applications with advanced features including typing simulation, anti-detection, analytics, and intelligent scheduling.
+
+**Now Available for Chrome and Firefox!** 🎉
 
 ## Features
 
@@ -45,11 +47,23 @@ A powerful Chrome extension that automatically sends messages to chat applicatio
 
 ## Installation
 
+### Chrome
+
 1. Download or clone this repository
 2. Open Chrome and navigate to `chrome://extensions/`
 3. Enable "Developer mode" (toggle in top-right corner)
 4. Click "Load unpacked"
-5. Select the `autochat` folder
+5. Select the `dist` folder (after running `npm run build`)
+
+### Firefox
+
+1. Download or clone this repository
+2. Run `npm install --legacy-peer-deps` and `npm run build:firefox`
+3. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`
+4. Click "Load Temporary Add-on"
+5. Select any file in the `dist-firefox` folder (e.g., `manifest.json`)
+
+For detailed Firefox installation and development guide, see [FIREFOX.md](FIREFOX.md).
 
 ## Usage
 
