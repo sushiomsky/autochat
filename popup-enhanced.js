@@ -108,6 +108,7 @@ const elements = {
   accountModal: document.getElementById('accountModal'),
   webhookModal: document.getElementById('webhookModal'),
   donationModal: document.getElementById('donationModal'),
+  performanceModal: document.getElementById('performanceModal'),
 
   // Phrase management
   customPhrasesList: document.getElementById('customPhrasesList'),
@@ -872,6 +873,211 @@ document.querySelectorAll('.btn-copy').forEach(btn => {
       showNotification('Failed to copy address', false);
     }
   });
+});
+
+// ===== PERFORMANCE MONITOR =====
+
+let performanceMonitor = null;
+
+// Initialize performance monitor
+async function initPerformanceMonitor() {
+  if (!performanceMonitor) {
+    performanceMonitor = {
+      metrics: {
+        messagesSent: [],
+        typingSpeed: [],
+        errors: [],
+        memoryUsage: []
+      },
+      startTime: Date.now(),
+      
+      recordMessageSend(duration, success) {
+        this.metrics.messagesSent.push({ timestamp: Date.now(), duration, success });
+        if (this.metrics.messagesSent.length > 100) this.metrics.messagesSent.shift();
+      },
+      
+      recordTypingSpeed(wpm) {
+        this.metrics.typingSpeed.push({ timestamp: Date.now(), wpm });
+        if (this.metrics.typingSpeed.length > 50) this.metrics.typingSpeed.shift();
+      },
+      
+      recordError(type, message) {
+        this.metrics.errors.push({ timestamp: Date.now(), type, message });
+        if (this.metrics.errors.length > 50) this.metrics.errors.shift();
+      },
+      
+      getStats() {
+        const now = Date.now();
+        const uptime = now - this.startTime;
+        
+        const successfulSends = this.metrics.messagesSent.filter(m => m.success);
+        const failedSends = this.metrics.messagesSent.filter(m => !m.success);
+        const avgSendDuration = successfulSends.length > 0
+          ? successfulSends.reduce((sum, m) => sum + m.duration, 0) / successfulSends.length
+          : 0;
+        
+        const avgTypingSpeed = this.metrics.typingSpeed.length > 0
+          ? this.metrics.typingSpeed.reduce((sum, t) => sum + t.wpm, 0) / this.metrics.typingSpeed.length
+          : 0;
+        
+        const recentErrors = this.metrics.errors.filter(e => now - e.timestamp < 3600000);
+        
+        return {
+          uptime,
+          messages: {
+            total: this.metrics.messagesSent.length,
+            successful: successfulSends.length,
+            failed: failedSends.length,
+            successRate: this.metrics.messagesSent.length > 0
+              ? ((successfulSends.length / this.metrics.messagesSent.length) * 100).toFixed(1)
+              : 0,
+            avgDuration: avgSendDuration.toFixed(0)
+          },
+          typing: {
+            avgSpeed: avgTypingSpeed.toFixed(1),
+            samples: this.metrics.typingSpeed.length
+          },
+          errors: {
+            total: this.metrics.errors.length,
+            recentCount: recentErrors.length
+          },
+          memory: performance.memory ? {
+            usedMB: (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2),
+            usagePercent: ((performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit) * 100).toFixed(1)
+          } : null
+        };
+      },
+      
+      getRecommendations() {
+        const stats = this.getStats();
+        const recommendations = [];
+        
+        if (stats.messages.successRate < 90 && stats.messages.total > 10) {
+          recommendations.push({ type: 'warning', text: '⚠️ Message success rate is below 90%. Check input field configuration.' });
+        }
+        
+        if (parseFloat(stats.typing.avgSpeed) < 30 && stats.typing.samples > 5) {
+          recommendations.push({ type: 'info', text: '💡 Typing speed is slow. Consider increasing typing simulation speed.' });
+        } else if (parseFloat(stats.typing.avgSpeed) > 100 && stats.typing.samples > 5) {
+          recommendations.push({ type: 'warning', text: '⚠️ Typing speed is very fast. May appear robotic.' });
+        }
+        
+        if (stats.errors.recentCount > 10) {
+          recommendations.push({ type: 'warning', text: '⚠️ High error rate detected. Review recent errors.' });
+        }
+        
+        if (stats.memory && parseFloat(stats.memory.usagePercent) > 80) {
+          recommendations.push({ type: 'warning', text: '⚠️ High memory usage. Consider restarting extension.' });
+        }
+        
+        if (recommendations.length === 0) {
+          recommendations.push({ type: 'success', text: '✅ Performance is optimal! No issues detected.' });
+        }
+        
+        return recommendations;
+      }
+    };
+    
+    // Load saved metrics
+    const data = await new Promise(resolve => {
+      chrome.storage.local.get(['performanceMetrics'], resolve);
+    });
+    if (data.performanceMetrics) {
+      performanceMonitor.metrics = data.performanceMetrics.metrics || performanceMonitor.metrics;
+      performanceMonitor.startTime = data.performanceMetrics.startTime || performanceMonitor.startTime;
+    }
+  }
+  return performanceMonitor;
+}
+
+// Update performance display
+async function updatePerformanceDisplay() {
+  await initPerformanceMonitor();
+  const stats = performanceMonitor.getStats();
+  
+  // Update message stats
+  document.getElementById('perfTotalMessages').textContent = stats.messages.total;
+  document.getElementById('perfSuccessRate').textContent = stats.messages.successRate + '%';
+  document.getElementById('perfAvgDuration').textContent = stats.messages.avgDuration + 'ms';
+  document.getElementById('perfFailed').textContent = stats.messages.failed;
+  
+  // Update typing stats
+  document.getElementById('perfTypingSpeed').textContent = stats.typing.avgSpeed + ' WPM';
+  document.getElementById('perfTypingSamples').textContent = stats.typing.samples;
+  
+  // Update system stats
+  if (stats.memory) {
+    document.getElementById('perfMemoryUsed').textContent = stats.memory.usedMB + ' MB';
+    document.getElementById('perfMemoryPercent').textContent = stats.memory.usagePercent + '%';
+  } else {
+    document.getElementById('perfMemoryUsed').textContent = 'N/A';
+    document.getElementById('perfMemoryPercent').textContent = 'N/A';
+  }
+  
+  const uptimeSeconds = Math.floor(stats.uptime / 1000);
+  const uptimeStr = uptimeSeconds < 60 
+    ? uptimeSeconds + 's'
+    : Math.floor(uptimeSeconds / 60) + 'm ' + (uptimeSeconds % 60) + 's';
+  document.getElementById('perfUptime').textContent = uptimeStr;
+  document.getElementById('perfErrors').textContent = stats.errors.total;
+  
+  // Update recommendations
+  const recommendations = performanceMonitor.getRecommendations();
+  const recContainer = document.getElementById('perfRecommendations');
+  recContainer.innerHTML = recommendations.map(rec => 
+    `<div class="perf-recommendation ${rec.type}">${rec.text}</div>`
+  ).join('');
+}
+
+// Performance modal
+document.getElementById('openPerformance')?.addEventListener('click', async () => {
+  await updatePerformanceDisplay();
+  elements.performanceModal.classList.add('show');
+});
+
+// Refresh performance
+document.getElementById('refreshPerformance')?.addEventListener('click', async () => {
+  await updatePerformanceDisplay();
+  showNotification('Performance data refreshed', true);
+});
+
+// Export performance
+document.getElementById('exportPerformance')?.addEventListener('click', async () => {
+  await initPerformanceMonitor();
+  const stats = performanceMonitor.getStats();
+  const data = {
+    exportTime: new Date().toISOString(),
+    stats,
+    recommendations: performanceMonitor.getRecommendations()
+  };
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `autochat-performance-${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  showNotification('Performance data exported', true);
+});
+
+// Clear performance
+document.getElementById('clearPerformance')?.addEventListener('click', async () => {
+  if (confirm('Clear all performance metrics? This cannot be undone.')) {
+    await initPerformanceMonitor();
+    performanceMonitor.metrics = {
+      messagesSent: [],
+      typingSpeed: [],
+      errors: [],
+      memoryUsage: []
+    };
+    performanceMonitor.startTime = Date.now();
+    
+    await chrome.storage.local.remove(['performanceMetrics']);
+    await updatePerformanceDisplay();
+    showNotification('Performance metrics cleared', true);
+  }
 });
 
 // Close modals

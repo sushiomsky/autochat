@@ -131,6 +131,9 @@
       <button id="openCategoryManager" class="btn-secondary">⚙️ Manage</button>
       <button id="openAnalytics" class="btn-secondary">📊 Stats</button>
     </div>
+    <div class="btn-row">
+      <button id="openPerformance" class="btn-secondary">⚡ Performance</button>
+    </div>
 
     <div class="shortcuts-info">
       <strong>Keyboard Shortcuts:</strong>
@@ -141,7 +144,7 @@
     </div>
 
     <!-- Version -->
-    <div class="version">v4.4 Professional Edition</div>
+    <div class="version">v4.5 Integration Foundation</div>
   </div>
 
   <!-- Settings Modal -->
@@ -697,6 +700,87 @@
           <li>Bug fixes and improvements</li>
           <li>Community support</li>
         </ul>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Performance Monitor Modal -->
+  <div id="performanceModal" class="modal">
+    <div class="modal-content modal-large">
+      <h3>⚡ Performance Monitor</h3>
+      <p class="help">Real-time performance metrics and optimization recommendations</p>
+
+      <div class="section">
+        <h4>📊 Message Statistics</h4>
+        <div class="perf-stats-grid">
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Total Sent</div>
+            <div class="perf-stat-value" id="perfTotalMessages">0</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Success Rate</div>
+            <div class="perf-stat-value" id="perfSuccessRate">0%</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Avg Duration</div>
+            <div class="perf-stat-value" id="perfAvgDuration">0ms</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Failed</div>
+            <div class="perf-stat-value error" id="perfFailed">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>⌨️ Typing Performance</h4>
+        <div class="perf-stats-grid">
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Avg Speed</div>
+            <div class="perf-stat-value" id="perfTypingSpeed">0 WPM</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Samples</div>
+            <div class="perf-stat-value" id="perfTypingSamples">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>💾 System Resources</h4>
+        <div class="perf-stats-grid">
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Memory Used</div>
+            <div class="perf-stat-value" id="perfMemoryUsed">N/A</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Memory %</div>
+            <div class="perf-stat-value" id="perfMemoryPercent">N/A</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Uptime</div>
+            <div class="perf-stat-value" id="perfUptime">0s</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Errors</div>
+            <div class="perf-stat-value error" id="perfErrors">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>💡 Recommendations</h4>
+        <div id="perfRecommendations" class="perf-recommendations"></div>
+      </div>
+
+      <div class="section">
+        <div class="btn-row">
+          <button id="refreshPerformance" class="btn-secondary">🔄 Refresh</button>
+          <button id="exportPerformance" class="btn-secondary">📥 Export</button>
+          <button id="clearPerformance" class="btn-secondary">🗑️ Clear</button>
+        </div>
       </div>
 
       <button class="close-modal btn-primary">Close</button>

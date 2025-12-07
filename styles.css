@@ -2321,3 +2321,74 @@ body.dark-mode .account-item-actions button:hover {
   font-size: 13px;
   color: var(--text-secondary);
 }
+
+/* Performance Monitor Styles */
+.perf-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.perf-stat-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.perf-stat-card:hover {
+  box-shadow: 0 2px 8px var(--shadow);
+  transform: translateY(-2px);
+}
+
+.perf-stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+
+.perf-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.perf-stat-value.error {
+  color: #e74c3c;
+}
+
+.perf-recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.perf-recommendation {
+  padding: 12px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  border-left: 4px solid var(--border-color);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.perf-recommendation.success {
+  border-left-color: #2ecc71;
+  background: rgba(46, 204, 113, 0.1);
+}
+
+.perf-recommendation.warning {
+  border-left-color: #f39c12;
+  background: rgba(243, 156, 18, 0.1);
+}
+
+.perf-recommendation.info {
+  border-left-color: #3498db;
+  background: rgba(52, 152, 219, 0.1);
+}
