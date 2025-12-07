@@ -5,6 +5,12 @@
 
 // ===== UTILITY FUNCTIONS =====
 
+function sanitizeHTML(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 async function getActiveTab() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   return tab;
@@ -100,6 +106,9 @@ const elements = {
   phraseModal: document.getElementById('phraseModal'),
   analyticsModal: document.getElementById('analyticsModal'),
   accountModal: document.getElementById('accountModal'),
+  webhookModal: document.getElementById('webhookModal'),
+  donationModal: document.getElementById('donationModal'),
+  performanceModal: document.getElementById('performanceModal'),
 
   // Phrase management
   customPhrasesList: document.getElementById('customPhrasesList'),
@@ -516,10 +525,559 @@ document.getElementById('openSettings')?.addEventListener('click', () => {
   elements.settingsModal.classList.add('show');
 });
 
+// ===== WEBHOOK MANAGEMENT =====
+
+let webhookManager = null;
+
+// Load webhook module
+async function initializeWebhookManager() {
+  if (!webhookManager) {
+    // Simple inline webhook manager
+    webhookManager = {
+      webhooks: [],
+      enabled: true,
+      async load() {
+        const data = await new Promise(resolve => {
+          chrome.storage.local.get(['webhooks', 'webhooksEnabled'], resolve);
+        });
+        this.webhooks = data.webhooks || [];
+        this.enabled = data.webhooksEnabled !== false;
+      },
+      async save() {
+        await new Promise(resolve => {
+          chrome.storage.local.set({ 
+            webhooks: this.webhooks,
+            webhooksEnabled: this.enabled
+          }, resolve);
+        });
+      },
+      generateId() {
+        return `webhook_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+      },
+      add(webhook) {
+        const newWebhook = {
+          id: this.generateId(),
+          name: webhook.name || 'Unnamed Webhook',
+          url: webhook.url,
+          events: webhook.events || [],
+          method: webhook.method || 'POST',
+          headers: webhook.headers || {},
+          enabled: true,
+          createdAt: new Date().toISOString(),
+          triggerCount: 0,
+          failureCount: 0,
+          lastTriggered: null
+        };
+        this.webhooks.push(newWebhook);
+        return newWebhook;
+      },
+      update(id, updates) {
+        const webhook = this.webhooks.find(w => w.id === id);
+        if (webhook) {
+          Object.assign(webhook, updates);
+        }
+        return webhook;
+      },
+      delete(id) {
+        const index = this.webhooks.findIndex(w => w.id === id);
+        if (index !== -1) {
+          this.webhooks.splice(index, 1);
+        }
+      },
+      getAll() {
+        return this.webhooks;
+      },
+      getStats() {
+        return {
+          total: this.webhooks.length,
+          enabled: this.webhooks.filter(w => w.enabled).length,
+          totalTriggers: this.webhooks.reduce((sum, w) => sum + w.triggerCount, 0),
+          totalFailures: this.webhooks.reduce((sum, w) => sum + w.failureCount, 0)
+        };
+      },
+      async test(id) {
+        const webhook = this.webhooks.find(w => w.id === id);
+        if (!webhook) {
+          throw new Error('Webhook not found');
+        }
+
+        try {
+          const response = await fetch(webhook.url, {
+            method: webhook.method,
+            headers: {
+              'Content-Type': 'application/json',
+              ...webhook.headers
+            },
+            body: JSON.stringify({
+              event: 'test',
+              timestamp: new Date().toISOString(),
+              data: { test: true, message: 'Test webhook from AutoChat' },
+              source: 'AutoChat',
+              version: chrome.runtime.getManifest().version
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          showNotification(`✅ Webhook "${webhook.name}" tested successfully!`, true);
+          return true;
+        } catch (error) {
+          showNotification(`❌ Webhook test failed: ${error.message}`, false);
+          return false;
+        }
+      }
+    };
+    await webhookManager.load();
+  }
+  return webhookManager;
+}
+
+// Render webhook list
+async function renderWebhookList() {
+  await initializeWebhookManager();
+  const webhookList = document.getElementById('webhookList');
+  const webhookCount = document.getElementById('webhookCount');
+  
+  if (!webhookList) return;
+
+  const webhooks = webhookManager.getAll();
+  webhookCount.textContent = webhooks.length;
+
+  if (webhooks.length === 0) {
+    webhookList.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🔗</div>
+        <div class="empty-state-text">No webhooks configured yet. Add your first webhook to get started!</div>
+      </div>
+    `;
+    return;
+  }
+
+  webhookList.innerHTML = webhooks.map(webhook => `
+    <div class="webhook-item ${webhook.enabled ? '' : 'disabled'}">
+      <div class="webhook-header">
+        <span class="webhook-name">${sanitizeHTML(webhook.name)}</span>
+        <div class="webhook-actions">
+          <button class="btn-toggle ${webhook.enabled ? 'enabled' : ''}" data-id="${webhook.id}">
+            ${webhook.enabled ? '✅' : '❌'}
+          </button>
+          <button class="btn-test" data-id="${webhook.id}">🧪 Test</button>
+          <button class="btn-delete" data-id="${webhook.id}">🗑️</button>
+        </div>
+      </div>
+      <div class="webhook-details">
+        <div class="webhook-detail-row">
+          <span class="webhook-detail-label">URL:</span>
+          <span class="webhook-detail-value">${sanitizeHTML(webhook.url)}</span>
+        </div>
+        <div class="webhook-detail-row">
+          <span class="webhook-detail-label">Method:</span>
+          <span class="webhook-detail-value">${webhook.method}</span>
+        </div>
+        <div class="webhook-detail-row">
+          <span class="webhook-detail-label">Events:</span>
+          <div class="webhook-events">
+            ${webhook.events.map(e => `<span class="webhook-event-tag">${e.replace('_', ' ')}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="webhook-item-stats">
+        <div class="webhook-stat">
+          <span class="webhook-stat-label">Triggers</span>
+          <span class="webhook-stat-value success">${webhook.triggerCount || 0}</span>
+        </div>
+        <div class="webhook-stat">
+          <span class="webhook-stat-label">Failures</span>
+          <span class="webhook-stat-value error">${webhook.failureCount || 0}</span>
+        </div>
+        <div class="webhook-stat">
+          <span class="webhook-stat-label">Last Triggered</span>
+          <span class="webhook-stat-value">${webhook.lastTriggered ? new Date(webhook.lastTriggered).toLocaleDateString() : 'Never'}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Attach event listeners
+  webhookList.querySelectorAll('.btn-toggle').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      const webhook = webhookManager.getAll().find(w => w.id === id);
+      if (webhook) {
+        webhookManager.update(id, { enabled: !webhook.enabled });
+        await webhookManager.save();
+        await renderWebhookList();
+        await updateWebhookStats();
+      }
+    });
+  });
+
+  webhookList.querySelectorAll('.btn-test').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      await webhookManager.test(id);
+    });
+  });
+
+  webhookList.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      const webhook = webhookManager.getAll().find(w => w.id === id);
+      if (webhook && confirm(`Are you sure you want to delete webhook "${webhook.name}"?`)) {
+        webhookManager.delete(id);
+        await webhookManager.save();
+        await renderWebhookList();
+        await updateWebhookStats();
+        showNotification(`Webhook "${webhook.name}" deleted`, true);
+      }
+    });
+  });
+}
+
+// Update webhook statistics
+async function updateWebhookStats() {
+  await initializeWebhookManager();
+  const stats = webhookManager.getStats();
+
+  const totalEl = document.getElementById('webhookStatsTotal');
+  const enabledEl = document.getElementById('webhookStatsEnabled');
+  const triggersEl = document.getElementById('webhookStatsTriggers');
+  const failuresEl = document.getElementById('webhookStatsFailures');
+
+  if (totalEl) totalEl.textContent = stats.total;
+  if (enabledEl) enabledEl.textContent = stats.enabled;
+  if (triggersEl) triggersEl.textContent = stats.totalTriggers;
+  if (failuresEl) failuresEl.textContent = stats.totalFailures;
+}
+
+// Webhook form handler
+document.getElementById('webhookForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById('webhookName').value.trim();
+  const url = document.getElementById('webhookUrl').value.trim();
+  const method = document.getElementById('webhookMethod').value;
+  const headersText = document.getElementById('webhookHeaders').value.trim();
+  
+  // Get selected events
+  const events = Array.from(document.querySelectorAll('#webhookEvents input[type="checkbox"]:checked'))
+    .map(cb => cb.value);
+
+  // Validation
+  if (!name) {
+    showNotification('❌ Webhook name is required', false);
+    return;
+  }
+
+  if (!url || !url.startsWith('http')) {
+    showNotification('❌ Valid URL is required (must start with http:// or https://)', false);
+    return;
+  }
+
+  if (events.length === 0) {
+    showNotification('❌ Please select at least one event', false);
+    return;
+  }
+
+  let headers = {};
+  if (headersText) {
+    try {
+      headers = JSON.parse(headersText);
+    } catch (error) {
+      showNotification('❌ Invalid JSON in custom headers', false);
+      return;
+    }
+  }
+
+  await initializeWebhookManager();
+  
+  try {
+    webhookManager.add({
+      name,
+      url,
+      method,
+      events,
+      headers
+    });
+    
+    await webhookManager.save();
+    await renderWebhookList();
+    await updateWebhookStats();
+    
+    // Reset form
+    document.getElementById('webhookForm').reset();
+    showNotification(`✅ Webhook "${name}" added successfully!`, true);
+  } catch (error) {
+    showNotification(`❌ Failed to add webhook: ${error.message}`, false);
+  }
+});
+
+// Cancel webhook form
+document.getElementById('cancelWebhookForm')?.addEventListener('click', () => {
+  document.getElementById('webhookForm').reset();
+});
+
+// Manage webhooks button
+document.getElementById('manageWebhooks')?.addEventListener('click', async () => {
+  await renderWebhookList();
+  await updateWebhookStats();
+  elements.webhookModal.classList.add('show');
+});
+
+// Webhooks enabled checkbox
+document.getElementById('webhooksEnabled')?.addEventListener('change', async (e) => {
+  await initializeWebhookManager();
+  webhookManager.enabled = e.target.checked;
+  await webhookManager.save();
+  showNotification(`Webhooks ${e.target.checked ? 'enabled' : 'disabled'}`, true);
+});
+
 // Analytics modal
 document.getElementById('openAnalytics')?.addEventListener('click', async () => {
   await updateStats();
   elements.analyticsModal.classList.add('show');
+});
+
+// Donation modal
+document.getElementById('openDonation')?.addEventListener('click', () => {
+  elements.donationModal.classList.add('show');
+});
+
+// Copy crypto address functionality
+document.querySelectorAll('.btn-copy').forEach(btn => {
+  btn.addEventListener('click', async (e) => {
+    const addressId = e.target.getAttribute('data-address');
+    const addressElement = document.getElementById(addressId);
+    if (!addressElement) return;
+
+    const address = addressElement.textContent;
+    
+    try {
+      await navigator.clipboard.writeText(address);
+      
+      // Show feedback
+      const originalText = e.target.textContent;
+      e.target.textContent = '✓';
+      e.target.style.background = '#2ecc71';
+      
+      setTimeout(() => {
+        e.target.textContent = originalText;
+        e.target.style.background = '';
+      }, 2000);
+      
+      showNotification('Address copied to clipboard!', true);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      showNotification('Failed to copy address', false);
+    }
+  });
+});
+
+// ===== PERFORMANCE MONITOR =====
+
+let performanceMonitor = null;
+
+// Initialize performance monitor
+async function initPerformanceMonitor() {
+  if (!performanceMonitor) {
+    performanceMonitor = {
+      metrics: {
+        messagesSent: [],
+        typingSpeed: [],
+        errors: [],
+        memoryUsage: []
+      },
+      startTime: Date.now(),
+      
+      recordMessageSend(duration, success) {
+        this.metrics.messagesSent.push({ timestamp: Date.now(), duration, success });
+        if (this.metrics.messagesSent.length > 100) this.metrics.messagesSent.shift();
+      },
+      
+      recordTypingSpeed(wpm) {
+        this.metrics.typingSpeed.push({ timestamp: Date.now(), wpm });
+        if (this.metrics.typingSpeed.length > 50) this.metrics.typingSpeed.shift();
+      },
+      
+      recordError(type, message) {
+        this.metrics.errors.push({ timestamp: Date.now(), type, message });
+        if (this.metrics.errors.length > 50) this.metrics.errors.shift();
+      },
+      
+      getStats() {
+        const now = Date.now();
+        const uptime = now - this.startTime;
+        
+        const successfulSends = this.metrics.messagesSent.filter(m => m.success);
+        const failedSends = this.metrics.messagesSent.filter(m => !m.success);
+        const avgSendDuration = successfulSends.length > 0
+          ? successfulSends.reduce((sum, m) => sum + m.duration, 0) / successfulSends.length
+          : 0;
+        
+        const avgTypingSpeed = this.metrics.typingSpeed.length > 0
+          ? this.metrics.typingSpeed.reduce((sum, t) => sum + t.wpm, 0) / this.metrics.typingSpeed.length
+          : 0;
+        
+        const recentErrors = this.metrics.errors.filter(e => now - e.timestamp < 3600000);
+        
+        return {
+          uptime,
+          messages: {
+            total: this.metrics.messagesSent.length,
+            successful: successfulSends.length,
+            failed: failedSends.length,
+            successRate: this.metrics.messagesSent.length > 0
+              ? ((successfulSends.length / this.metrics.messagesSent.length) * 100).toFixed(1)
+              : 0,
+            avgDuration: avgSendDuration.toFixed(0)
+          },
+          typing: {
+            avgSpeed: avgTypingSpeed.toFixed(1),
+            samples: this.metrics.typingSpeed.length
+          },
+          errors: {
+            total: this.metrics.errors.length,
+            recentCount: recentErrors.length
+          },
+          memory: performance.memory ? {
+            usedMB: (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2),
+            usagePercent: ((performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit) * 100).toFixed(1)
+          } : null
+        };
+      },
+      
+      getRecommendations() {
+        const stats = this.getStats();
+        const recommendations = [];
+        
+        if (stats.messages.successRate < 90 && stats.messages.total > 10) {
+          recommendations.push({ type: 'warning', text: '⚠️ Message success rate is below 90%. Check input field configuration.' });
+        }
+        
+        if (parseFloat(stats.typing.avgSpeed) < 30 && stats.typing.samples > 5) {
+          recommendations.push({ type: 'info', text: '💡 Typing speed is slow. Consider increasing typing simulation speed.' });
+        } else if (parseFloat(stats.typing.avgSpeed) > 100 && stats.typing.samples > 5) {
+          recommendations.push({ type: 'warning', text: '⚠️ Typing speed is very fast. May appear robotic.' });
+        }
+        
+        if (stats.errors.recentCount > 10) {
+          recommendations.push({ type: 'warning', text: '⚠️ High error rate detected. Review recent errors.' });
+        }
+        
+        if (stats.memory && parseFloat(stats.memory.usagePercent) > 80) {
+          recommendations.push({ type: 'warning', text: '⚠️ High memory usage. Consider restarting extension.' });
+        }
+        
+        if (recommendations.length === 0) {
+          recommendations.push({ type: 'success', text: '✅ Performance is optimal! No issues detected.' });
+        }
+        
+        return recommendations;
+      }
+    };
+    
+    // Load saved metrics
+    const data = await new Promise(resolve => {
+      chrome.storage.local.get(['performanceMetrics'], resolve);
+    });
+    if (data.performanceMetrics) {
+      performanceMonitor.metrics = data.performanceMetrics.metrics || performanceMonitor.metrics;
+      performanceMonitor.startTime = data.performanceMetrics.startTime || performanceMonitor.startTime;
+    }
+  }
+  return performanceMonitor;
+}
+
+// Update performance display
+async function updatePerformanceDisplay() {
+  await initPerformanceMonitor();
+  const stats = performanceMonitor.getStats();
+  
+  // Update message stats
+  document.getElementById('perfTotalMessages').textContent = stats.messages.total;
+  document.getElementById('perfSuccessRate').textContent = stats.messages.successRate + '%';
+  document.getElementById('perfAvgDuration').textContent = stats.messages.avgDuration + 'ms';
+  document.getElementById('perfFailed').textContent = stats.messages.failed;
+  
+  // Update typing stats
+  document.getElementById('perfTypingSpeed').textContent = stats.typing.avgSpeed + ' WPM';
+  document.getElementById('perfTypingSamples').textContent = stats.typing.samples;
+  
+  // Update system stats
+  if (stats.memory) {
+    document.getElementById('perfMemoryUsed').textContent = stats.memory.usedMB + ' MB';
+    document.getElementById('perfMemoryPercent').textContent = stats.memory.usagePercent + '%';
+  } else {
+    document.getElementById('perfMemoryUsed').textContent = 'N/A';
+    document.getElementById('perfMemoryPercent').textContent = 'N/A';
+  }
+  
+  const uptimeSeconds = Math.floor(stats.uptime / 1000);
+  const uptimeStr = uptimeSeconds < 60 
+    ? uptimeSeconds + 's'
+    : Math.floor(uptimeSeconds / 60) + 'm ' + (uptimeSeconds % 60) + 's';
+  document.getElementById('perfUptime').textContent = uptimeStr;
+  document.getElementById('perfErrors').textContent = stats.errors.total;
+  
+  // Update recommendations
+  const recommendations = performanceMonitor.getRecommendations();
+  const recContainer = document.getElementById('perfRecommendations');
+  recContainer.innerHTML = recommendations.map(rec => 
+    `<div class="perf-recommendation ${rec.type}">${rec.text}</div>`
+  ).join('');
+}
+
+// Performance modal
+document.getElementById('openPerformance')?.addEventListener('click', async () => {
+  await updatePerformanceDisplay();
+  elements.performanceModal.classList.add('show');
+});
+
+// Refresh performance
+document.getElementById('refreshPerformance')?.addEventListener('click', async () => {
+  await updatePerformanceDisplay();
+  showNotification('Performance data refreshed', true);
+});
+
+// Export performance
+document.getElementById('exportPerformance')?.addEventListener('click', async () => {
+  await initPerformanceMonitor();
+  const stats = performanceMonitor.getStats();
+  const data = {
+    exportTime: new Date().toISOString(),
+    stats,
+    recommendations: performanceMonitor.getRecommendations()
+  };
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `autochat-performance-${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  showNotification('Performance data exported', true);
+});
+
+// Clear performance
+document.getElementById('clearPerformance')?.addEventListener('click', async () => {
+  if (confirm('Clear all performance metrics? This cannot be undone.')) {
+    await initPerformanceMonitor();
+    performanceMonitor.metrics = {
+      messagesSent: [],
+      typingSpeed: [],
+      errors: [],
+      memoryUsage: []
+    };
+    performanceMonitor.startTime = Date.now();
+    
+    await chrome.storage.local.remove(['performanceMetrics']);
+    await updatePerformanceDisplay();
+    showNotification('Performance metrics cleared', true);
+  }
 });
 
 // Close modals

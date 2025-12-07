@@ -14,6 +14,7 @@
           🔔
           <span id="notificationBadge" class="notification-count-badge" style="display: none;">0</span>
         </button>
+        <button id="openDonation" class="header-btn" title="Support Development" aria-label="Donate with Crypto">💝</button>
         <button id="themeToggle" class="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
       </div>
     </h2>
@@ -130,6 +131,9 @@
       <button id="openCategoryManager" class="btn-secondary">⚙️ Manage</button>
       <button id="openAnalytics" class="btn-secondary">📊 Stats</button>
     </div>
+    <div class="btn-row">
+      <button id="openPerformance" class="btn-secondary">⚡ Performance</button>
+    </div>
 
     <div class="shortcuts-info">
       <strong>Keyboard Shortcuts:</strong>
@@ -140,7 +144,7 @@
     </div>
 
     <!-- Version -->
-    <div class="version">v4.4 Professional Edition</div>
+    <div class="version">v4.5 Integration Foundation</div>
   </div>
 
   <!-- Settings Modal -->
@@ -248,6 +252,18 @@
         <textarea id="mentionReplyMessages" rows="3" placeholder="Thanks for mentioning me!&#10;Hello! I'm here.&#10;Hi! What's up?"></textarea>
       </label>
       <div class="help">Random reply will be selected from this list</div>
+
+      <hr>
+
+      <h4>🔗 Webhooks & Integrations</h4>
+
+      <label>
+        <input type="checkbox" id="webhooksEnabled" checked>
+        🌐 Enable Webhooks
+      </label>
+      <div class="help">Send HTTP requests when events occur (integrations with external services)</div>
+
+      <button id="manageWebhooks" class="btn-secondary">⚙️ Manage Webhooks</button>
 
       <hr>
 
@@ -537,6 +553,234 @@
           <li><strong>Active Hours</strong> - Only sends during specified hours</li>
           <li><strong>Mention Detection</strong> - Auto-reply when mentioned</li>
         </ul>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Webhook Manager Modal -->
+  <div id="webhookModal" class="modal">
+    <div class="modal-content modal-large">
+      <h3>🔗 Webhook Management</h3>
+      <p class="help">Webhooks allow you to send HTTP requests when specific events occur. Connect AutoChat with external services like Slack, Discord, Zapier, or your own custom endpoints.</p>
+
+      <div class="section">
+        <h4>➕ Add New Webhook</h4>
+        <form id="webhookForm">
+          <label>
+            Webhook Name:
+            <input type="text" id="webhookName" placeholder="My Webhook" required>
+          </label>
+
+          <label>
+            URL:
+            <input type="url" id="webhookUrl" placeholder="https://example.com/webhook" required>
+          </label>
+
+          <label>
+            HTTP Method:
+            <select id="webhookMethod">
+              <option value="POST">POST</option>
+              <option value="GET">GET</option>
+              <option value="PUT">PUT</option>
+              <option value="PATCH">PATCH</option>
+            </select>
+          </label>
+
+          <label>
+            Events (select one or more):
+            <div class="checkbox-group" id="webhookEvents">
+              <label><input type="checkbox" value="message_sent"> Message Sent</label>
+              <label><input type="checkbox" value="campaign_started"> Campaign Started</label>
+              <label><input type="checkbox" value="campaign_stopped"> Campaign Stopped</label>
+              <label><input type="checkbox" value="campaign_paused"> Campaign Paused</label>
+              <label><input type="checkbox" value="campaign_resumed"> Campaign Resumed</label>
+              <label><input type="checkbox" value="daily_limit_reached"> Daily Limit Reached</label>
+              <label><input type="checkbox" value="error"> Error</label>
+              <label><input type="checkbox" value="milestone"> Milestone</label>
+            </div>
+          </label>
+
+          <label>
+            Custom Headers (optional, JSON format):
+            <textarea id="webhookHeaders" rows="3" placeholder='{"Authorization": "Bearer token123", "X-Custom": "value"}'></textarea>
+          </label>
+
+          <div class="btn-row">
+            <button type="submit" class="btn-success">➕ Add Webhook</button>
+            <button type="button" id="cancelWebhookForm" class="btn-secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <h4>📋 Configured Webhooks <span id="webhookCount" class="badge">0</span></h4>
+        <div id="webhookList" class="webhook-list"></div>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <h4>📊 Statistics</h4>
+        <div class="webhook-stats">
+          <div class="stat-item">
+            <div class="stat-label">Total Webhooks</div>
+            <div class="stat-value" id="webhookStatsTotal">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Enabled</div>
+            <div class="stat-value" id="webhookStatsEnabled">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Total Triggers</div>
+            <div class="stat-value" id="webhookStatsTriggers">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Failures</div>
+            <div class="stat-value" id="webhookStatsFailures">0</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Donation Modal -->
+  <div id="donationModal" class="modal">
+    <div class="modal-content">
+      <h3>💝 Support AutoChat Development</h3>
+      <p>Help keep AutoChat free and open-source! Your support enables continued development and new features.</p>
+
+      <div class="donation-section">
+        <h4>🪙 Crypto Donations</h4>
+        
+        <div class="crypto-address">
+          <label>Bitcoin (BTC)</label>
+          <div class="address-box">
+            <code id="btcAddress">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</code>
+            <button class="btn-copy" data-address="btcAddress" title="Copy address">📋</button>
+          </div>
+        </div>
+
+        <div class="crypto-address">
+          <label>Ethereum (ETH)</label>
+          <div class="address-box">
+            <code id="ethAddress">0x742d35Cc6634C0532925a3b844Bc454e4438f44e</code>
+            <button class="btn-copy" data-address="ethAddress" title="Copy address">📋</button>
+          </div>
+        </div>
+
+        <div class="crypto-address">
+          <label>USDT (TRC20)</label>
+          <div class="address-box">
+            <code id="usdtAddress">TYASr5UV6HEcXatwdFQfmLVUqQQQMUxHLS</code>
+            <button class="btn-copy" data-address="usdtAddress" title="Copy address">📋</button>
+          </div>
+        </div>
+
+        <div class="crypto-address">
+          <label>Litecoin (LTC)</label>
+          <div class="address-box">
+            <code id="ltcAddress">LTC1QW2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</code>
+            <button class="btn-copy" data-address="ltcAddress" title="Copy address">📋</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="donation-info">
+        <p>✨ <strong>Every contribution matters!</strong></p>
+        <p>Your donation helps with:</p>
+        <ul>
+          <li>Development of new features</li>
+          <li>Server and infrastructure costs</li>
+          <li>Bug fixes and improvements</li>
+          <li>Community support</li>
+        </ul>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Performance Monitor Modal -->
+  <div id="performanceModal" class="modal">
+    <div class="modal-content modal-large">
+      <h3>⚡ Performance Monitor</h3>
+      <p class="help">Real-time performance metrics and optimization recommendations</p>
+
+      <div class="section">
+        <h4>📊 Message Statistics</h4>
+        <div class="perf-stats-grid">
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Total Sent</div>
+            <div class="perf-stat-value" id="perfTotalMessages">0</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Success Rate</div>
+            <div class="perf-stat-value" id="perfSuccessRate">0%</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Avg Duration</div>
+            <div class="perf-stat-value" id="perfAvgDuration">0ms</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Failed</div>
+            <div class="perf-stat-value error" id="perfFailed">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>⌨️ Typing Performance</h4>
+        <div class="perf-stats-grid">
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Avg Speed</div>
+            <div class="perf-stat-value" id="perfTypingSpeed">0 WPM</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Samples</div>
+            <div class="perf-stat-value" id="perfTypingSamples">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>💾 System Resources</h4>
+        <div class="perf-stats-grid">
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Memory Used</div>
+            <div class="perf-stat-value" id="perfMemoryUsed">N/A</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Memory %</div>
+            <div class="perf-stat-value" id="perfMemoryPercent">N/A</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Uptime</div>
+            <div class="perf-stat-value" id="perfUptime">0s</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Errors</div>
+            <div class="perf-stat-value error" id="perfErrors">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>💡 Recommendations</h4>
+        <div id="perfRecommendations" class="perf-recommendations"></div>
+      </div>
+
+      <div class="section">
+        <div class="btn-row">
+          <button id="refreshPerformance" class="btn-secondary">🔄 Refresh</button>
+          <button id="exportPerformance" class="btn-secondary">📥 Export</button>
+          <button id="clearPerformance" class="btn-secondary">🗑️ Clear</button>
+        </div>
       </div>
 
       <button class="close-modal btn-primary">Close</button>
