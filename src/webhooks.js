@@ -43,7 +43,7 @@ export class WebhookManager {
    * Generate unique ID for webhook
    */
   generateId() {
-    return `webhook_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `webhook_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
 
   /**

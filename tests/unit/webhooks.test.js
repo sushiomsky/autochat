@@ -13,7 +13,7 @@ describe('WebhookManager', () => {
     global.fetch = mockFetch;
 
     // Mock chrome.runtime.getManifest
-    chrome.runtime.getManifest = jest.fn(() => ({ version: '4.4.0' }));
+    chrome.runtime.getManifest = jest.fn(() => ({ version: '4.5.0' }));
 
     // Create inline class for testing (mirrors src/webhooks.js)
     WebhookManager = class {
@@ -46,7 +46,7 @@ describe('WebhookManager', () => {
       }
 
       generateId() {
-        return `webhook_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        return `webhook_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
       }
 
       async addWebhook(webhook) {
