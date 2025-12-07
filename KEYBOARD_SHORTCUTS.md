@@ -108,7 +108,7 @@ Quick insertion shortcuts (type these in your messages):
 ### Extension Management
 | Shortcut | Action |
 |----------|--------|
-| `Alt+Shift+A` | Open AutoChat popup (custom) |
+| `Alt+Shift+A` | Open AutoChat popup (user-configurable via Chrome) |
 | Browser toolbar icon click | Open popup |
 
 ### Developer Mode

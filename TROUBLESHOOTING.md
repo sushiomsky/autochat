@@ -393,7 +393,7 @@ Common send button selectors:
 - Rate limiting is aggressive (increase intervals)
 
 #### WhatsApp Web
-- Works well with default settings
+- Works best with default settings
 - Use "Press Enter key"
 - Mark the `contenteditable` div
 
@@ -505,7 +505,7 @@ Include the following information:
 ### Where to Get Help
 
 - **GitHub Issues**: https://github.com/sushiomsky/autochat/issues
-- **Discussions**: https://github.com/sushiomsky/autochat/discussions
+- **Discussions**: https://github.com/sushiomsky/autochat/discussions (if enabled on repository)
 - **Documentation**: [README.md](README.md)
 
 ---

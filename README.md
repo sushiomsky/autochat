@@ -269,8 +269,8 @@ MIT License - Feel free to use and modify. See [LICENSE](LICENSE) for details.
 Quick access to common actions:
 - **Ctrl+K**: Open Command Palette (NEW!)
 - **Ctrl+S**: Save Settings
-- **Ctrl+X**: Start/Stop Auto-Send
-- **Ctrl+P**: Pause/Resume Auto-Send
+- **Ctrl+X**: Toggle Auto-Send (Start/Stop)
+- **Ctrl+P**: Toggle Pause/Resume
 - **Escape**: Close open modals
 - **↑↓**: Navigate command palette
 - **Enter**: Execute selected command
