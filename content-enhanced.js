@@ -805,7 +805,10 @@ async function sendMessage(text, retries = 3) {
       if (confirmed) {
         messagesSentToday++;
         totalMessagesSent++;
-        chrome.runtime.sendMessage({ action: 'incrementMessageCount' });
+        chrome.runtime.sendMessage({ 
+          action: 'incrementMessageCount',
+          message: text.substring(0, 100) // Send first 100 chars for webhook
+        });
         console.log('[AutoChat] Message confirmed sent:', text);
         return true;
       }
@@ -893,6 +896,10 @@ async function scheduleNextMessage() {
     console.log('[AutoChat] Daily limit reached, stopping...');
     stopAutoSend();
     chrome.runtime.sendMessage({ action: 'updateBadge', active: false });
+    chrome.runtime.sendMessage({ 
+      action: 'dailyLimitReached',
+      limit: dailyLimit
+    });
     return;
   }
 
