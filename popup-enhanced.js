@@ -5,6 +5,12 @@
 
 // ===== UTILITY FUNCTIONS =====
 
+function sanitizeHTML(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 async function getActiveTab() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   return tab;
@@ -100,6 +106,7 @@ const elements = {
   phraseModal: document.getElementById('phraseModal'),
   analyticsModal: document.getElementById('analyticsModal'),
   accountModal: document.getElementById('accountModal'),
+  webhookModal: document.getElementById('webhookModal'),
 
   // Phrase management
   customPhrasesList: document.getElementById('customPhrasesList'),
@@ -514,6 +521,315 @@ document.getElementById('managePhrases')?.addEventListener('click', async () => 
 // Settings modal
 document.getElementById('openSettings')?.addEventListener('click', () => {
   elements.settingsModal.classList.add('show');
+});
+
+// ===== WEBHOOK MANAGEMENT =====
+
+let webhookManager = null;
+
+// Load webhook module
+async function initializeWebhookManager() {
+  if (!webhookManager) {
+    // Simple inline webhook manager
+    webhookManager = {
+      webhooks: [],
+      enabled: true,
+      async load() {
+        const data = await new Promise(resolve => {
+          chrome.storage.local.get(['webhooks', 'webhooksEnabled'], resolve);
+        });
+        this.webhooks = data.webhooks || [];
+        this.enabled = data.webhooksEnabled !== false;
+      },
+      async save() {
+        await new Promise(resolve => {
+          chrome.storage.local.set({ 
+            webhooks: this.webhooks,
+            webhooksEnabled: this.enabled
+          }, resolve);
+        });
+      },
+      generateId() {
+        return `webhook_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      },
+      add(webhook) {
+        const newWebhook = {
+          id: this.generateId(),
+          name: webhook.name || 'Unnamed Webhook',
+          url: webhook.url,
+          events: webhook.events || [],
+          method: webhook.method || 'POST',
+          headers: webhook.headers || {},
+          enabled: true,
+          createdAt: new Date().toISOString(),
+          triggerCount: 0,
+          failureCount: 0,
+          lastTriggered: null
+        };
+        this.webhooks.push(newWebhook);
+        return newWebhook;
+      },
+      update(id, updates) {
+        const webhook = this.webhooks.find(w => w.id === id);
+        if (webhook) {
+          Object.assign(webhook, updates);
+        }
+        return webhook;
+      },
+      delete(id) {
+        const index = this.webhooks.findIndex(w => w.id === id);
+        if (index !== -1) {
+          this.webhooks.splice(index, 1);
+        }
+      },
+      getAll() {
+        return this.webhooks;
+      },
+      getStats() {
+        return {
+          total: this.webhooks.length,
+          enabled: this.webhooks.filter(w => w.enabled).length,
+          totalTriggers: this.webhooks.reduce((sum, w) => sum + w.triggerCount, 0),
+          totalFailures: this.webhooks.reduce((sum, w) => sum + w.failureCount, 0)
+        };
+      },
+      async test(id) {
+        const webhook = this.webhooks.find(w => w.id === id);
+        if (!webhook) {
+          throw new Error('Webhook not found');
+        }
+
+        try {
+          const response = await fetch(webhook.url, {
+            method: webhook.method,
+            headers: {
+              'Content-Type': 'application/json',
+              ...webhook.headers
+            },
+            body: JSON.stringify({
+              event: 'test',
+              timestamp: new Date().toISOString(),
+              data: { test: true, message: 'Test webhook from AutoChat' },
+              source: 'AutoChat',
+              version: chrome.runtime.getManifest().version
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          showNotification(`✅ Webhook "${webhook.name}" tested successfully!`, true);
+          return true;
+        } catch (error) {
+          showNotification(`❌ Webhook test failed: ${error.message}`, false);
+          return false;
+        }
+      }
+    };
+    await webhookManager.load();
+  }
+  return webhookManager;
+}
+
+// Render webhook list
+async function renderWebhookList() {
+  await initializeWebhookManager();
+  const webhookList = document.getElementById('webhookList');
+  const webhookCount = document.getElementById('webhookCount');
+  
+  if (!webhookList) return;
+
+  const webhooks = webhookManager.getAll();
+  webhookCount.textContent = webhooks.length;
+
+  if (webhooks.length === 0) {
+    webhookList.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🔗</div>
+        <div class="empty-state-text">No webhooks configured yet. Add your first webhook to get started!</div>
+      </div>
+    `;
+    return;
+  }
+
+  webhookList.innerHTML = webhooks.map(webhook => `
+    <div class="webhook-item ${webhook.enabled ? '' : 'disabled'}">
+      <div class="webhook-header">
+        <span class="webhook-name">${sanitizeHTML(webhook.name)}</span>
+        <div class="webhook-actions">
+          <button class="btn-toggle ${webhook.enabled ? 'enabled' : ''}" data-id="${webhook.id}">
+            ${webhook.enabled ? '✅' : '❌'}
+          </button>
+          <button class="btn-test" data-id="${webhook.id}">🧪 Test</button>
+          <button class="btn-delete" data-id="${webhook.id}">🗑️</button>
+        </div>
+      </div>
+      <div class="webhook-details">
+        <div class="webhook-detail-row">
+          <span class="webhook-detail-label">URL:</span>
+          <span class="webhook-detail-value">${sanitizeHTML(webhook.url)}</span>
+        </div>
+        <div class="webhook-detail-row">
+          <span class="webhook-detail-label">Method:</span>
+          <span class="webhook-detail-value">${webhook.method}</span>
+        </div>
+        <div class="webhook-detail-row">
+          <span class="webhook-detail-label">Events:</span>
+          <div class="webhook-events">
+            ${webhook.events.map(e => `<span class="webhook-event-tag">${e.replace('_', ' ')}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="webhook-item-stats">
+        <div class="webhook-stat">
+          <span class="webhook-stat-label">Triggers</span>
+          <span class="webhook-stat-value success">${webhook.triggerCount || 0}</span>
+        </div>
+        <div class="webhook-stat">
+          <span class="webhook-stat-label">Failures</span>
+          <span class="webhook-stat-value error">${webhook.failureCount || 0}</span>
+        </div>
+        <div class="webhook-stat">
+          <span class="webhook-stat-label">Last Triggered</span>
+          <span class="webhook-stat-value">${webhook.lastTriggered ? new Date(webhook.lastTriggered).toLocaleDateString() : 'Never'}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Attach event listeners
+  webhookList.querySelectorAll('.btn-toggle').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      const webhook = webhookManager.getAll().find(w => w.id === id);
+      if (webhook) {
+        webhookManager.update(id, { enabled: !webhook.enabled });
+        await webhookManager.save();
+        await renderWebhookList();
+        await updateWebhookStats();
+      }
+    });
+  });
+
+  webhookList.querySelectorAll('.btn-test').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      await webhookManager.test(id);
+    });
+  });
+
+  webhookList.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      const webhook = webhookManager.getAll().find(w => w.id === id);
+      if (webhook && confirm(`Are you sure you want to delete webhook "${webhook.name}"?`)) {
+        webhookManager.delete(id);
+        await webhookManager.save();
+        await renderWebhookList();
+        await updateWebhookStats();
+        showNotification(`Webhook "${webhook.name}" deleted`, true);
+      }
+    });
+  });
+}
+
+// Update webhook statistics
+async function updateWebhookStats() {
+  await initializeWebhookManager();
+  const stats = webhookManager.getStats();
+
+  const totalEl = document.getElementById('webhookStatsTotal');
+  const enabledEl = document.getElementById('webhookStatsEnabled');
+  const triggersEl = document.getElementById('webhookStatsTriggers');
+  const failuresEl = document.getElementById('webhookStatsFailures');
+
+  if (totalEl) totalEl.textContent = stats.total;
+  if (enabledEl) enabledEl.textContent = stats.enabled;
+  if (triggersEl) triggersEl.textContent = stats.totalTriggers;
+  if (failuresEl) failuresEl.textContent = stats.totalFailures;
+}
+
+// Webhook form handler
+document.getElementById('webhookForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById('webhookName').value.trim();
+  const url = document.getElementById('webhookUrl').value.trim();
+  const method = document.getElementById('webhookMethod').value;
+  const headersText = document.getElementById('webhookHeaders').value.trim();
+  
+  // Get selected events
+  const events = Array.from(document.querySelectorAll('#webhookEvents input[type="checkbox"]:checked'))
+    .map(cb => cb.value);
+
+  // Validation
+  if (!name) {
+    showNotification('❌ Webhook name is required', false);
+    return;
+  }
+
+  if (!url || !url.startsWith('http')) {
+    showNotification('❌ Valid URL is required (must start with http:// or https://)', false);
+    return;
+  }
+
+  if (events.length === 0) {
+    showNotification('❌ Please select at least one event', false);
+    return;
+  }
+
+  let headers = {};
+  if (headersText) {
+    try {
+      headers = JSON.parse(headersText);
+    } catch (error) {
+      showNotification('❌ Invalid JSON in custom headers', false);
+      return;
+    }
+  }
+
+  await initializeWebhookManager();
+  
+  try {
+    webhookManager.add({
+      name,
+      url,
+      method,
+      events,
+      headers
+    });
+    
+    await webhookManager.save();
+    await renderWebhookList();
+    await updateWebhookStats();
+    
+    // Reset form
+    document.getElementById('webhookForm').reset();
+    showNotification(`✅ Webhook "${name}" added successfully!`, true);
+  } catch (error) {
+    showNotification(`❌ Failed to add webhook: ${error.message}`, false);
+  }
+});
+
+// Cancel webhook form
+document.getElementById('cancelWebhookForm')?.addEventListener('click', () => {
+  document.getElementById('webhookForm').reset();
+});
+
+// Manage webhooks button
+document.getElementById('manageWebhooks')?.addEventListener('click', async () => {
+  await renderWebhookList();
+  await updateWebhookStats();
+  elements.webhookModal.classList.add('show');
+});
+
+// Webhooks enabled checkbox
+document.getElementById('webhooksEnabled')?.addEventListener('change', async (e) => {
+  await initializeWebhookManager();
+  webhookManager.enabled = e.target.checked;
+  await webhookManager.save();
+  showNotification(`Webhooks ${e.target.checked ? 'enabled' : 'disabled'}`, true);
 });
 
 // Analytics modal

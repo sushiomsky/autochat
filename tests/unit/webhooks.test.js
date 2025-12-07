@@ -437,7 +437,7 @@ describe('WebhookManager', () => {
     });
 
     test('should trigger webhooks for matching event', async () => {
-      const webhook = await webhookManager.addWebhook({
+      await webhookManager.addWebhook({
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
         events: ['message_sent']

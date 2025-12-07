@@ -251,6 +251,18 @@
 
       <hr>
 
+      <h4>🔗 Webhooks & Integrations</h4>
+
+      <label>
+        <input type="checkbox" id="webhooksEnabled" checked>
+        🌐 Enable Webhooks
+      </label>
+      <div class="help">Send HTTP requests when events occur (integrations with external services)</div>
+
+      <button id="manageWebhooks" class="btn-secondary">⚙️ Manage Webhooks</button>
+
+      <hr>
+
       <div class="btn-row">
         <button id="exportSettings" class="btn-secondary">📥 Export</button>
         <button id="importSettings" class="btn-secondary">📤 Import</button>
@@ -537,6 +549,96 @@
           <li><strong>Active Hours</strong> - Only sends during specified hours</li>
           <li><strong>Mention Detection</strong> - Auto-reply when mentioned</li>
         </ul>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Webhook Manager Modal -->
+  <div id="webhookModal" class="modal">
+    <div class="modal-content modal-large">
+      <h3>🔗 Webhook Management</h3>
+      <p class="help">Webhooks allow you to send HTTP requests when specific events occur. Connect AutoChat with external services like Slack, Discord, Zapier, or your own custom endpoints.</p>
+
+      <div class="section">
+        <h4>➕ Add New Webhook</h4>
+        <form id="webhookForm">
+          <label>
+            Webhook Name:
+            <input type="text" id="webhookName" placeholder="My Webhook" required>
+          </label>
+
+          <label>
+            URL:
+            <input type="url" id="webhookUrl" placeholder="https://example.com/webhook" required>
+          </label>
+
+          <label>
+            HTTP Method:
+            <select id="webhookMethod">
+              <option value="POST">POST</option>
+              <option value="GET">GET</option>
+              <option value="PUT">PUT</option>
+              <option value="PATCH">PATCH</option>
+            </select>
+          </label>
+
+          <label>
+            Events (select one or more):
+            <div class="checkbox-group" id="webhookEvents">
+              <label><input type="checkbox" value="message_sent"> Message Sent</label>
+              <label><input type="checkbox" value="campaign_started"> Campaign Started</label>
+              <label><input type="checkbox" value="campaign_stopped"> Campaign Stopped</label>
+              <label><input type="checkbox" value="campaign_paused"> Campaign Paused</label>
+              <label><input type="checkbox" value="campaign_resumed"> Campaign Resumed</label>
+              <label><input type="checkbox" value="daily_limit_reached"> Daily Limit Reached</label>
+              <label><input type="checkbox" value="error"> Error</label>
+              <label><input type="checkbox" value="milestone"> Milestone</label>
+            </div>
+          </label>
+
+          <label>
+            Custom Headers (optional, JSON format):
+            <textarea id="webhookHeaders" rows="3" placeholder='{"Authorization": "Bearer token123", "X-Custom": "value"}'></textarea>
+          </label>
+
+          <div class="btn-row">
+            <button type="submit" class="btn-success">➕ Add Webhook</button>
+            <button type="button" id="cancelWebhookForm" class="btn-secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <h4>📋 Configured Webhooks <span id="webhookCount" class="badge">0</span></h4>
+        <div id="webhookList" class="webhook-list"></div>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <h4>📊 Statistics</h4>
+        <div class="webhook-stats">
+          <div class="stat-item">
+            <div class="stat-label">Total Webhooks</div>
+            <div class="stat-value" id="webhookStatsTotal">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Enabled</div>
+            <div class="stat-value" id="webhookStatsEnabled">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Total Triggers</div>
+            <div class="stat-value" id="webhookStatsTriggers">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Failures</div>
+            <div class="stat-value" id="webhookStatsFailures">0</div>
+          </div>
+        </div>
       </div>
 
       <button class="close-modal btn-primary">Close</button>
