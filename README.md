@@ -227,52 +227,9 @@ For more details, see [MULTI_LANGUAGE_PHRASES.md](MULTI_LANGUAGE_PHRASES.md).
 - **v4.1**: Dark mode, keyboard shortcuts, pause/resume
 - **v4.0**: Typing simulation, anti-detection, analytics dashboard
 
-**v4.2 Feature Complete Edition** - Previous release with:
-- 🔔 **Browser Notifications**: Desktop alerts for all events
-- 👁️ **Message Preview**: Test messages before sending with dry-run mode
-- 📁 **Phrase Categories**: Organize messages with 10 default categories and custom tags
-- ⚡ **Command Palette**: Instant access to all features with Ctrl+K
-- 😊 **Emoji Picker**: 300+ emojis organized and searchable
-- 🧪 **75 Tests Passing**: Comprehensive test coverage
-- 📚 **Complete API**: Well-documented module APIs
-
-**v4.1 Professional Edition** - Previous release with:
-- 🌙 Dark mode support with theme toggle
-- ⌨️ Keyboard shortcuts (Ctrl+S/X/P)
-- ⏸️ Pause/Resume functionality
-- 💾 Analytics export (JSON backup)
-- 🧪 Comprehensive test suite (Jest)
-- 🔧 Professional build system (npm)
-- 🔒 Enhanced security (input validation, XSS protection)
-- ⚡ Performance optimizations (debouncing, lazy loading)
-- ♿ Accessibility improvements (ARIA labels, focus management)
-- 📚 Complete developer documentation
-
-**v4.0 Enhanced Edition** - Major upgrade with:
-- Typing simulation and anti-detection features
-- Analytics and statistics tracking
-- Advanced scheduling (active hours, daily limits)
-- Template variables for dynamic content
-- Retry logic and improved reliability
-- Modern UI with gradient design
-- Import/Export settings
-
-**v3.0** - Complete rewrite focused on message automation
-
-## Release Notes
-
-See [LOCALIZATION.md](LOCALIZATION.md) for i18n documentation and translation guide.
-See [RELEASE_NOTES_v4.2.md](RELEASE_NOTES_v4.2.md) for v4.2 changelog.
-See [RELEASE_NOTES_v4.1.md](RELEASE_NOTES_v4.1.md) for v4.1 changelog.
+For detailed release notes, see [CHANGELOG.md](CHANGELOG.md)
 
 ## Roadmap
-
-### v4.4 (Next - Q1 2026)
-- [ ] More languages (Arabic, French, Hindi)
-- [ ] Visual improvements and animations
-- [ ] User onboarding tutorial
-- [ ] More keyboard shortcuts
-- [ ] Complete UI integration for v4.2 backend features
 
 ### v4.5 (Planned - Q2 2026)
 - [ ] Firefox port (WebExtensions)
