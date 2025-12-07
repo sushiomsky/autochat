@@ -40,7 +40,7 @@ AutoChat is a Chrome Extension (Manifest V3) that automates sending messages wit
 npm install --legacy-peer-deps
 ```
 
-Note: Use `--legacy-peer-deps` due to jest-chrome peer dependency compatibility.
+Note: Use `--legacy-peer-deps` due to jest-chrome peer dependency compatibility with Jest 29. The project uses jest-chrome@0.8.0 which expects Jest 26-27, but the codebase uses Jest 29 for better features and support.
 
 **Build Commands**
 
@@ -85,9 +85,10 @@ Note: Use `--legacy-peer-deps` due to jest-chrome peer dependency compatibility.
 
 - Use `jest-webextension-mock` and custom mocks provided in `tests/setup.js`
 - Mock `global.chrome` APIs using the provided setup
-- Aim for >80% code coverage for new code
+- Aim for >80% code coverage for new code (check with `npm run test:coverage`)
 - Test edge cases and error conditions
 - Follow existing test patterns in the repository
+- Coverage reports are generated in the `coverage/` directory
 
 **Test Example**
 
