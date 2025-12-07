@@ -52,10 +52,6 @@ describe('Anti-Repetition Logic', () => {
     // Get next 10 messages
     const messages = Array.from({ length: 10 }, () => getNextMessage());
     
-    // Should prefer msg3, msg4, msg5 at the start
-    const firstFew = messages.slice(0, 5);
-    const hasRecentInFirst = firstFew.some(m => ['msg1', 'msg2'].includes(m));
-    
     // Not guaranteed but highly unlikely to always pick recent ones
     expect(messages.length).toBe(10);
   });

@@ -3,7 +3,6 @@
  */
 
 describe('Mention Detection', () => {
-  let mockElement;
   let mockContainer;
 
   beforeEach(() => {

@@ -1,5 +1,3 @@
-const { JSDOM } = require('jsdom');
-
 // jest provides jsdom by default; ensure global document/window are available
 beforeEach(() => {
   document.body.innerHTML = '';

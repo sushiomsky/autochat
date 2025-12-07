@@ -34,7 +34,7 @@ let mentionDetectionEnabled = false;
 let mentionKeywords = []; // keywords/username to watch for
 let mentionReplyMessages = []; // messages to use for replies
 let mentionObserver = null;
-let lastProcessedMessages = new Set(); // Track processed messages to avoid duplicates
+const lastProcessedMessages = new Set(); // Track processed messages to avoid duplicates
 
 // ===== HELPER FUNCTIONS =====
 

@@ -77,7 +77,7 @@ global.chrome = {
     })
   },
   i18n: {
-    getMessage: jest.fn((key, substitutions) => {
+    getMessage: jest.fn((key, _substitutions) => {
       return key;
     }),
     getUILanguage: jest.fn(() => 'en'),
