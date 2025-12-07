@@ -58,12 +58,9 @@ jsFiles.forEach((file) => {
     content = content.replace(/chrome\./g, 'browser.');
     
     if (isProd) {
-      // Simple minification: remove comments and extra whitespace
+      // Simple minification: remove block comments only (preserve code structure)
       content = content
-        .replace(/\/\*[\s\S]*?\*\//g, '') // Remove block comments
-        .replace(/\/\/.*/g, '') // Remove line comments
-        .replace(/\n\s*\n/g, '\n') // Remove empty lines
-        .replace(/^\s+/gm, ''); // Remove leading whitespace
+        .replace(/\/\*[\s\S]*?\*\//g, ''); // Remove block comments only
     }
     
     fs.writeFileSync(dest, content);
