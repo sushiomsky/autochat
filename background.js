@@ -49,7 +49,6 @@ function incrementMessageCount() {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'stop') {
         isRunning = false;
-        messageCount = 0;
         
         // Clear badge and set to OFF state
         chrome.action.setBadgeText({ text: '' });

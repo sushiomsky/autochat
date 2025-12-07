@@ -79,6 +79,10 @@ const elements = {
   mentionKeywords: document.getElementById('mentionKeywords'),
   mentionReplyMessages: document.getElementById('mentionReplyMessages'),
 
+  // Notifications
+  notificationsEnabled: document.getElementById('notificationsEnabled'),
+  notificationSound: document.getElementById('notificationSound'),
+
   // Account Management
   accountSelect: document.getElementById('accountSelect'),
   manageAccounts: document.getElementById('manageAccounts'),
@@ -766,7 +770,9 @@ function getCurrentSettings() {
     sendConfirmTimeout: elements.sendConfirmTimeout ? elements.sendConfirmTimeout.value : 3,
     mentionDetectionEnabled: elements.mentionDetectionEnabled.checked,
     mentionKeywords: mentionKeywords,
-    mentionReplyMessages: mentionReplyMessages
+    mentionReplyMessages: mentionReplyMessages,
+    notificationsEnabled: elements.notificationsEnabled.checked,
+    notificationSound: elements.notificationSound.checked
   };
 }
 
@@ -877,7 +883,9 @@ function loadSettings() {
     'sendConfirmTimeout',
     'mentionDetectionEnabled',
     'mentionKeywords',
-    'mentionReplyMessages'
+    'mentionReplyMessages',
+    'notificationsEnabled',
+    'notificationSound'
   ], (data) => {
     if (data.messageList) elements.messageList.value = data.messageList;
     if (data.sendMode) elements.sendMode.value = data.sendMode;
@@ -903,6 +911,10 @@ function loadSettings() {
     if (data.mentionReplyMessages && Array.isArray(data.mentionReplyMessages)) {
       elements.mentionReplyMessages.value = data.mentionReplyMessages.join('\n');
     }
+
+    // Notification settings
+    elements.notificationsEnabled.checked = data.notificationsEnabled !== false;
+    elements.notificationSound.checked = data.notificationSound !== false;
 
     // Show/hide active hours inputs
     const hoursInputs = document.getElementById('activeHoursInputs');
@@ -937,6 +949,10 @@ elements.activeHours?.addEventListener('change', saveSettings);
 elements.activeHoursStart?.addEventListener('change', saveSettings);
 elements.activeHoursEnd?.addEventListener('change', saveSettings);
 elements.sendConfirmTimeout?.addEventListener('change', saveSettings);
+
+// Notification settings
+elements.notificationsEnabled?.addEventListener('change', saveSettings);
+elements.notificationSound?.addEventListener('change', saveSettings);
 
 // Mention detection settings
 elements.mentionDetectionEnabled?.addEventListener('change', async () => {
