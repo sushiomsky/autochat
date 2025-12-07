@@ -268,12 +268,14 @@ MIT License - Feel free to use and modify. See [LICENSE](LICENSE) for details.
 
 Quick access to common actions:
 - **Ctrl+K**: Open Command Palette (NEW!)
-- **Ctrl+S**: Start Auto-Send
-- **Ctrl+X**: Stop Auto-Send
+- **Ctrl+S**: Save Settings
+- **Ctrl+X**: Start/Stop Auto-Send
 - **Ctrl+P**: Pause/Resume Auto-Send
 - **Escape**: Close open modals
 - **↑↓**: Navigate command palette
 - **Enter**: Execute selected command
+
+For complete keyboard shortcut reference, see [KEYBOARD_SHORTCUTS.md](KEYBOARD_SHORTCUTS.md)
 
 ## Configuration Options
 
@@ -307,6 +309,16 @@ Quick access to common actions:
 - Total messages sent (all-time)
 - Auto-send status indicator
 - Reset statistics option
+
+## Troubleshooting
+
+Having issues? See our comprehensive [TROUBLESHOOTING.md](TROUBLESHOOTING.md) guide covering:
+- Installation problems
+- Input field detection
+- Message sending issues
+- Performance optimization
+- Browser compatibility
+- Advanced debugging
 
 ## Notes
 
@@ -373,6 +385,33 @@ AutoCh supports multiple languages:
 - **Urdu (اردو)** - Full RTL support with Nastaliq fonts
 
 Want to add your language? See [LOCALIZATION.md](LOCALIZATION.md) for the translation guide.
+
+## Documentation
+
+Complete documentation for AutoChat Enhanced:
+
+### User Guides
+- 📖 **[README.md](README.md)** (this file) - Main documentation and feature overview
+- 🚀 **[QUICKSTART.md](QUICKSTART.md)** - Quick start guide for users and developers
+- ⌨️ **[KEYBOARD_SHORTCUTS.md](KEYBOARD_SHORTCUTS.md)** - Complete keyboard shortcut reference
+- 🔧 **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
+
+### Feature Documentation
+- 👥 **[MULTI_ACCOUNT_FEATURE.md](MULTI_ACCOUNT_FEATURE.md)** - Multi-account management guide
+- 💬 **[MENTION_DETECTION_FEATURE.md](MENTION_DETECTION_FEATURE.md)** - Auto-reply to mentions
+- 🌍 **[MULTI_LANGUAGE_PHRASES.md](MULTI_LANGUAGE_PHRASES.md)** - Multi-language phrase system
+- 🌐 **[LOCALIZATION.md](LOCALIZATION.md)** - Translation and i18n guide
+
+### Development & Contributing
+- 🤝 **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+- 📝 **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
+- 🗺️ **[ROADMAP_v5.0.md](ROADMAP_v5.0.md)** - Future plans and roadmap
+- 📋 **[TODO.md](TODO.md)** - Task list and priorities
+
+### Release Documentation
+- 📦 **[RELEASE_NOTES_v4.2.md](RELEASE_NOTES_v4.2.md)** - v4.2 release notes
+- 📦 **[RELEASE_NOTES_v4.1.md](RELEASE_NOTES_v4.1.md)** - v4.1 release notes
+- ✅ **[V4.4_UI_FEATURES_VERIFICATION.md](V4.4_UI_FEATURES_VERIFICATION.md)** - v4.4 feature verification
 
 ## Support
 
