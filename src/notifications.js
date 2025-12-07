@@ -1,12 +1,16 @@
 /**
  * Browser Notifications Module
- * Handles desktop notifications for events
+ * Handles desktop notifications for events and in-app notification center
  */
 
 export class NotificationManager {
   constructor() {
     this.enabled = true;
     this.soundEnabled = true;
+    this.notificationHistory = [];
+    this.maxHistory = 50;
+    this.unreadCount = 0;
+    this.idCounter = 0;
     this.loadSettings();
   }
 
@@ -14,9 +18,21 @@ export class NotificationManager {
    * Load notification settings from storage
    */
   async loadSettings() {
-    const data = await chrome.storage.local.get(['notificationsEnabled', 'notificationSound']);
+    const data = await chrome.storage.local.get(['notificationsEnabled', 'notificationSound', 'notificationHistory', 'unreadCount']);
     this.enabled = data.notificationsEnabled !== false;
     this.soundEnabled = data.notificationSound !== false;
+    this.notificationHistory = data.notificationHistory || [];
+    this.unreadCount = data.unreadCount || 0;
+  }
+
+  /**
+   * Save notification history to storage
+   */
+  async saveHistory() {
+    await chrome.storage.local.set({ 
+      notificationHistory: this.notificationHistory,
+      unreadCount: this.unreadCount
+    });
   }
 
   /**
@@ -47,6 +63,9 @@ export class NotificationManager {
    * @param {object} options - Notification options
    */
   async show(title, options = {}) {
+    // Add to history
+    this.addToHistory(title, options);
+
     if (!this.enabled) return;
 
     const hasPermission = await this.requestPermission();
@@ -67,6 +86,106 @@ export class NotificationManager {
     }
 
     return notification;
+  }
+
+  /**
+   * Generate unique ID for notifications
+   * Uses timestamp + counter to avoid collisions
+   */
+  generateId() {
+    this.idCounter++;
+    return `${Date.now()}-${this.idCounter}`;
+  }
+
+  /**
+   * Add notification to history
+   * @param {string} title - Notification title
+   * @param {object} options - Notification options
+   */
+  addToHistory(title, options = {}) {
+    const historyItem = {
+      id: this.generateId(),
+      title,
+      body: options.body || '',
+      type: options.type || 'info',
+      timestamp: new Date().toISOString(),
+      read: false,
+      tag: options.tag || null
+    };
+
+    this.notificationHistory.unshift(historyItem);
+    
+    // Keep only maxHistory items
+    if (this.notificationHistory.length > this.maxHistory) {
+      this.notificationHistory = this.notificationHistory.slice(0, this.maxHistory);
+    }
+
+    this.unreadCount++;
+    this.saveHistory();
+    return historyItem;
+  }
+
+  /**
+   * Mark notification as read
+   * @param {number} id - Notification ID
+   */
+  markAsRead(id) {
+    const notification = this.notificationHistory.find(n => n.id === id);
+    if (notification && !notification.read) {
+      notification.read = true;
+      this.unreadCount = Math.max(0, this.unreadCount - 1);
+      this.saveHistory();
+    }
+  }
+
+  /**
+   * Mark all notifications as read
+   */
+  markAllAsRead() {
+    this.notificationHistory.forEach(n => n.read = true);
+    this.unreadCount = 0;
+    this.saveHistory();
+  }
+
+  /**
+   * Clear notification history
+   */
+  clearHistory() {
+    this.notificationHistory = [];
+    this.unreadCount = 0;
+    this.saveHistory();
+  }
+
+  /**
+   * Get notification history
+   * @param {number} limit - Max items to return
+   * @returns {Array} Notification history
+   */
+  getHistory(limit = 20) {
+    return this.notificationHistory.slice(0, limit);
+  }
+
+  /**
+   * Get unread count
+   * @returns {number} Unread count
+   */
+  getUnreadCount() {
+    return this.unreadCount;
+  }
+
+  /**
+   * Delete a notification from history
+   * @param {number} id - Notification ID
+   */
+  deleteNotification(id) {
+    const index = this.notificationHistory.findIndex(n => n.id === id);
+    if (index !== -1) {
+      if (!this.notificationHistory[index].read) {
+        this.unreadCount = Math.max(0, this.unreadCount - 1);
+      }
+      this.notificationHistory.splice(index, 1);
+      this.saveHistory();
+    }
   }
 
   /**
