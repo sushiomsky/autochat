@@ -107,6 +107,7 @@ const elements = {
   analyticsModal: document.getElementById('analyticsModal'),
   accountModal: document.getElementById('accountModal'),
   webhookModal: document.getElementById('webhookModal'),
+  donationModal: document.getElementById('donationModal'),
 
   // Phrase management
   customPhrasesList: document.getElementById('customPhrasesList'),
@@ -836,6 +837,41 @@ document.getElementById('webhooksEnabled')?.addEventListener('change', async (e)
 document.getElementById('openAnalytics')?.addEventListener('click', async () => {
   await updateStats();
   elements.analyticsModal.classList.add('show');
+});
+
+// Donation modal
+document.getElementById('openDonation')?.addEventListener('click', () => {
+  elements.donationModal.classList.add('show');
+});
+
+// Copy crypto address functionality
+document.querySelectorAll('.btn-copy').forEach(btn => {
+  btn.addEventListener('click', async (e) => {
+    const addressId = e.target.getAttribute('data-address');
+    const addressElement = document.getElementById(addressId);
+    if (!addressElement) return;
+
+    const address = addressElement.textContent;
+    
+    try {
+      await navigator.clipboard.writeText(address);
+      
+      // Show feedback
+      const originalText = e.target.textContent;
+      e.target.textContent = '✓';
+      e.target.style.background = '#2ecc71';
+      
+      setTimeout(() => {
+        e.target.textContent = originalText;
+        e.target.style.background = '';
+      }, 2000);
+      
+      showNotification('Address copied to clipboard!', true);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      showNotification('Failed to copy address', false);
+    }
+  });
 });
 
 // Close modals

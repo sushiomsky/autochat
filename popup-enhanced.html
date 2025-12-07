@@ -14,6 +14,7 @@
           🔔
           <span id="notificationBadge" class="notification-count-badge" style="display: none;">0</span>
         </button>
+        <button id="openDonation" class="header-btn" title="Support Development" aria-label="Donate with Crypto">💝</button>
         <button id="themeToggle" class="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
       </div>
     </h2>
@@ -639,6 +640,63 @@
             <div class="stat-value" id="webhookStatsFailures">0</div>
           </div>
         </div>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Donation Modal -->
+  <div id="donationModal" class="modal">
+    <div class="modal-content">
+      <h3>💝 Support AutoChat Development</h3>
+      <p>Help keep AutoChat free and open-source! Your support enables continued development and new features.</p>
+
+      <div class="donation-section">
+        <h4>🪙 Crypto Donations</h4>
+        
+        <div class="crypto-address">
+          <label>Bitcoin (BTC)</label>
+          <div class="address-box">
+            <code id="btcAddress">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</code>
+            <button class="btn-copy" data-address="btcAddress" title="Copy address">📋</button>
+          </div>
+        </div>
+
+        <div class="crypto-address">
+          <label>Ethereum (ETH)</label>
+          <div class="address-box">
+            <code id="ethAddress">0x742d35Cc6634C0532925a3b844Bc454e4438f44e</code>
+            <button class="btn-copy" data-address="ethAddress" title="Copy address">📋</button>
+          </div>
+        </div>
+
+        <div class="crypto-address">
+          <label>USDT (TRC20)</label>
+          <div class="address-box">
+            <code id="usdtAddress">TYASr5UV6HEcXatwdFQfmLVUqQQQMUxHLS</code>
+            <button class="btn-copy" data-address="usdtAddress" title="Copy address">📋</button>
+          </div>
+        </div>
+
+        <div class="crypto-address">
+          <label>Litecoin (LTC)</label>
+          <div class="address-box">
+            <code id="ltcAddress">LTC1QW2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</code>
+            <button class="btn-copy" data-address="ltcAddress" title="Copy address">📋</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="donation-info">
+        <p>✨ <strong>Every contribution matters!</strong></p>
+        <p>Your donation helps with:</p>
+        <ul>
+          <li>Development of new features</li>
+          <li>Server and infrastructure costs</li>
+          <li>Bug fixes and improvements</li>
+          <li>Community support</li>
+        </ul>
       </div>
 
       <button class="close-modal btn-primary">Close</button>

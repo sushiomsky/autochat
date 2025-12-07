@@ -2239,3 +2239,85 @@ body.dark-mode .account-item-actions button:hover {
 .empty-state-text {
   font-size: 14px;
 }
+
+/* Donation Modal Styles */
+.donation-section {
+  margin: 20px 0;
+}
+
+.crypto-address {
+  margin-bottom: 16px;
+}
+
+.crypto-address label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.address-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-primary);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.address-box code {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  word-break: break-all;
+  user-select: all;
+}
+
+.btn-copy {
+  padding: 6px 10px;
+  background: var(--gradient-secondary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-copy:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.btn-copy:active {
+  transform: scale(0.95);
+}
+
+.donation-info {
+  margin-top: 20px;
+  padding: 16px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.donation-info p {
+  margin: 8px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.donation-info ul {
+  margin: 8px 0 0 20px;
+  padding: 0;
+}
+
+.donation-info li {
+  margin: 4px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}

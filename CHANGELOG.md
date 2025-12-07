@@ -2,6 +2,39 @@
 
 All notable changes to AutoChat will be documented in this file.
 
+## [4.5.1] - 2025-12-07 - Human-Like Improvements & Donations
+
+### Added
+- **Human-Like Message Imperfections**: Automatic introduction of natural human typing errors (10% of messages)
+  - Random typos (adjacent letter swaps)
+  - Missing punctuation
+  - Double spaces
+  - Lowercase sentence starts
+  - Extra letters
+  - Makes bot behavior less detectable in Turing tests
+- **Crypto Donation Feature**: Support development with cryptocurrency donations
+  - Bitcoin (BTC), Ethereum (ETH), USDT (TRC20), Litecoin (LTC)
+  - One-click copy addresses
+  - Beautiful donation modal with copy feedback
+  - Donation button in header (💝)
+- **Natural Language Phrases**: Replaced farming-specific phrases with generic, commonly-used expressions
+  - English: 200+ common phrases (Hi, Hello, Thanks, etc.)
+  - Spanish: 150+ natural phrases (Hola, Gracias, etc.)
+  - Urdu: 150+ everyday phrases
+  - Reduces detectability when using default phrases
+
+### Changed
+- Completely replaced all farming_phrases files with natural, everyday language
+- Messages now include occasional human-like imperfections for better Turing test performance
+- "Say as less as possible, much as needed" strategy implemented
+- Donation modal accessible from main interface
+
+### Technical
+- Added `addHumanImperfections()` function in content-enhanced.js
+- Applied to both scheduled messages and mention replies
+- Donation modal with clipboard API integration
+- Copy feedback with visual confirmation
+
 ## [4.5.0] - 2025-12-07 - Integration Foundation
 
 ### Added
