@@ -24,10 +24,16 @@
 ### Quick Tips
 
 - **Dark Mode**: Click the 🌙 icon in the top-right
-- **Keyboard Shortcuts**: Ctrl+S (start), Ctrl+X (stop), Ctrl+P (pause)
+- **Command Palette**: Press Ctrl+K for quick access to all features
+- **Keyboard Shortcuts**: Ctrl+S (save), Ctrl+X (start/stop), Ctrl+P (pause)
 - **Template Variables**: Use `{time}`, `{date}`, `{random_emoji}` in messages
 - **Settings**: Click ⚙️ for advanced options like typing simulation
-- **Analytics**: Click 📊 to see your sending statistics
+- **Analytics**: View stats in the dashboard
+- **Notifications**: Click 🔔 bell icon to view notification history
+- **Emojis**: Click 😊 to open emoji picker (200+ emojis)
+- **Preview**: Click 👁️ to preview messages before sending
+- **Categories**: Organize messages with custom categories
+- **Help**: Click ❓ for in-app documentation
 
 ## For Developers
 
@@ -216,18 +222,36 @@ EditorConfig settings in `.editorconfig` will work with most modern editors.
 ## Next Steps
 
 ### For Users
-1. Explore advanced settings (⚙️ button)
-2. Try dark mode (🌙 button)
-3. Set up active hours and daily limits
-4. Export your settings as backup
-5. Check analytics (📊 button)
+1. **Explore v4.4 Features**:
+   - Press Ctrl+K to try the Command Palette
+   - Click 🔔 to view Notification Center
+   - Click 😊 to use the Emoji Picker
+   - Click 👁️ to Preview messages
+   - Open Categories manager to organize messages
+2. **Configure Settings** (⚙️ button):
+   - Enable typing simulation for realistic sending
+   - Set active hours (e.g., 9 AM - 5 PM)
+   - Configure daily limits (e.g., 50 messages/day)
+   - Enable/disable notifications and sounds
+3. **Try Dark Mode** (🌙 button)
+4. **Export Settings** as backup (Settings → Export)
+5. **Read Full Docs**:
+   - [KEYBOARD_SHORTCUTS.md](KEYBOARD_SHORTCUTS.md) - All shortcuts
+   - [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Common issues
+   - [MULTI_ACCOUNT_FEATURE.md](MULTI_ACCOUNT_FEATURE.md) - Account management
 
 ### For Developers
-1. Read CONTRIBUTING.md
-2. Explore the codebase
-3. Run the test suite
-4. Fix a small issue or add a small feature
-5. Submit your first PR!
+1. **Read Documentation**:
+   - [CONTRIBUTING.md](CONTRIBUTING.md) - Development guidelines
+   - [KEYBOARD_SHORTCUTS.md](KEYBOARD_SHORTCUTS.md) - Shortcuts reference
+   - [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Debug guide
+2. **Explore v4.4 Code**:
+   - `popup-enhanced.js` - UI and all modals (lines 1023-1302 for new features)
+   - `src/notifications.js` - Notification manager with history
+   - `tests/unit/` - 125 passing tests covering all features
+3. **Run Test Suite**: `npm test` (all 125 tests should pass)
+4. **Try Adding Features**: Check [TODO.md](TODO.md) for ideas
+5. **Submit Your First PR**: Fix a small issue or improve documentation
 
 ## Key Commands Reference
 

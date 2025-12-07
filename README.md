@@ -32,7 +32,16 @@ A powerful Chrome extension that automatically sends messages to chat applicatio
 - 🌍 **i18n Support**: Full localization with RTL support for Urdu and other languages
 - 🗣️ **Smart Phrase Loading**: Automatically loads phrases in your preferred language with English fallback
 - 🎯 **Mention Detection**: Auto-reply when someone mentions you in chat
-- 👥 **Multi-Account Support**: Manage multiple profiles with separate settings (NEW!)
+- 👥 **Multi-Account Support**: Manage multiple profiles with separate settings
+
+### New in v4.4 (UI Polish Edition) ✨
+- 🔔 **Notification Center**: In-app notification history with full management (view, mark as read, delete)
+- 📁 **Category Manager**: Create and manage custom message categories with icons and colors
+- ⌨️ **Command Palette**: Quick access to all features with Ctrl+K keyboard shortcut
+- 😊 **Emoji Picker**: Built-in emoji selector with 200+ emojis in 8 categories
+- 👁️ **Preview Mode**: Preview messages with template variables before sending
+- ❓ **Help Documentation**: Comprehensive in-app help with guides and keyboard shortcuts
+- 🎨 **Enhanced UI**: Improved button layouts, notification badges, and visual polish
 
 ## Installation
 
@@ -105,6 +114,46 @@ Perfect for managing multiple casino accounts or different automation scenarios!
 
 Each profile stores completely separate settings. See [MULTI_ACCOUNT_FEATURE.md](MULTI_ACCOUNT_FEATURE.md) for detailed documentation.
 
+### Using v4.4 UI Features
+
+#### Notification Center 🔔
+1. **Click the bell icon** (🔔) in the header
+2. **View notification history** - see all past messages, errors, and achievements
+3. **Mark as read** - individual notifications or mark all read
+4. **Delete notifications** - remove individual items or clear all
+5. **Unread badge** - shows count of unread notifications
+
+#### Command Palette ⌨️
+1. **Press Ctrl+K** or click the keyboard icon
+2. **Type to search** commands (e.g., "start", "stop", "settings")
+3. **Arrow keys** to navigate, **Enter** to execute
+4. **Quick access** to all major features without clicking through menus
+
+#### Emoji Picker 😊
+1. **Click the emoji button** (😊)
+2. **Browse categories** - Smileys, Hearts, Animals, Food, Sports, Objects, Symbols
+3. **Search emojis** with the search bar
+4. **Click to insert** - adds emoji to your message list
+
+#### Preview Mode 👁️
+1. **Click Preview button** before sending
+2. **See rendered messages** with all template variables replaced
+3. **Check first 10 messages** to verify they look correct
+4. **Test variables** like {time}, {date}, {random_emoji} before going live
+
+#### Category Manager 📁
+1. **Open Categories** from the main interface
+2. **Create custom categories** with name, icon (emoji), and color
+3. **View category statistics** - see how many phrases in each category
+4. **Organize messages** by category for better management
+
+#### Help Documentation ❓
+1. **Click Help button** (❓) for in-app assistance
+2. **Getting Started guide** - step-by-step setup instructions
+3. **Template Variables reference** - all available variables explained
+4. **Keyboard Shortcuts** - complete list of hotkeys
+5. **Advanced Features** - detailed explanations of all capabilities
+
 ## Settings Persistence
 
 All settings are automatically saved:
@@ -163,58 +212,24 @@ For more details, see [MULTI_LANGUAGE_PHRASES.md](MULTI_LANGUAGE_PHRASES.md).
 
 ## Version
 
-**v4.3 Localization Edition** - Current release with:
-- 🌍 **Internationalization**: Full i18n support with English and Urdu (اردو)
-- ↔️ **RTL Support**: Complete Right-to-Left layout for Arabic script languages
-- 🔄 **Language Switcher**: Easy language selection with live updates
-- 🎨 **Localized Fonts**: Beautiful Urdu/Nastaliq font rendering
+**v4.4.0 UI Polish Edition** - Current release with:
+- 🔔 **Notification Center**: Complete notification history management
+- 📁 **Category Manager**: Create and organize custom message categories
+- ⌨️ **Command Palette**: Quick access to all features (Ctrl+K)
+- 😊 **Emoji Picker**: Built-in emoji selection with 200+ emojis
+- 👁️ **Preview Mode**: Test messages before sending
+- ❓ **Help System**: Comprehensive in-app documentation
+- 🎨 **UI Enhancements**: Improved layouts, badges, and polish
 
-**v4.2 Feature Complete Edition** - Previous release with:
-- 🔔 **Browser Notifications**: Desktop alerts for all events
-- 👁️ **Message Preview**: Test messages before sending with dry-run mode
-- 📁 **Phrase Categories**: Organize messages with 10 default categories and custom tags
-- ⚡ **Command Palette**: Instant access to all features with Ctrl+K
-- 😊 **Emoji Picker**: 300+ emojis organized and searchable
-- 🧪 **75 Tests Passing**: Comprehensive test coverage
-- 📚 **Complete API**: Well-documented module APIs
+**Previous releases:**
+- **v4.3**: Multi-language support with English, Urdu (اردو), and Spanish (Español)
+- **v4.2**: Enhanced features and stability improvements  
+- **v4.1**: Dark mode, keyboard shortcuts, pause/resume
+- **v4.0**: Typing simulation, anti-detection, analytics dashboard
 
-**v4.1 Professional Edition** - Previous release with:
-- 🌙 Dark mode support with theme toggle
-- ⌨️ Keyboard shortcuts (Ctrl+S/X/P)
-- ⏸️ Pause/Resume functionality
-- 💾 Analytics export (JSON backup)
-- 🧪 Comprehensive test suite (Jest)
-- 🔧 Professional build system (npm)
-- 🔒 Enhanced security (input validation, XSS protection)
-- ⚡ Performance optimizations (debouncing, lazy loading)
-- ♿ Accessibility improvements (ARIA labels, focus management)
-- 📚 Complete developer documentation
-
-**v4.0 Enhanced Edition** - Major upgrade with:
-- Typing simulation and anti-detection features
-- Analytics and statistics tracking
-- Advanced scheduling (active hours, daily limits)
-- Template variables for dynamic content
-- Retry logic and improved reliability
-- Modern UI with gradient design
-- Import/Export settings
-
-**v3.0** - Complete rewrite focused on message automation
-
-## Release Notes
-
-See [LOCALIZATION.md](LOCALIZATION.md) for i18n documentation and translation guide.
-See [RELEASE_NOTES_v4.2.md](RELEASE_NOTES_v4.2.md) for v4.2 changelog.
-See [RELEASE_NOTES_v4.1.md](RELEASE_NOTES_v4.1.md) for v4.1 changelog.
+For detailed release notes, see [CHANGELOG.md](CHANGELOG.md)
 
 ## Roadmap
-
-### v4.4 (Next - Q1 2026)
-- [ ] More languages (Arabic, French, Hindi)
-- [ ] Visual improvements and animations
-- [ ] User onboarding tutorial
-- [ ] More keyboard shortcuts
-- [ ] Complete UI integration for v4.2 backend features
 
 ### v4.5 (Planned - Q2 2026)
 - [ ] Firefox port (WebExtensions)
@@ -253,12 +268,14 @@ MIT License - Feel free to use and modify. See [LICENSE](LICENSE) for details.
 
 Quick access to common actions:
 - **Ctrl+K**: Open Command Palette (NEW!)
-- **Ctrl+S**: Start Auto-Send
-- **Ctrl+X**: Stop Auto-Send
-- **Ctrl+P**: Pause/Resume Auto-Send
+- **Ctrl+S**: Save Settings
+- **Ctrl+X**: Toggle Auto-Send (Start/Stop)
+- **Ctrl+P**: Toggle Pause/Resume
 - **Escape**: Close open modals
 - **↑↓**: Navigate command palette
 - **Enter**: Execute selected command
+
+For complete keyboard shortcut reference, see [KEYBOARD_SHORTCUTS.md](KEYBOARD_SHORTCUTS.md)
 
 ## Configuration Options
 
@@ -292,6 +309,16 @@ Quick access to common actions:
 - Total messages sent (all-time)
 - Auto-send status indicator
 - Reset statistics option
+
+## Troubleshooting
+
+Having issues? See our comprehensive [TROUBLESHOOTING.md](TROUBLESHOOTING.md) guide covering:
+- Installation problems
+- Input field detection
+- Message sending issues
+- Performance optimization
+- Browser compatibility
+- Advanced debugging
 
 ## Notes
 
@@ -358,6 +385,33 @@ AutoCh supports multiple languages:
 - **Urdu (اردو)** - Full RTL support with Nastaliq fonts
 
 Want to add your language? See [LOCALIZATION.md](LOCALIZATION.md) for the translation guide.
+
+## Documentation
+
+Complete documentation for AutoChat Enhanced:
+
+### User Guides
+- 📖 **[README.md](README.md)** (this file) - Main documentation and feature overview
+- 🚀 **[QUICKSTART.md](QUICKSTART.md)** - Quick start guide for users and developers
+- ⌨️ **[KEYBOARD_SHORTCUTS.md](KEYBOARD_SHORTCUTS.md)** - Complete keyboard shortcut reference
+- 🔧 **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
+
+### Feature Documentation
+- 👥 **[MULTI_ACCOUNT_FEATURE.md](MULTI_ACCOUNT_FEATURE.md)** - Multi-account management guide
+- 💬 **[MENTION_DETECTION_FEATURE.md](MENTION_DETECTION_FEATURE.md)** - Auto-reply to mentions
+- 🌍 **[MULTI_LANGUAGE_PHRASES.md](MULTI_LANGUAGE_PHRASES.md)** - Multi-language phrase system
+- 🌐 **[LOCALIZATION.md](LOCALIZATION.md)** - Translation and i18n guide
+
+### Development & Contributing
+- 🤝 **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+- 📝 **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
+- 🗺️ **[ROADMAP_v5.0.md](ROADMAP_v5.0.md)** - Future plans and roadmap
+- 📋 **[TODO.md](TODO.md)** - Task list and priorities
+
+### Release Documentation
+- 📦 **[RELEASE_NOTES_v4.2.md](RELEASE_NOTES_v4.2.md)** - v4.2 release notes
+- 📦 **[RELEASE_NOTES_v4.1.md](RELEASE_NOTES_v4.1.md)** - v4.1 release notes
+- ✅ **[V4.4_UI_FEATURES_VERIFICATION.md](V4.4_UI_FEATURES_VERIFICATION.md)** - v4.4 feature verification
 
 ## Support
 
