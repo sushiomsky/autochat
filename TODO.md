@@ -2,9 +2,9 @@
 
 ## Immediate (Before v4.1 Release)
 
-- [ ] Install npm dependencies and run tests
-- [ ] Fix any failing tests
-- [ ] Verify build produces correct output
+- [x] Install npm dependencies and run tests
+- [x] Fix any failing tests
+- [x] Verify build produces correct output
 - [ ] Test extension in Chrome manually
 - [ ] Create actual screenshots (see SCREENSHOTS.md)
 - [ ] Test dark mode functionality
