@@ -2018,3 +2018,377 @@ body.dark-mode .account-item-actions button:hover {
   font-family: monospace;
   font-size: 11px;
 }
+
+/* Webhook Management Styles */
+.modal-large {
+  max-width: 650px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+  padding: 12px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  margin: 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+  margin: 0;
+}
+
+.webhook-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.webhook-item {
+  padding: 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.webhook-item:hover {
+  box-shadow: 0 4px 12px var(--shadow);
+  transform: translateY(-2px);
+}
+
+.webhook-item.disabled {
+  opacity: 0.6;
+}
+
+.webhook-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.webhook-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.webhook-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.webhook-actions button {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-test {
+  background: #3498db;
+  color: white;
+}
+
+.btn-test:hover {
+  background: #2980b9;
+}
+
+.btn-edit {
+  background: #f39c12;
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #e67e22;
+}
+
+.btn-delete {
+  background: #e74c3c;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #c0392b;
+}
+
+.btn-toggle {
+  background: #95a5a6;
+  color: white;
+}
+
+.btn-toggle:hover {
+  background: #7f8c8d;
+}
+
+.btn-toggle.enabled {
+  background: #2ecc71;
+}
+
+.btn-toggle.enabled:hover {
+  background: #27ae60;
+}
+
+.webhook-details {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.webhook-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.webhook-detail-label {
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.webhook-detail-value {
+  flex: 1;
+  word-break: break-all;
+}
+
+.webhook-events {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.webhook-event-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #667eea;
+  color: white;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.webhook-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.webhook-item-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.webhook-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.webhook-stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.webhook-stat-value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.webhook-stat-value.success {
+  color: #2ecc71;
+}
+
+.webhook-stat-value.error {
+  color: #e74c3c;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-tertiary);
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.empty-state-text {
+  font-size: 14px;
+}
+
+/* Donation Modal Styles */
+.donation-section {
+  margin: 20px 0;
+}
+
+.crypto-address {
+  margin-bottom: 16px;
+}
+
+.crypto-address label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.address-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-primary);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.address-box code {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  word-break: break-all;
+  user-select: all;
+}
+
+.btn-copy {
+  padding: 6px 10px;
+  background: var(--gradient-secondary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-copy:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.btn-copy:active {
+  transform: scale(0.95);
+}
+
+.donation-info {
+  margin-top: 20px;
+  padding: 16px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.donation-info p {
+  margin: 8px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.donation-info ul {
+  margin: 8px 0 0 20px;
+  padding: 0;
+}
+
+.donation-info li {
+  margin: 4px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Performance Monitor Styles */
+.perf-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.perf-stat-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.perf-stat-card:hover {
+  box-shadow: 0 2px 8px var(--shadow);
+  transform: translateY(-2px);
+}
+
+.perf-stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+
+.perf-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.perf-stat-value.error {
+  color: #e74c3c;
+}
+
+.perf-recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.perf-recommendation {
+  padding: 12px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  border-left: 4px solid var(--border-color);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.perf-recommendation.success {
+  border-left-color: #2ecc71;
+  background: rgba(46, 204, 113, 0.1);
+}
+
+.perf-recommendation.warning {
+  border-left-color: #f39c12;
+  background: rgba(243, 156, 18, 0.1);
+}
+
+.perf-recommendation.info {
+  border-left-color: #3498db;
+  background: rgba(52, 152, 219, 0.1);
+}

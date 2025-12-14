@@ -73,6 +73,48 @@ function processTemplateVariables(text) {
     .replace(/\{timestamp\}/g, Date.now().toString());
 }
 
+// Add human-like imperfections to messages (10% chance)
+function addHumanImperfections(text) {
+  // Only apply to 10% of messages to stay natural
+  if (Math.random() > 0.1) return text;
+  
+  const imperfections = [
+    // Common typos (swap adjacent letters)
+    () => {
+      if (text.length < 5) return text;
+      const words = text.split(' ');
+      const wordIdx = Math.floor(Math.random() * words.length);
+      const word = words[wordIdx];
+      if (word.length < 3) return text;
+      const charIdx = Math.floor(Math.random() * (word.length - 1));
+      const chars = word.split('');
+      [chars[charIdx], chars[charIdx + 1]] = [chars[charIdx + 1], chars[charIdx]];
+      words[wordIdx] = chars.join('');
+      return words.join(' ');
+    },
+    // Missing punctuation at end
+    () => text.endsWith('.') || text.endsWith('!') || text.endsWith('?') ? text.slice(0, -1) : text,
+    // Double space
+    () => text.replace(/ /g, (match) => Math.random() > 0.95 ? '  ' : match),
+    // Lowercase start (casual)
+    () => text.charAt(0).toLowerCase() + text.slice(1),
+    // Extra letter
+    () => {
+      const words = text.split(' ');
+      const wordIdx = Math.floor(Math.random() * words.length);
+      const word = words[wordIdx];
+      if (word.length < 2) return text;
+      const charIdx = Math.floor(Math.random() * word.length);
+      words[wordIdx] = word.slice(0, charIdx) + word.charAt(charIdx) + word.slice(charIdx);
+      return words.join(' ');
+    }
+  ];
+  
+  // Randomly pick one imperfection
+  const imperfection = imperfections[Math.floor(Math.random() * imperfections.length)];
+  return imperfection();
+}
+
 // Simple sleep helper
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -273,7 +315,10 @@ async function handleMentionDetected(messageElement) {
   const replyMessage = mentionReplyMessages[Math.floor(Math.random() * mentionReplyMessages.length)];
   
   // Process template variables
-  const processedMessage = processTemplateVariables(replyMessage);
+  let processedMessage = processTemplateVariables(replyMessage);
+  
+  // Add human-like imperfections
+  processedMessage = addHumanImperfections(processedMessage);
 
   // Send the reply
   console.log('[AutoChat] Sending auto-reply to mention:', processedMessage);
@@ -805,7 +850,10 @@ async function sendMessage(text, retries = 3) {
       if (confirmed) {
         messagesSentToday++;
         totalMessagesSent++;
-        chrome.runtime.sendMessage({ action: 'incrementMessageCount' });
+        chrome.runtime.sendMessage({ 
+          action: 'incrementMessageCount',
+          message: text.substring(0, 100) // Send first 100 chars for webhook
+        });
         console.log('[AutoChat] Message confirmed sent:', text);
         return true;
       }
@@ -893,14 +941,21 @@ async function scheduleNextMessage() {
     console.log('[AutoChat] Daily limit reached, stopping...');
     stopAutoSend();
     chrome.runtime.sendMessage({ action: 'updateBadge', active: false });
+    chrome.runtime.sendMessage({ 
+      action: 'dailyLimitReached',
+      limit: dailyLimit
+    });
     return;
   }
 
-  const message = getNextMessage();
+  let message = getNextMessage();
   if (!message) {
     console.warn('[AutoChat] No messages in list');
     return;
   }
+
+  // Add human-like imperfections to pass Turing test
+  message = addHumanImperfections(message);
 
   await sendMessage(message);
 

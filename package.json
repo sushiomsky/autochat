@@ -1,6 +1,6 @@
 {
   "name": "autochat-enhanced",
-  "version": "4.4.0",
+  "version": "4.5.3",
   "description": "Advanced automated message sender with typing simulation, anti-detection, and smart scheduling",
   "main": "background.js",
   "scripts": {
@@ -13,9 +13,12 @@
     "format:check": "prettier --check \"**/*.{js,json,md,html,css}\"",
     "build": "node scripts/build.js",
     "build:prod": "NODE_ENV=production node scripts/build.js",
+    "build:firefox": "node scripts/build-firefox.js",
+    "build:firefox:prod": "NODE_ENV=production node scripts/build-firefox.js",
     "watch": "node scripts/build.js --watch",
     "package": "npm run build:prod && node scripts/package.js",
-    "clean": "rm -rf dist build coverage"
+    "package:firefox": "npm run build:firefox:prod && cd dist-firefox && zip -r ../autochat-firefox-v4.5.2.zip *",
+    "clean": "rm -rf dist dist-firefox build coverage"
   },
   "keywords": [
     "chrome-extension",

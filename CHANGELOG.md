@@ -2,6 +2,166 @@
 
 All notable changes to AutoChat will be documented in this file.
 
+## [4.5.3] - 2025-12-07 - v4.5 Complete Edition
+
+### Added
+- **Performance Monitoring Dashboard**: Real-time performance tracking and optimization
+  - Message send statistics (total, success rate, avg duration, failures)
+  - Typing speed monitoring (avg WPM, samples)
+  - System resource tracking (memory usage, uptime, errors)
+  - Smart recommendations based on metrics
+  - Export performance data to JSON
+  - Clear metrics functionality
+  - Refresh on-demand updates
+- **Chrome Web Store Optimization**:
+  - Complete store listing guide (CHROME_STORE.md)
+  - Optimized description and keywords
+  - Privacy practices documentation
+  - Permission justifications
+  - Marketing plan and SEO strategy
+  - Publishing checklist
+
+### Changed
+- Updated version to 4.5.3
+- Updated popup version display to "v4.5 Integration Foundation"
+- Enhanced UI with performance monitor button
+
+### Technical
+- Performance monitor module (`src/performance.js`)
+- Performance modal with real-time stats
+- Metrics stored in chrome.storage
+- Automatic memory usage tracking (when available)
+- Performance recommendations engine
+
+### v4.5 Roadmap - ✅ COMPLETE
+- ✅ Firefox port (v4.5.2)
+- ✅ Webhook integration (v4.5.0)
+- ✅ Human-like behavior (v4.5.1)
+- ✅ Performance monitoring (v4.5.3)
+- ✅ Chrome Web Store optimization (v4.5.3)
+
+## [4.5.2] - 2025-12-07 - Firefox Support
+
+### Added
+- **Firefox Browser Support**: Full cross-browser compatibility
+  - Firefox Manifest V2 support
+  - `manifest_firefox.json` for Firefox-specific configuration
+  - Browser API compatibility layer
+  - Separate Firefox build pipeline (`npm run build:firefox`)
+  - Firefox package script (`npm run package:firefox`)
+  - Comprehensive Firefox documentation (FIREFOX.md)
+- **Build System Enhancements**:
+  - `scripts/build-firefox.js` - Firefox-specific build script
+  - Automatic `chrome.*` to `browser.*` API conversion
+  - Firefox-compatible manifest generation
+  - Separate `dist-firefox` output directory
+
+### Changed
+- Updated package.json with Firefox build commands
+- Build system now supports both Chrome and Firefox targets
+- Updated .gitignore to exclude `dist-firefox` directory
+
+### Technical
+- Firefox uses Manifest V2 (browser_action instead of action)
+- Background scripts instead of service workers for Firefox
+- Promise-based browser API namespace
+- Full feature parity with Chrome version
+
+### Documentation
+- Added FIREFOX.md with installation and development guide
+- Firefox-specific troubleshooting section
+- Browser compatibility notes
+- Migration guide from Chrome to Firefox
+
+## [4.5.1] - 2025-12-07 - Human-Like Improvements & Donations
+
+### Added
+- **Human-Like Message Imperfections**: Automatic introduction of natural human typing errors (10% of messages)
+  - Random typos (adjacent letter swaps)
+  - Missing punctuation
+  - Double spaces
+  - Lowercase sentence starts
+  - Extra letters
+  - Makes bot behavior less detectable in Turing tests
+- **Crypto Donation Feature**: Support development with cryptocurrency donations
+  - Bitcoin (BTC), Ethereum (ETH), USDT (TRC20), Litecoin (LTC)
+  - One-click copy addresses
+  - Beautiful donation modal with copy feedback
+  - Donation button in header (💝)
+- **Natural Language Phrases**: Replaced farming-specific phrases with generic, commonly-used expressions
+  - English: 200+ common phrases (Hi, Hello, Thanks, etc.)
+  - Spanish: 150+ natural phrases (Hola, Gracias, etc.)
+  - Urdu: 150+ everyday phrases
+  - Reduces detectability when using default phrases
+
+### Changed
+- Completely replaced all farming_phrases files with natural, everyday language
+- Messages now include occasional human-like imperfections for better Turing test performance
+- "Say as less as possible, much as needed" strategy implemented
+- Donation modal accessible from main interface
+
+### Technical
+- Added `addHumanImperfections()` function in content-enhanced.js
+- Applied to both scheduled messages and mention replies
+- Donation modal with clipboard API integration
+- Copy feedback with visual confirmation
+
+## [4.5.0] - 2025-12-07 - Integration Foundation
+
+### Added
+- **Webhook Integration System**: Complete webhook infrastructure for external integrations
+  - 8 event types: message_sent, campaign_started, campaign_stopped, campaign_paused, campaign_resumed, daily_limit_reached, error, milestone
+  - Webhook management UI with full CRUD operations
+  - Custom HTTP methods (POST, GET, PUT, PATCH)
+  - Custom headers support for authentication
+  - Automatic retry logic (3 attempts with exponential backoff)
+  - Statistics tracking (triggers, failures, last triggered)
+  - Test functionality for webhooks
+  - Enable/disable controls (global and per-webhook)
+- **Webhook Module** (`src/webhooks.js`): Core webhook functionality with 33 comprehensive tests
+- **Webhook Manager Modal**: Full-featured UI for webhook configuration
+  - Add, edit, delete webhooks
+  - View webhook statistics and performance
+  - Test webhooks with real payloads
+  - Enable/disable webhooks individually
+- **Background Script Integration**: Automatic webhook triggers for all events
+- **Content Script Integration**: Message-level webhook triggers with context data
+- **Documentation**: 
+  - Complete webhook guide (WEBHOOK_GUIDE.md)
+  - Integration examples for popular services (WEBHOOK_EXAMPLES.md)
+  - Templates for Slack, Discord, Teams, Telegram, and more
+
+### Changed
+- Updated version to 4.5.0
+- Enhanced background script with webhook trigger functionality
+- Enhanced content script to include webhook context in messages
+- Improved CSS with webhook-specific styling (modal-large, webhook-list, etc.)
+
+### Technical
+- Added 33 new tests for webhook functionality (total: 158 tests)
+- All tests passing with zero errors/warnings
+- Build system includes webhook module in dist
+- Linting passes with zero errors/warnings
+- Webhook system uses Promise-based API for compatibility
+- Retry logic implements exponential backoff (1s, 2s, 3s)
+- Request timeout set to 10 seconds
+- Maximum 10 webhooks per extension
+
+### Files Added
+- `src/webhooks.js` - Core webhook management module
+- `tests/unit/webhooks.test.js` - Comprehensive webhook tests
+- `WEBHOOK_GUIDE.md` - Complete webhook documentation
+- `WEBHOOK_EXAMPLES.md` - Integration examples and templates
+
+### Files Modified
+- `popup-enhanced.html` - Added webhook management modal and settings
+- `popup-enhanced.js` - Integrated webhook manager UI
+- `styles.css` - Added webhook-specific styles
+- `background.js` - Added webhook trigger functionality
+- `content-enhanced.js` - Added webhook context for messages
+- `manifest.json` - Updated version to 4.5.0
+- `package.json` - Updated version to 4.5.0
+
 ## [4.4.0] - 2025-11-28 - UI Polish Edition
 
 ### Added

@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "__MSG_extName__",
   "version": "4.5.3",
   "description": "__MSG_extDescription__",
@@ -7,18 +7,19 @@
   "permissions": [
     "storage",
     "activeTab",
-    "scripting",
-    "alarms"
+    "tabs",
+    "alarms",
+    "<all_urls>"
   ],
-  "host_permissions": ["<all_urls>"],
-  "action": {
+  "browser_action": {
     "default_popup": "popup-enhanced.html",
     "default_icon": {
       "48": "icon48.png"
     }
   },
   "background": {
-    "service_worker": "background.js"
+    "scripts": ["background.js"],
+    "persistent": false
   },
   "content_scripts": [
     {
@@ -28,12 +29,16 @@
     }
   ],
   "web_accessible_resources": [
-    {
-      "resources": ["farming_phrases.txt", "farming_phrases_en.txt", "farming_phrases_ur.txt", "farming_phrases_es.txt"],
-      "matches": ["<all_urls>"]
-    }
+    "farming_phrases.txt",
+    "farming_phrases_en.txt",
+    "farming_phrases_ur.txt",
+    "farming_phrases_es.txt"
   ],
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
+  "content_security_policy": "script-src 'self'; object-src 'self'",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "autochat@sushiomsky.github.io",
+      "strict_min_version": "109.0"
+    }
   }
 }

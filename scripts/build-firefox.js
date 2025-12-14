@@ -3,19 +3,17 @@ const fs = require('fs');
 const path = require('path');
 
 const isProd = process.env.NODE_ENV === 'production';
-const isWatch = process.argv.includes('--watch');
 
-console.log(`Building AutoChat ${isProd ? '(Production)' : '(Development)'}...`);
+console.log(`Building AutoChat for Firefox ${isProd ? '(Production)' : '(Development)'}...`);
 
-// Create dist directory
-const distDir = path.join(__dirname, '../dist');
+// Create dist-firefox directory
+const distDir = path.join(__dirname, '../dist-firefox');
 if (!fs.existsSync(distDir)) {
   fs.mkdirSync(distDir, { recursive: true });
 }
 
 // Files to copy directly
 const filesToCopy = [
-  'manifest.json',
   'farming_phrases.txt',
   'farming_phrases_en.txt',
   'farming_phrases_ur.txt',
@@ -56,6 +54,9 @@ jsFiles.forEach((file) => {
   if (fs.existsSync(src)) {
     let content = fs.readFileSync(src, 'utf8');
     
+    // Replace Chrome-specific APIs with browser namespace (Firefox compatible)
+    content = content.replace(/chrome\./g, 'browser.');
+    
     if (isProd) {
       // Simple minification: remove block comments only (preserve code structure)
       content = content
@@ -63,7 +64,7 @@ jsFiles.forEach((file) => {
     }
     
     fs.writeFileSync(dest, content);
-    console.log(`✓ Processed ${file}`);
+    console.log(`✓ Processed ${file} (Firefox compatible)`);
   }
 });
 
@@ -100,41 +101,21 @@ if (fs.existsSync(srcDir)) {
   console.log('✓ Copied src directory');
 }
 
-// Update manifest version
-const manifestPath = path.join(distDir, 'manifest.json');
-if (fs.existsSync(manifestPath)) {
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  manifest.version_name = isProd ? `${manifest.version}` : `${manifest.version}-dev`;
-  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
-}
-
-console.log(`\n✅ Build complete! Output: ${distDir}`);
-
-if (isWatch) {
-  console.log('\n👀 Watching for changes...');
-  const srcDir = path.join(__dirname, '..');
+// Copy Firefox-specific manifest
+const firefoxManifestSrc = path.join(__dirname, '..', 'manifest_firefox.json');
+const manifestDest = path.join(distDir, 'manifest.json');
+if (fs.existsSync(firefoxManifestSrc)) {
+  fs.copyFileSync(firefoxManifestSrc, manifestDest);
+  console.log('✓ Copied Firefox manifest');
   
-  fs.watch(srcDir, { recursive: false }, (eventType, filename) => {
-    if (filename && (filesToCopy.includes(filename) || jsFiles.includes(filename))) {
-      console.log(`\n🔄 ${filename} changed, rebuilding...`);
-      
-      const src = path.join(srcDir, filename);
-      const dest = path.join(distDir, filename);
-      
-      if (fs.existsSync(src)) {
-        let content = fs.readFileSync(src, 'utf8');
-        
-        if (jsFiles.includes(filename) && isProd) {
-          content = content
-            .replace(/\/\*[\s\S]*?\*\//g, '')
-            .replace(/\/\/.*/g, '')
-            .replace(/\n\s*\n/g, '\n')
-            .replace(/^\s+/gm, '');
-        }
-        
-        fs.writeFileSync(dest, content);
-        console.log(`✓ Rebuilt ${filename}`);
-      }
-    }
-  });
+  // Update manifest version
+  const manifest = JSON.parse(fs.readFileSync(manifestDest, 'utf8'));
+  manifest.version_name = isProd ? `${manifest.version}` : `${manifest.version}-dev`;
+  fs.writeFileSync(manifestDest, JSON.stringify(manifest, null, 2));
+} else {
+  console.error('✗ Firefox manifest not found!');
 }
+
+console.log(`\n✅ Firefox build complete! Output: ${distDir}`);
+console.log('\n📦 To package for Firefox:');
+console.log('   cd dist-firefox && zip -r ../autochat-firefox-v4.5.2.zip *');
