@@ -230,7 +230,11 @@ class BackgroundTabManager {
     return new Promise((resolve) => {
       chrome.storage.local.get([this.storageKey], (data) => {
         if (data[this.storageKey]) {
-          this.activeTabs = new Map(Object.entries(data[this.storageKey]));
+          // Convert string keys back to numbers for tab IDs
+          const entries = Object.entries(data[this.storageKey]).map(([key, value]) => {
+            return [parseInt(key, 10), value];
+          });
+          this.activeTabs = new Map(entries);
           console.log('[BackgroundTabManager] Loaded state:', this.activeTabs.size, 'tabs');
         }
         resolve();
@@ -243,7 +247,11 @@ class BackgroundTabManager {
    */
   async saveState() {
     return new Promise((resolve) => {
-      const stateObj = Object.fromEntries(this.activeTabs);
+      const stateObj = Object.fromEntries(
+        Array.from(this.activeTabs.entries()).map(([key, value]) => {
+          return [key.toString(), value];
+        })
+      );
       chrome.storage.local.set({ [this.storageKey]: stateObj }, () => {
         resolve();
       });

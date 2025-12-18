@@ -613,7 +613,7 @@ function startManualDetection() {
     // Reset the timer as if an automated message was sent
     if (autoSendInterval) {
       // Clear existing timeout
-      if (typeof autoSendInterval === 'number') {
+      if (autoSendInterval !== true) {
         clearTimeout(autoSendInterval);
       }
       

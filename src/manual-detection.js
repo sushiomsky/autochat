@@ -67,9 +67,8 @@ class ManualMessageDetector {
     // Method 3: Listen for Enter key
     this.keydownHandler = (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
-        // Mark that Enter was pressed
-        this.enterPressed = true;
-        this.scheduleCheck(500); // Check after short delay
+        // Schedule check after Enter press
+        this.scheduleCheck(500);
       }
     };
 

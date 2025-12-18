@@ -284,12 +284,12 @@ class ChatLogger {
    */
   detectPlatform() {
     const hostname = window.location.hostname.toLowerCase();
-    if (hostname === 'web.whatsapp.com' || hostname.endsWith('.web.whatsapp.com')) return 'WhatsApp';
-    if (hostname === 'discord.com' || hostname.endsWith('.discord.com')) return 'Discord';
-    if (hostname === 'web.telegram.org' || hostname.endsWith('.web.telegram.org')) return 'Telegram';
-    if (hostname === 'messenger.com' || hostname.endsWith('.messenger.com')) return 'Facebook Messenger';
-    if (hostname === 'slack.com' || hostname.endsWith('.slack.com')) return 'Slack';
-    if (hostname === 'teams.microsoft.com' || hostname.endsWith('.teams.microsoft.com')) return 'Microsoft Teams';
+    if (hostname.endsWith('.web.whatsapp.com') || hostname === 'web.whatsapp.com') return 'WhatsApp';
+    if (hostname.endsWith('.discord.com') || hostname === 'discord.com') return 'Discord';
+    if (hostname.endsWith('.web.telegram.org') || hostname === 'web.telegram.org') return 'Telegram';
+    if (hostname.endsWith('.messenger.com') || hostname === 'messenger.com') return 'Facebook Messenger';
+    if (hostname.endsWith('.slack.com') || hostname === 'slack.com') return 'Slack';
+    if (hostname.endsWith('.teams.microsoft.com') || hostname === 'teams.microsoft.com') return 'Microsoft Teams';
     return 'Unknown';
   }
 
