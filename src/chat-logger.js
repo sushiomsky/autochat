@@ -283,13 +283,13 @@ class ChatLogger {
    * Detect chat platform
    */
   detectPlatform() {
-    const url = window.location.href.toLowerCase();
-    if (url.includes('web.whatsapp.com')) return 'WhatsApp';
-    if (url.includes('discord.com')) return 'Discord';
-    if (url.includes('web.telegram.org')) return 'Telegram';
-    if (url.includes('messenger.com')) return 'Facebook Messenger';
-    if (url.includes('slack.com')) return 'Slack';
-    if (url.includes('teams.microsoft.com')) return 'Microsoft Teams';
+    const hostname = window.location.hostname.toLowerCase();
+    if (hostname === 'web.whatsapp.com' || hostname.endsWith('.web.whatsapp.com')) return 'WhatsApp';
+    if (hostname === 'discord.com' || hostname.endsWith('.discord.com')) return 'Discord';
+    if (hostname === 'web.telegram.org' || hostname.endsWith('.web.telegram.org')) return 'Telegram';
+    if (hostname === 'messenger.com' || hostname.endsWith('.messenger.com')) return 'Facebook Messenger';
+    if (hostname === 'slack.com' || hostname.endsWith('.slack.com')) return 'Slack';
+    if (hostname === 'teams.microsoft.com' || hostname.endsWith('.teams.microsoft.com')) return 'Microsoft Teams';
     return 'Unknown';
   }
 

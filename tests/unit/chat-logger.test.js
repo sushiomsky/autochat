@@ -137,7 +137,10 @@ describe('ChatLogger', () => {
   describe('detectPlatform', () => {
     test('should detect WhatsApp', () => {
       Object.defineProperty(window, 'location', {
-        value: { href: 'https://web.whatsapp.com/' },
+        value: { 
+          href: 'https://web.whatsapp.com/',
+          hostname: 'web.whatsapp.com'
+        },
         writable: true
       });
 
@@ -148,7 +151,10 @@ describe('ChatLogger', () => {
 
     test('should detect Discord', () => {
       Object.defineProperty(window, 'location', {
-        value: { href: 'https://discord.com/channels/123' },
+        value: { 
+          href: 'https://discord.com/channels/123',
+          hostname: 'discord.com'
+        },
         writable: true
       });
 
@@ -159,7 +165,10 @@ describe('ChatLogger', () => {
 
     test('should return Unknown for unrecognized platforms', () => {
       Object.defineProperty(window, 'location', {
-        value: { href: 'https://example.com' },
+        value: { 
+          href: 'https://example.com',
+          hostname: 'example.com'
+        },
         writable: true
       });
 

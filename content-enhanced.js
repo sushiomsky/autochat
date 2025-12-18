@@ -568,9 +568,10 @@ function createChatLogger() {
 
     detectPlatform() {
       const url = window.location.href.toLowerCase();
-      if (url.includes('web.whatsapp.com')) return 'WhatsApp';
-      if (url.includes('discord.com')) return 'Discord';
-      if (url.includes('web.telegram.org')) return 'Telegram';
+      const hostname = window.location.hostname.toLowerCase();
+      if (hostname === 'web.whatsapp.com' || hostname.endsWith('.web.whatsapp.com')) return 'WhatsApp';
+      if (hostname === 'discord.com' || hostname.endsWith('.discord.com')) return 'Discord';
+      if (hostname === 'web.telegram.org' || hostname.endsWith('.web.telegram.org')) return 'Telegram';
       return 'Unknown';
     },
 
