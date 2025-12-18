@@ -133,6 +133,7 @@
     </div>
     <div class="btn-row">
       <button id="openPerformance" class="btn-secondary">⚡ Performance</button>
+      <button id="openChatLogs" class="btn-secondary">📖 Chat Logs</button>
     </div>
 
     <div class="shortcuts-info">
@@ -252,6 +253,30 @@
         <textarea id="mentionReplyMessages" rows="3" placeholder="Thanks for mentioning me!&#10;Hello! I'm here.&#10;Hi! What's up?"></textarea>
       </label>
       <div class="help">Random reply will be selected from this list</div>
+
+      <hr>
+
+      <h4>📝 Chat Logging</h4>
+
+      <label>
+        <input type="checkbox" id="chatLoggingEnabled">
+        💾 Enable Chat Logging
+      </label>
+      <div class="help">Save all chat messages for later review</div>
+
+      <button id="viewChatLogs" class="btn-secondary">📖 View Chat Logs</button>
+
+      <hr>
+
+      <h4>🎮 Manual Message Detection</h4>
+
+      <label>
+        <input type="checkbox" id="manualDetectionEnabled">
+        👆 Detect Manual Messages
+      </label>
+      <div class="help">Reset timer when you manually send a message</div>
+
+      <div id="manualDetectionStatus" class="status" style="display: none;"></div>
 
       <hr>
 

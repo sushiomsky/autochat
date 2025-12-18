@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Log Viewer - AutoChat</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: white;
+      color: #667eea;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #6c757d;
+      margin-top: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .search-bar {
+      padding: 20px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .filter-group label {
+      font-size: 14px;
+      color: #6c757d;
+      font-weight: 600;
+    }
+
+    select, input[type="date"] {
+      padding: 8px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .messages-container {
+      padding: 20px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .message-item {
+      padding: 15px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border-left: 4px solid;
+      background: #f8f9fa;
+      transition: all 0.2s;
+    }
+
+    .message-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .message-item.incoming {
+      border-left-color: #28a745;
+      background: #d4edda;
+    }
+
+    .message-item.outgoing {
+      border-left-color: #007bff;
+      background: #d1ecf1;
+    }
+
+    .message-item.unknown {
+      border-left-color: #6c757d;
+      background: #e9ecef;
+    }
+
+    .message-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .message-sender {
+      font-weight: 700;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .message-meta {
+      display: flex;
+      gap: 10px;
+      font-size: 12px;
+      color: #6c757d;
+    }
+
+    .message-text {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #333;
+      word-wrap: break-word;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6c757d;
+    }
+
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .pagination {
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .pagination button {
+      padding: 8px 16px;
+      border: 1px solid #ced4da;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background: #f8f9fa;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination-info {
+      font-size: 14px;
+      color: #6c757d;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .badge-info {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .badge-secondary {
+      background: #e9ecef;
+      color: #495057;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>💬 Chat Log Viewer</h1>
+      <div class="header-actions">
+        <button class="btn btn-secondary" id="exportBtn">📥 Export</button>
+        <button class="btn btn-secondary" id="clearBtn">🗑️ Clear Logs</button>
+        <button class="btn btn-primary" id="refreshBtn">🔄 Refresh</button>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-value" id="totalCount">0</div>
+        <div class="stat-label">Total Messages</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="incomingCount">0</div>
+        <div class="stat-label">Incoming</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="outgoingCount">0</div>
+        <div class="stat-label">Outgoing</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="platformsCount">0</div>
+        <div class="stat-label">Platforms</div>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <div class="search-row">
+        <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search messages...">
+        <button class="btn btn-primary" id="searchBtn">Search</button>
+      </div>
+      <div class="filter-row">
+        <div class="filter-group">
+          <label>Direction:</label>
+          <select id="directionFilter">
+            <option value="">All</option>
+            <option value="incoming">Incoming</option>
+            <option value="outgoing">Outgoing</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Platform:</label>
+          <select id="platformFilter">
+            <option value="">All Platforms</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>From:</label>
+          <input type="date" id="startDate">
+        </div>
+        <div class="filter-group">
+          <label>To:</label>
+          <input type="date" id="endDate">
+        </div>
+        <button class="btn btn-secondary" id="clearFiltersBtn">Clear Filters</button>
+      </div>
+    </div>
+
+    <div id="messagesContainer" class="messages-container">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Loading messages...</p>
+      </div>
+    </div>
+
+    <div class="pagination" id="pagination" style="display: none;">
+      <button id="prevBtn">← Previous</button>
+      <span class="pagination-info" id="pageInfo">Page 1</span>
+      <button id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <script src="chat-log-viewer.js"></script>
+</body>
+</html>
