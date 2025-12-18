@@ -70,10 +70,11 @@ class BackgroundTabManager {
         }
         break;
 
-      case 'getAllTabs':
+      case 'getAllTabs': {
         const tabs = await this.getAllTabs();
         sendResponse({ tabs });
         break;
+      }
 
       case 'isTabActive':
         if (request.tabId !== undefined) {
