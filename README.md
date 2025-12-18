@@ -245,22 +245,23 @@ For detailed release notes, see [CHANGELOG.md](CHANGELOG.md)
 
 ## Roadmap
 
-### v4.5 (Planned - Q2 2026)
-- [ ] Firefox port (WebExtensions)
-- [ ] Advanced scheduling calendar
-- [ ] Webhook integration
-- [ ] Performance monitoring dashboard
-- [ ] Basic API for integrations
+### v4.5 (Completed - December 2025) ✅
+- ✅ Firefox port (WebExtensions)
+- ✅ Webhook integration
+- ✅ Performance monitoring dashboard
+- ✅ Chrome Web Store optimization
+- ✅ Human-like behavior improvements
+
+See [CHANGELOG.md](CHANGELOG.md) for complete v4.5 features and updates.
 
 ### v5.0 (Major Release - Q3 2026)
 
 **🚀 Next major release with comprehensive feature proposals!**
 
 See detailed planning documents:
-- **[Quick Start Guide](QUICK_START_v5.0_PLANNING.md)** - Start here! 5-minute overview
+- **[Roadmap](ROADMAP_v5.0.md)** - Complete timeline and milestones
 - **[Feature Suggestions](FEATURE_SUGGESTIONS_v5.0.md)** - 15 detailed feature proposals
 - **[Priority Matrix](FEATURE_PRIORITY_MATRIX.md)** - Prioritization analysis
-- **[Roadmap](ROADMAP_v5.0.md)** - Timeline and milestones
 
 **Top 5 Features Planned**:
 1. 🤖 **AI-Powered Message Generation** - Smart compose with local models
@@ -398,41 +399,44 @@ AutoCh supports multiple languages:
 - **English** - Default language
 - **Urdu (اردو)** - Full RTL support with Nastaliq fonts
 
-Want to add your language? See [LOCALIZATION.md](LOCALIZATION.md) for the translation guide.
+Want to add your language? See [docs/development/LOCALIZATION.md](docs/development/LOCALIZATION.md) for the translation guide.
 
 ## Documentation
 
-Complete documentation for AutoChat Enhanced:
+📚 **[Complete Documentation](docs/)** - All guides and resources organized by category
 
-### User Guides
-- 📖 **[README.md](README.md)** (this file) - Main documentation and feature overview
-- 🚀 **[QUICKSTART.md](QUICKSTART.md)** - Quick start guide for users and developers
-- ⌨️ **[KEYBOARD_SHORTCUTS.md](KEYBOARD_SHORTCUTS.md)** - Complete keyboard shortcut reference
-- 🔧 **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
+### Quick Links
 
-### Feature Documentation
-- 👥 **[MULTI_ACCOUNT_FEATURE.md](MULTI_ACCOUNT_FEATURE.md)** - Multi-account management guide
-- 💬 **[MENTION_DETECTION_FEATURE.md](MENTION_DETECTION_FEATURE.md)** - Auto-reply to mentions
-- 🌍 **[MULTI_LANGUAGE_PHRASES.md](MULTI_LANGUAGE_PHRASES.md)** - Multi-language phrase system
-- 🌐 **[LOCALIZATION.md](LOCALIZATION.md)** - Translation and i18n guide
+#### For Users
+- 🚀 **[Quick Start Guide](docs/user-guides/QUICKSTART.md)** - Get started in 5 minutes
+- ⌨️ **[Keyboard Shortcuts](docs/user-guides/KEYBOARD_SHORTCUTS.md)** - Hotkey reference
+- 🔧 **[Troubleshooting](docs/user-guides/TROUBLESHOOTING.md)** - Common issues and solutions
+- 📈 **[Upgrade Guide](docs/user-guides/UPGRADE_GUIDE.md)** - Version migration help
 
-### Development & Contributing
-- 🤝 **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
-- 📝 **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
-- 🗺️ **[ROADMAP_v5.0.md](ROADMAP_v5.0.md)** - Future plans and roadmap
-- 📋 **[TODO.md](TODO.md)** - Task list and priorities
+#### Feature Guides
+- 👥 **[Multi-Account Support](docs/features/MULTI_ACCOUNT_FEATURE.md)** - Manage multiple profiles
+- 💬 **[Mention Detection](docs/features/MENTION_DETECTION_FEATURE.md)** - Auto-reply to mentions
+- 🌍 **[Multi-Language Phrases](docs/features/MULTI_LANGUAGE_PHRASES.md)** - Language-specific messaging
+- 🔗 **[Webhook Integration](docs/features/WEBHOOK_GUIDE.md)** - External integrations
 
-### Release Documentation
-- 📦 **[RELEASE_NOTES_v4.2.md](RELEASE_NOTES_v4.2.md)** - v4.2 release notes
-- 📦 **[RELEASE_NOTES_v4.1.md](RELEASE_NOTES_v4.1.md)** - v4.1 release notes
-- ✅ **[V4.4_UI_FEATURES_VERIFICATION.md](V4.4_UI_FEATURES_VERIFICATION.md)** - v4.4 feature verification
+#### For Developers
+- 🤝 **[Contributing Guide](docs/development/CONTRIBUTING.md)** - How to contribute
+- 🌐 **[Localization Guide](docs/development/LOCALIZATION.md)** - Add translations
+- 🦊 **[Firefox Development](docs/development/FIREFOX.md)** - Firefox-specific guide
+- 🔍 **[CI Debugging](docs/development/CI_DEBUGGING_GUIDE.md)** - CI/CD troubleshooting
+
+#### Project Info
+- 📝 **[Changelog](CHANGELOG.md)** - Complete version history
+- 🗺️ **[Roadmap](ROADMAP_v5.0.md)** - Future development plans
+- 📋 **[TODO](TODO.md)** - Current task list
+- 🔒 **[Privacy Policy](PRIVACY_POLICY.md)** - Privacy and data handling
 
 ## Support
 
 For issues or questions:
 - **Issues**: [GitHub Issues](https://github.com/sushiomsky/autochat/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/sushiomsky/autochat/discussions)
-- **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md)
-- **Translations**: See [LOCALIZATION.md](LOCALIZATION.md)
+- **Contributing**: See [docs/development/CONTRIBUTING.md](docs/development/CONTRIBUTING.md)
+- **Translations**: See [docs/development/LOCALIZATION.md](docs/development/LOCALIZATION.md)
 
 ---
