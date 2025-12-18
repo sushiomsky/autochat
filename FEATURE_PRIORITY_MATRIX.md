@@ -20,28 +20,34 @@ Each feature is scored across 4 dimensions (1-5 scale):
 
 | Rank | Feature | User Value | Feasibility | Strategic | Resources | Total | Status |
 |------|---------|-----------|------------|-----------|-----------|-------|--------|
-| 1 | AI Message Generation | 5 | 4 | 5 | 3 | 17 | 🔴 CRITICAL |
-| 2 | Advanced Analytics | 5 | 5 | 4 | 4 | 18 | 🔴 CRITICAL |
+| 1 | Advanced Analytics | 5 | 5 | 4 | 4 | 18 | 🔴 CRITICAL |
+| 2 | AI Message Generation | 5 | 4 | 5 | 3 | 17 | 🔴 CRITICAL |
 | 3 | Smart Scheduling | 5 | 4 | 5 | 3 | 17 | 🔴 CRITICAL |
-| 4 | Cloud Sync | 4 | 4 | 5 | 3 | 16 | 🟠 HIGH |
-| 5 | Team Collaboration | 4 | 3 | 5 | 2 | 14 | 🟠 HIGH |
-| 6 | AI Assistant | 4 | 4 | 4 | 3 | 15 | 🟠 HIGH |
-| 7 | Personalization Engine | 4 | 4 | 4 | 3 | 15 | 🟡 MEDIUM |
-| 8 | Integration Marketplace | 4 | 3 | 4 | 2 | 13 | 🟡 MEDIUM |
-| 9 | Mobile App | 3 | 3 | 4 | 2 | 12 | 🟡 MEDIUM |
-| 10 | Enterprise Security | 3 | 4 | 3 | 3 | 13 | 🟡 MEDIUM |
-| 11 | Sentiment Analysis | 3 | 4 | 3 | 4 | 14 | 🟢 LOW |
-| 12 | Voice/Video Support | 3 | 3 | 3 | 2 | 11 | 🟢 LOW |
-| 13 | Gamification | 2 | 5 | 2 | 4 | 13 | 🟢 LOW |
-| 14 | Plugin System | 3 | 3 | 4 | 2 | 12 | 🟢 LOW |
-| 15 | Blockchain Features | 1 | 2 | 2 | 1 | 6 | ⚪ MAYBE |
+| 4 | 🎰 Multi-Site Profile Management | 5 | 4 | 5 | 3 | 17 | 🔴 CRITICAL |
+| 5 | 🎰 AI Farming Phrase Generator | 5 | 4 | 5 | 3 | 17 | 🔴 CRITICAL |
+| 6 | Cloud Sync | 4 | 4 | 5 | 3 | 16 | 🟠 HIGH |
+| 7 | 🎰 Daemon Mode Auto-Start | 5 | 3 | 5 | 3 | 16 | 🟠 HIGH |
+| 8 | AI Assistant | 4 | 4 | 4 | 3 | 15 | 🟠 HIGH |
+| 9 | Team Collaboration | 4 | 3 | 5 | 2 | 14 | 🟠 HIGH |
+| 10 | 🎰 File Export/Import Profiles | 4 | 5 | 4 | 4 | 17 | 🟠 HIGH |
+| 11 | Personalization Engine | 4 | 4 | 4 | 3 | 15 | 🟡 MEDIUM |
+| 12 | Integration Marketplace | 4 | 3 | 4 | 2 | 13 | 🟡 MEDIUM |
+| 13 | Mobile App | 3 | 3 | 4 | 2 | 12 | 🟡 MEDIUM |
+| 14 | Enterprise Security | 3 | 4 | 3 | 3 | 13 | 🟡 MEDIUM |
+| 15 | Sentiment Analysis | 3 | 4 | 3 | 4 | 14 | 🟢 LOW |
+| 16 | Voice/Video Support | 3 | 3 | 3 | 2 | 11 | 🟢 LOW |
+| 17 | Gamification | 2 | 5 | 2 | 4 | 13 | 🟢 LOW |
+| 18 | Plugin System | 3 | 3 | 4 | 2 | 12 | 🟢 LOW |
+| 19 | Blockchain Features | 1 | 2 | 2 | 1 | 6 | ⚪ MAYBE |
+
+**🎰 Casino Automation Features** - High priority features essential for casino/gaming use cases
 
 ---
 
 ## 🚀 Recommended Implementation Order
 
 ### Wave 1: Foundation (Months 1-3)
-**Goal**: Build core intelligence capabilities
+**Goal**: Build core intelligence capabilities and casino automation foundation
 
 1. **Advanced Analytics Dashboard** (Score: 18)
    - Effort: 3-4 weeks
@@ -55,18 +61,36 @@ Each feature is scored across 4 dimensions (1-5 scale):
    - Impact: Transformative
    - Risk: Medium (API costs, privacy)
 
-3. **Smart Scheduling** (Score: 17)
+3. **🎰 AI Farming Phrase Generator** (Score: 17)
+   - Effort: 2-3 weeks
+   - Dependencies: AI message generation
+   - Impact: Critical for casino automation
+   - Risk: Low (leverages same AI infrastructure)
+
+4. **Smart Scheduling** (Score: 17)
    - Effort: 3-4 weeks
    - Dependencies: Analytics data
    - Impact: High efficiency gain
    - Risk: Low
 
-**Wave 1 Total**: 10-14 weeks (~3 months)
+5. **🎰 Multi-Site Profile Management** (Score: 17)
+   - Effort: 3-4 weeks
+   - Dependencies: None
+   - Impact: Enables parallel casino automation
+   - Risk: Medium (complexity)
+
+6. **🎰 File Export/Import** (Score: 17)
+   - Effort: 1-2 weeks
+   - Dependencies: Profile system
+   - Impact: Configuration portability
+   - Risk: Low
+
+**Wave 1 Total**: 13-19 weeks (~3-4 months)
 
 ---
 
 ### Wave 2: Scale & Collaboration (Months 4-6)
-**Goal**: Enable team usage and multi-device
+**Goal**: Enable team usage, multi-device, and daemon mode
 
 4. **Cloud Sync** (Score: 16)
    - Effort: 4-5 weeks
@@ -74,13 +98,19 @@ Each feature is scored across 4 dimensions (1-5 scale):
    - Impact: Multi-device seamless experience
    - Risk: Medium (security, privacy)
 
-5. **AI Assistant** (Score: 15)
+5. **🎰 Daemon Mode with Auto-Start** (Score: 16)
+   - Effort: 4-5 weeks
+   - Dependencies: Cloud sync, profile management
+   - Impact: Hands-free casino automation
+   - Risk: Medium (resource management)
+
+6. **AI Assistant** (Score: 15)
    - Effort: 3-4 weeks
    - Dependencies: AI generation module
    - Impact: Better UX, discoverability
    - Risk: Low
 
-6. **Team Collaboration** (Score: 14)
+7. **Team Collaboration** (Score: 14)
    - Effort: 5-6 weeks
    - Dependencies: Cloud sync
    - Impact: Enterprise market access

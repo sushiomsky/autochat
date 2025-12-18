@@ -88,6 +88,66 @@
 **See [FEATURE_SUGGESTIONS_v5.0.md](FEATURE_SUGGESTIONS_v5.0.md) for comprehensive feature proposals**
 
 ### Major Features - Priority Tier 1 (CRITICAL)
+
+#### 🎰 Casino Automation Core Features
+- [ ] **Multi-Site Profile Management & Auto-Detection** 🎰
+  - [ ] Automatic site/domain detection
+  - [ ] Profile-to-domain mapping system
+  - [ ] Multi-tab parallel operation support
+  - [ ] Profile auto-loading based on active tab URL
+  - [ ] Site-specific configuration storage
+  - [ ] Profile templates for popular casino sites
+  - [ ] Tab coordination to prevent conflicts
+  - [ ] Per-site activity status indicators
+  - [ ] Visual dashboard showing all active profiles
+  - [ ] Support for 10+ simultaneous profiles
+- [ ] **AI-Powered Farming Phrase Generation** 🤖🎰
+  - [ ] AI-driven phrase generation system
+  - [ ] Personalized variations for each user
+  - [ ] Category-based generation (greetings, questions, reactions)
+  - [ ] Anti-repetition and anti-detection algorithms
+  - [ ] Cultural and language adaptation
+  - [ ] Batch generation (50-100 phrases at once)
+  - [ ] Quality scoring and filtering
+  - [ ] Generic phrase hardcoding (only universal phrases)
+  - [ ] User approval/rejection workflow
+  - [ ] Continuous learning from user feedback
+- [ ] **Daemon Mode with Auto-Start** ⚙️🎰
+  - [ ] Persistent background service worker
+  - [ ] Auto-start on browser launch
+  - [ ] Profile queue management
+  - [ ] Scheduled activation/deactivation
+  - [ ] Centralized configuration management
+  - [ ] Cloud config sync for daemon settings
+  - [ ] Headless operation mode
+  - [ ] Real-time status dashboard
+  - [ ] Remote control from mobile/other devices
+  - [ ] Automatic error recovery and restart
+  - [ ] Resource management across profiles
+  - [ ] Comprehensive logging and monitoring
+- [ ] **Enhanced Cloud Sync & File Export** ☁️🎰
+  - [ ] Full profile synchronization
+  - [ ] File-based config export (JSON/YAML)
+  - [ ] Individual profile export/import
+  - [ ] Configuration portability
+  - [ ] Real-time sync across devices
+  - [ ] Version control with history
+  - [ ] Merge conflict resolution
+  - [ ] Selective sync options
+  - [ ] Automatic daily backups
+  - [ ] Import from file/URL/clipboard
+  - [ ] Share profiles with other users
+- [ ] **Smart Auto-Reply with AI** 🤖💬🎰
+  - [ ] AI-powered response generation
+  - [ ] Context-aware replies to mentions
+  - [ ] Natural conversation flow
+  - [ ] Tone matching (mirror conversation style)
+  - [ ] Delay randomization for human-like timing
+  - [ ] Response appropriateness scoring
+  - [ ] "Chat as needed, as little as possible" philosophy
+  - [ ] Smart reply frequency management
+
+#### General Platform Features
 - [ ] **AI-Powered Message Generation** 🤖
   - [ ] Smart compose with context awareness
   - [ ] Local model support (WebLLM)
@@ -104,6 +164,7 @@
   - [ ] Heatmaps and activity patterns
   - [ ] Predictive analytics with ML
   - [ ] Custom reports and exports
+  - [ ] Per-profile analytics (🎰 Casino Feature)
 - [ ] **Smart Scheduling & Campaign Manager** 📅
   - [ ] Visual calendar with drag-and-drop
   - [ ] Drip campaigns (multi-step sequences)
@@ -113,6 +174,7 @@
   - [ ] Timezone intelligence
   - [ ] Holiday awareness
   - [ ] Campaign templates and A/B testing
+  - [ ] Per-profile scheduling (🎰 Casino Feature)
 - [ ] **Team Collaboration & Multi-User Support** 👥
   - [ ] Shared workspaces and templates
   - [ ] Role-based access control

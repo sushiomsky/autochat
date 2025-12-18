@@ -22,7 +22,7 @@ This document presents a comprehensive set of feature suggestions for AutoChat v
 
 ## 🎯 Strategic Vision for v5.0
 
-### Theme: **"Intelligent Communication Assistant"**
+### Theme: **"Intelligent Communication Assistant with Casino Automation Excellence"**
 
 Move beyond simple automation to create an intelligent assistant that:
 - Understands context and timing
@@ -30,6 +30,888 @@ Move beyond simple automation to create an intelligent assistant that:
 - Suggests optimal messages
 - Protects privacy while enhancing capabilities
 - Scales from personal use to team collaboration
+- **Enables seamless multi-site casino automation** 🎰
+- **Operates autonomously in daemon mode** 🎰
+- **Generates unique, human-like phrases** 🎰
+
+---
+
+## 🎰 Tier 0: Casino Automation Core Features (Critical Priority)
+
+### 0.1 Multi-Site Profile Management & Auto-Detection 🎰
+
+**Priority**: ⭐⭐⭐⭐⭐ CRITICAL
+
+**Description**: Enable seamless automation across multiple casino sites in parallel tabs with automatic profile detection and intelligent switching. This is the foundation for advanced casino automation.
+
+**Key Features**:
+- **Automatic Site Recognition**: Detects casino/site based on URL/domain
+- **Profile Auto-Loading**: Loads appropriate profile when switching tabs
+- **Multi-Tab Parallel Operation**: Run 10+ profiles simultaneously
+- **Domain-to-Profile Mapping**: User-defined and auto-suggested mappings
+- **Site-Specific Settings**: Each profile maintains independent configuration
+- **Profile Templates**: Pre-configured templates for popular casinos
+- **Tab State Management**: Prevents conflicts when same site open in multiple tabs
+- **Visual Status Dashboard**: Real-time view of all active profiles
+- **Quick Profile Switching**: Manual override for auto-detection
+- **Profile Isolation**: Each profile operates independently
+
+**Technical Implementation**:
+```javascript
+// src/multi-site-manager.js
+class MultiSiteProfileManager {
+  constructor() {
+    this.profileMap = new Map(); // domain -> profile
+    this.activeProfiles = new Map(); // tabId -> profile
+    this.siteDetector = new SiteDetector();
+  }
+
+  async onTabActivated(tabId) {
+    const tab = await chrome.tabs.get(tabId);
+    const domain = this.extractDomain(tab.url);
+    
+    // Auto-detect and load profile
+    const profile = this.profileMap.get(domain);
+    if (profile) {
+      await this.activateProfile(tabId, profile);
+    } else {
+      await this.suggestProfileCreation(domain);
+    }
+  }
+
+  async activateProfile(tabId, profile) {
+    // Inject profile-specific content script
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      files: ['content-enhanced.js']
+    });
+
+    // Send profile configuration
+    await chrome.tabs.sendMessage(tabId, {
+      action: 'loadProfile',
+      profile: profile
+    });
+
+    this.activeProfiles.set(tabId, profile.id);
+  }
+
+  // Site-specific selector detection
+  async detectChatInput(domain) {
+    const siteConfig = this.siteConfigs.get(domain);
+    if (siteConfig) {
+      return siteConfig.chatInputSelector;
+    }
+    return null; // User needs to mark manually
+  }
+}
+```
+
+**User Workflow**:
+1. User creates profiles: "Casino A - Account 1", "Casino B - Account 2"
+2. Associates each profile with domain: casino-a.com, casino-b.com
+3. Opens multiple casino tabs
+4. Extension auto-detects each site and loads correct profile
+5. Each tab operates independently with profile-specific settings
+6. Status bar shows: ✅ Casino A (Active) | ✅ Casino B (Active)
+
+**Benefits**:
+- Manage multiple casino accounts effortlessly
+- No manual profile switching needed
+- Parallel automation across sites
+- Isolated configurations prevent cross-contamination
+- Visual clarity on active automations
+
+---
+
+### 0.2 AI-Powered Farming Phrase Generation 🎰🤖
+
+**Priority**: ⭐⭐⭐⭐⭐ CRITICAL
+
+**Description**: Use AI to generate unique, personalized farming phrases for each user to avoid detection patterns. Only truly universal phrases are hardcoded; everything else is AI-generated and user-specific.
+
+**Key Features**:
+- **Personalized Generation**: Each user gets unique phrase variations
+- **AI-Driven Diversity**: No two users have identical phrase sets
+- **Category-Based Creation**: Generate by category (greetings, questions, reactions, emojis)
+- **Anti-Detection Intelligence**: Avoids known spam patterns
+- **Quality Filtering**: AI scores phrases for naturalness (0-100)
+- **Batch Generation**: Create 50-500 phrases at once
+- **Cultural Adaptation**: Language and culture-appropriate phrases
+- **Tone Control**: Casual, friendly, enthusiastic, neutral
+- **Length Variation**: Mix of short and long messages
+- **Emoji Integration**: Natural emoji placement
+- **User Approval Flow**: Review and approve/reject generated phrases
+- **Continuous Learning**: System learns from user preferences
+- **Generic Hardcoded Library**: Only universal phrases (hi, hello, thanks, ok, lol)
+
+**Hardcoded vs Generated Strategy**:
+```javascript
+// Hardcoded - Generic phrases anyone might say
+const UNIVERSAL_PHRASES = [
+  "hi", "hello", "hey", "thanks", "thank you", 
+  "ok", "okay", "yes", "no", "lol", "😊", "👍"
+];
+
+// Everything else is AI-generated and user-specific
+const AI_GENERATED_CATEGORIES = [
+  "greetings", // "Good morning friend!", "Hey there, how's it going?"
+  "questions", // "What's new today?", "How was your day?"
+  "reactions", // "That's awesome!", "Interesting point!"
+  "comments", // "Been busy lately", "Weather's nice today"
+  "emojis"    // "🎰", "🎲", "🍀", "💰"
+];
+```
+
+**Technical Architecture**:
+```javascript
+// src/ai-phrase-generator.js
+class AIFarmingPhraseGenerator {
+  async generatePhrases(config) {
+    const { count, category, tone, language, userId } = config;
+    
+    // Create unique seed per user for consistent uniqueness
+    const userSeed = this.createUserSeed(userId);
+    
+    const prompt = `Generate ${count} unique, natural-sounding ${category} phrases for casual chat.
+    
+    Requirements:
+    - Sound like a real human, not a bot
+    - Vary in length (2-15 words)
+    - Include appropriate emojis naturally
+    - Tone: ${tone}
+    - Language: ${language}
+    - Avoid these patterns: ${this.getDetectionPatterns()}
+    - User seed: ${userSeed} (ensures uniqueness across users)
+    
+    Categories:
+    - Greetings: Natural ways to say hello
+    - Questions: Casual conversation starters
+    - Reactions: Responses to others' messages
+    - Comments: Random thoughts or observations
+    
+    Format: Return array of phrases only.`;
+
+    const phrases = await this.llm.generate(prompt, {
+      temperature: 0.9, // High creativity
+      topP: 0.95,
+      frequencyPenalty: 0.3
+    });
+
+    return this.filterAndScore(phrases);
+  }
+
+  filterAndScore(phrases) {
+    return phrases
+      .map(phrase => ({
+        text: phrase,
+        naturalness: this.scoreNaturalness(phrase),
+        uniqueness: this.scoreUniqueness(phrase),
+        appropriateness: this.scoreAppropriateness(phrase)
+      }))
+      .filter(p => p.naturalness > 70) // Only natural-sounding phrases
+      .sort((a, b) => b.naturalness - a.naturalness);
+  }
+
+  createUserSeed(userId) {
+    // Ensures each user gets different phrases even with same prompt
+    return crypto.createHash('sha256').update(userId).digest('hex').slice(0, 16);
+  }
+}
+```
+
+**UI Integration**:
+```
+┌─────────────────────────────────────────┐
+│ Phrase Generator                  [×]  │
+├─────────────────────────────────────────┤
+│ Category: [Greetings    ▼]             │
+│ Tone:     [Casual       ▼]             │
+│ Language: [English      ▼]             │
+│ Count:    [50          ]               │
+│                                         │
+│ [Generate Phrases]                     │
+│                                         │
+│ Generated Phrases (48/50 approved):    │
+│ ┌─────────────────────────────────┐   │
+│ │ ✅ Hey friend! How's it going?  │   │
+│ │ ✅ Morning! Hope you're well 😊 │   │
+│ │ ❌ Hello there good sir         │   │
+│ │ ✅ What's up today?             │   │
+│ └─────────────────────────────────┘   │
+│                                         │
+│ [Approve All] [Regenerate Rejected]    │
+│ [Add to Library]                       │
+└─────────────────────────────────────────┘
+```
+
+**Benefits**:
+- Each user has unique phrases = no pattern detection
+- AI generates natural, human-like variations
+- Continuous fresh content without repetition
+- Culturally and linguistically appropriate
+- Maintains "chat as little as needed" philosophy
+- Quality scoring ensures only good phrases used
+
+---
+
+### 0.3 Daemon Mode with Auto-Start 🎰⚙️
+
+**Priority**: ⭐⭐⭐⭐⭐ CRITICAL
+
+**Description**: Background daemon service that auto-starts all configured profiles when browser launches, enabling truly hands-free casino automation across multiple sites.
+
+**Key Features**:
+- **Auto-Start on Browser Launch**: Begins automation immediately
+- **Profile Queue Management**: Handles 10+ profiles simultaneously
+- **Centralized Configuration**: Single JSON config for all settings
+- **Cloud Config Sync**: Configure on desktop, sync to all devices
+- **Scheduled Activation**: Start/stop at specific times
+- **Headless Operation**: Minimal interaction required
+- **Real-Time Monitoring**: Live dashboard showing all automations
+- **Remote Control**: Start/stop from mobile or another device
+- **Error Recovery**: Auto-restart failed profiles
+- **Resource Management**: Smart CPU/memory allocation
+- **Logging & Alerts**: Comprehensive logs and notifications
+- **Health Monitoring**: Checks profile status every 30 seconds
+
+**Architecture**:
+```javascript
+// background-daemon.js
+class AutoChatDaemon {
+  constructor() {
+    this.profiles = [];
+    this.activeAutomations = new Map();
+    this.config = null;
+    this.cloudSync = new CloudSyncManager();
+    this.healthCheck = null;
+  }
+
+  async initialize() {
+    console.log('[Daemon] Initializing AutoChat Daemon...');
+    
+    // Load configuration from cloud or local
+    this.config = await this.loadConfiguration();
+    
+    if (!this.config.daemon.enabled) {
+      console.log('[Daemon] Disabled in config');
+      return;
+    }
+
+    // Check if within scheduled hours
+    if (!this.isWithinSchedule()) {
+      console.log('[Daemon] Outside scheduled hours');
+      this.scheduleNextStart();
+      return;
+    }
+
+    // Start all auto-start enabled profiles
+    for (const profile of this.config.profiles) {
+      if (profile.autoStart && profile.enabled) {
+        await this.startProfileAutomation(profile);
+      }
+    }
+
+    // Setup monitoring
+    this.startHealthMonitoring();
+    this.setupCloudSyncListener();
+    
+    console.log('[Daemon] Initialization complete');
+  }
+
+  async startProfileAutomation(profile) {
+    console.log(`[Daemon] Starting profile: ${profile.name}`);
+    
+    const automation = {
+      profileId: profile.id,
+      domain: profile.domain,
+      status: 'starting',
+      startedAt: Date.now(),
+      restartCount: 0
+    };
+
+    try {
+      // Ensure tab exists or create new one
+      let tab = await this.findOrCreateTab(profile.domain);
+      
+      // Wait for page load
+      await this.waitForPageLoad(tab.id);
+      
+      // Inject content script with profile config
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['content-enhanced.js']
+      });
+
+      // Send start command with profile
+      await chrome.tabs.sendMessage(tab.id, {
+        action: 'startAutomation',
+        profile: profile
+      });
+
+      automation.status = 'active';
+      automation.tabId = tab.id;
+      this.activeAutomations.set(profile.id, automation);
+      
+      console.log(`[Daemon] Profile ${profile.name} is now active`);
+      
+      // Start monitoring this automation
+      this.monitorAutomation(profile.id);
+      
+    } catch (error) {
+      console.error(`[Daemon] Failed to start ${profile.name}:`, error);
+      automation.status = 'failed';
+      automation.error = error.message;
+      
+      // Retry after delay
+      if (automation.restartCount < 3) {
+        setTimeout(() => {
+          automation.restartCount++;
+          this.startProfileAutomation(profile);
+        }, 30000); // 30 second delay
+      }
+    }
+  }
+
+  async findOrCreateTab(domain) {
+    const tabs = await chrome.tabs.query({});
+    const existingTab = tabs.find(tab => tab.url?.includes(domain));
+    
+    if (existingTab) {
+      return existingTab;
+    }
+    
+    // Create new tab
+    return await chrome.tabs.create({
+      url: `https://${domain}`,
+      active: false // Don't focus the tab
+    });
+  }
+
+  startHealthMonitoring() {
+    this.healthCheck = setInterval(async () => {
+      for (const [profileId, automation] of this.activeAutomations) {
+        // Check if tab still exists
+        try {
+          await chrome.tabs.get(automation.tabId);
+          
+          // Send health check ping
+          const response = await chrome.tabs.sendMessage(automation.tabId, {
+            action: 'healthCheck'
+          });
+          
+          if (!response || response.status !== 'ok') {
+            console.warn(`[Daemon] Profile ${profileId} not responding`);
+            await this.restartAutomation(profileId);
+          }
+        } catch (error) {
+          // Tab closed or unresponsive
+          console.error(`[Daemon] Profile ${profileId} tab lost:`, error);
+          await this.restartAutomation(profileId);
+        }
+      }
+    }, 30000); // Check every 30 seconds
+  }
+
+  async loadConfiguration() {
+    // Try cloud first
+    if (this.config?.cloudSync?.enabled) {
+      try {
+        const cloudConfig = await this.cloudSync.fetchConfig();
+        if (cloudConfig) {
+          return cloudConfig;
+        }
+      } catch (error) {
+        console.warn('[Daemon] Cloud sync failed, using local:', error);
+      }
+    }
+    
+    // Fallback to local storage
+    const local = await chrome.storage.local.get('daemonConfig');
+    return local.daemonConfig || this.getDefaultConfig();
+  }
+
+  setupCloudSyncListener() {
+    // Listen for config updates from cloud
+    this.cloudSync.on('configUpdated', async (newConfig) => {
+      console.log('[Daemon] Config updated from cloud');
+      const oldConfig = this.config;
+      this.config = newConfig;
+      
+      // Restart if profiles changed
+      await this.reconcileProfiles(oldConfig, newConfig);
+    });
+  }
+
+  isWithinSchedule() {
+    if (!this.config.daemon.schedules) return true;
+    
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const hour = now.getHours();
+    
+    for (const schedule of this.config.daemon.schedules) {
+      if (schedule.daysOfWeek.includes(dayOfWeek)) {
+        const [startHour] = schedule.start.split(':').map(Number);
+        const [stopHour] = schedule.stop.split(':').map(Number);
+        
+        if (hour >= startHour && hour < stopHour) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  }
+}
+
+// Start daemon when browser launches
+chrome.runtime.onStartup.addListener(() => {
+  const daemon = new AutoChatDaemon();
+  daemon.initialize();
+});
+
+// Also start when extension installed/updated
+chrome.runtime.onInstalled.addListener(() => {
+  const daemon = new AutoChatDaemon();
+  daemon.initialize();
+});
+```
+
+**Configuration File Structure**:
+```json
+{
+  "version": "5.0.0",
+  "daemon": {
+    "enabled": true,
+    "autoStartOnBrowserLaunch": true,
+    "schedules": [
+      {
+        "start": "09:00",
+        "stop": "23:00",
+        "daysOfWeek": [1, 2, 3, 4, 5, 6, 0]
+      }
+    ],
+    "healthCheckInterval": 30,
+    "maxRestartAttempts": 3
+  },
+  "profiles": [
+    {
+      "id": "uuid-1",
+      "name": "Casino A - Main Account",
+      "domain": "casino-a.com",
+      "enabled": true,
+      "autoStart": true,
+      "settings": {
+        "messages": ["...", "..."],
+        "intervals": { "min": 60, "max": 180 },
+        "activeHours": { "start": "09:00", "end": "23:00" }
+      }
+    },
+    {
+      "id": "uuid-2",
+      "name": "Casino B - Secondary",
+      "domain": "casino-b.com",
+      "enabled": true,
+      "autoStart": true,
+      "settings": { /* ... */ }
+    }
+  ],
+  "cloudSync": {
+    "enabled": true,
+    "provider": "firebase",
+    "syncInterval": 300,
+    "encryptionKey": "user-derived-key"
+  }
+}
+```
+
+**Monitoring Dashboard UI**:
+```
+┌─────────────────────────────────────────────┐
+│ Daemon Status                    [⚙️]  [🔄] │
+├─────────────────────────────────────────────┤
+│ Status: ● ACTIVE                            │
+│ Uptime: 2h 34m                              │
+│ Active Profiles: 3 / 5                      │
+│                                             │
+│ Active Automations:                         │
+│ ┌─────────────────────────────────────┐   │
+│ │ ✅ Casino A - Main      [Stop]      │   │
+│ │    Messages: 47   Uptime: 2h 30m    │   │
+│ │                                      │   │
+│ │ ✅ Casino B - Secondary [Stop]      │   │
+│ │    Messages: 23   Uptime: 1h 45m    │   │
+│ │                                      │   │
+│ │ ⏸️ Casino C - Backup    [Start]     │   │
+│ │    Status: Paused by user           │   │
+│ └─────────────────────────────────────┘   │
+│                                             │
+│ [Stop All] [Start All] [View Logs]         │
+└─────────────────────────────────────────────┘
+```
+
+**Benefits**:
+- True hands-free operation
+- Configure once, runs everywhere
+- Auto-recovery from failures
+- Remote monitoring and control
+- Resource-efficient background operation
+- Synchronized across all devices
+
+---
+
+### 0.4 Enhanced Cloud Sync & File-Based Config 🎰☁️
+
+**Priority**: ⭐⭐⭐⭐⭐ CRITICAL
+
+**Description**: Comprehensive cloud synchronization with file-based export/import for backup, sharing, and portability. Configure automation on desktop, automatically sync to laptop and other devices.
+
+**Key Features**:
+- **Profile Cloud Sync**: All profiles sync in real-time
+- **Configuration Export**: Export entire config as JSON/YAML file
+- **Individual Profile Export**: Export/import single profiles
+- **Cross-Device Sync**: Desktop config → Laptop auto-sync
+- **Version History**: Track changes with rollback
+- **Merge Conflict Resolution**: Smart merging when editing on multiple devices
+- **Selective Sync**: Choose what to sync (profiles, phrases, analytics)
+- **Automatic Backups**: Daily snapshots with 30-day retention
+- **Import Sources**: File, URL, clipboard, QR code
+- **Share Profiles**: Generate shareable links/files
+- **Encryption**: End-to-end encryption for cloud data
+
+**Export File Format**:
+```json
+{
+  "exportVersion": "5.0.0",
+  "exportDate": "2026-03-15T10:30:00Z",
+  "exportType": "full",
+  "metadata": {
+    "deviceName": "Desktop PC",
+    "userName": "user@example.com",
+    "exportReason": "backup"
+  },
+  "daemon": {
+    "enabled": true,
+    "autoStartOnBrowserLaunch": true,
+    "schedules": [/* ... */]
+  },
+  "profiles": [
+    {
+      "id": "profile-1",
+      "name": "Casino A - Main",
+      "domain": "casino-a.com",
+      "enabled": true,
+      "autoStart": true,
+      "messages": ["Hey!", "What's up?", "..."],
+      "settings": {
+        "sendMode": "random",
+        "intervals": { "min": 60, "max": 180 },
+        "activeHours": { "start": "09:00", "end": "23:00" },
+        "dailyLimit": 100,
+        "typingSimulation": true
+      },
+      "analytics": {
+        "totalMessages": 1234,
+        "todayMessages": 45,
+        "successRate": 98.5
+      }
+    }
+  ],
+  "phraseLibrary": {
+    "custom": ["phrase1", "phrase2"],
+    "aiGenerated": ["phrase3", "phrase4"],
+    "categories": {
+      "greetings": ["hi", "hello"],
+      "questions": ["how are you?"]
+    }
+  },
+  "globalSettings": {
+    "language": "en",
+    "theme": "dark",
+    "notifications": true
+  }
+}
+```
+
+**Cloud Sync Architecture**:
+```javascript
+// src/cloud-sync-manager.js
+class CloudSyncManager {
+  constructor() {
+    this.provider = null; // Firebase, AWS S3, custom backend
+    this.encryptionKey = null;
+    this.syncInterval = 300000; // 5 minutes
+    this.lastSync = null;
+  }
+
+  async initialize(config) {
+    // Derive encryption key from user password
+    this.encryptionKey = await this.deriveEncryptionKey(config.password);
+    
+    // Connect to cloud provider
+    this.provider = await this.connectProvider(config.provider);
+    
+    // Start automatic sync
+    this.startSyncLoop();
+  }
+
+  async syncToCloud(localConfig) {
+    // Encrypt before sending
+    const encrypted = await this.encrypt(localConfig, this.encryptionKey);
+    
+    // Add metadata
+    const payload = {
+      version: localConfig.version,
+      timestamp: Date.now(),
+      deviceId: await this.getDeviceId(),
+      data: encrypted
+    };
+    
+    // Upload to cloud
+    await this.provider.upload('autochat-config', payload);
+    
+    this.lastSync = Date.now();
+    console.log('[CloudSync] Configuration synced to cloud');
+  }
+
+  async syncFromCloud() {
+    // Download encrypted config
+    const payload = await this.provider.download('autochat-config');
+    
+    // Decrypt locally
+    const decrypted = await this.decrypt(payload.data, this.encryptionKey);
+    
+    // Check version and merge if needed
+    const localConfig = await this.getLocalConfig();
+    
+    if (payload.version > localConfig.version) {
+      // Cloud is newer, apply it
+      await this.applyConfig(decrypted);
+    } else if (payload.version < localConfig.version) {
+      // Local is newer, push to cloud
+      await this.syncToCloud(localConfig);
+    } else {
+      // Same version, check for conflicts
+      await this.mergeConfigs(localConfig, decrypted);
+    }
+  }
+
+  async mergeConfigs(local, remote) {
+    // Smart merging logic
+    const merged = {
+      version: Math.max(local.version, remote.version) + 1,
+      daemon: this.mergeObject(local.daemon, remote.daemon),
+      profiles: this.mergeProfiles(local.profiles, remote.profiles),
+      phraseLibrary: this.mergePhraseLibrary(local.phraseLibrary, remote.phraseLibrary),
+      globalSettings: this.mergeObject(local.globalSettings, remote.globalSettings)
+    };
+    
+    // Save merged config
+    await this.applyConfig(merged);
+    
+    // Push merged version to cloud
+    await this.syncToCloud(merged);
+  }
+
+  mergeProfiles(localProfiles, remoteProfiles) {
+    const merged = new Map();
+    
+    // Add all local profiles
+    localProfiles.forEach(p => merged.set(p.id, p));
+    
+    // Merge remote profiles
+    remoteProfiles.forEach(remoteProfile => {
+      const localProfile = merged.get(remoteProfile.id);
+      
+      if (!localProfile) {
+        // New profile from remote
+        merged.set(remoteProfile.id, remoteProfile);
+      } else {
+        // Merge: take newest data based on lastModified
+        if (remoteProfile.lastModified > localProfile.lastModified) {
+          merged.set(remoteProfile.id, remoteProfile);
+        }
+      }
+    });
+    
+    return Array.from(merged.values());
+  }
+
+  startSyncLoop() {
+    setInterval(async () => {
+      try {
+        await this.syncFromCloud();
+      } catch (error) {
+        console.error('[CloudSync] Sync failed:', error);
+      }
+    }, this.syncInterval);
+  }
+}
+```
+
+**User Workflow**:
+
+1. **Desktop Configuration**:
+   - User opens AutoChat on desktop
+   - Creates 5 profiles for different casinos
+   - Configures messages, timing, settings
+   - Enables cloud sync
+   - Config automatically syncs to cloud (encrypted)
+
+2. **Laptop Auto-Sync**:
+   - User opens browser on laptop
+   - AutoChat detects cloud account
+   - Pulls latest configuration
+   - Daemon auto-starts all enabled profiles
+   - User doesn't need to configure anything!
+
+3. **File Export/Backup**:
+   - User exports config as JSON file
+   - Stores locally or in external backup
+   - Can import later or share with others
+   - Useful for migration or disaster recovery
+
+**UI Components**:
+```
+┌─────────────────────────────────────────┐
+│ Cloud Sync & Export            [×]     │
+├─────────────────────────────────────────┤
+│ Cloud Sync Status:                     │
+│ ● Connected                            │
+│ Last sync: 2 minutes ago               │
+│ [Sync Now] [Disconnect]                │
+│                                         │
+│ ────────────────────────────────────── │
+│                                         │
+│ Export Configuration:                  │
+│ ┌────────────────────────────────┐    │
+│ │ ○ Full Configuration           │    │
+│ │ ○ Profiles Only                │    │
+│ │ ○ Selected Profiles:           │    │
+│ │   [x] Casino A                 │    │
+│ │   [ ] Casino B                 │    │
+│ └────────────────────────────────┘    │
+│                                         │
+│ Format: [JSON ▼]                       │
+│ [Export to File] [Copy to Clipboard]  │
+│                                         │
+│ ────────────────────────────────────── │
+│                                         │
+│ Import Configuration:                  │
+│ [📁 Choose File] [📋 From Clipboard]  │
+│ [🔗 From URL]    [📷 Scan QR Code]    │
+└─────────────────────────────────────────┘
+```
+
+**Benefits**:
+- Configure once on desktop, works everywhere
+- Automatic synchronization across devices
+- Easy backup and restoration
+- Share configurations with trusted users
+- Zero data loss with version history
+- Seamless migration to new devices
+
+---
+
+### 0.5 Smart Auto-Reply with AI 🎰🤖💬
+
+**Priority**: ⭐⭐⭐⭐ HIGH
+
+**Description**: AI-powered automatic replies to mentions and messages that appear natural and context-aware. Follows the "chat as needed, as little as possible" philosophy.
+
+**Key Features**:
+- **Context-Aware Replies**: AI analyzes message context before responding
+- **Tone Matching**: Mirrors the conversation style and tone
+- **Smart Frequency Control**: Limits replies to appear natural
+- **Delay Randomization**: Variable response times (5-30 seconds)
+- **Reply Appropriateness Scoring**: Only replies when truly appropriate
+- **Keyword Triggering**: Responds to specific mentions/keywords
+- **Conversation Threading**: Maintains context across multiple messages
+- **"Minimal Chat" Philosophy**: Only replies when absolutely necessary
+- **Quality Filtering**: Won't send low-quality or risky responses
+
+**Implementation**:
+```javascript
+// src/smart-auto-reply.js
+class SmartAutoReply {
+  constructor() {
+    this.aiEngine = new AIEngine();
+    this.replyHistory = new Map(); // Track recent replies
+    this.minimalChatMode = true;
+  }
+
+  async handleMention(message) {
+    // Check if we should reply at all
+    if (!this.shouldReply(message)) {
+      console.log('[AutoReply] Skipping - minimal chat mode');
+      return null;
+    }
+
+    // Analyze context
+    const context = await this.analyzeContext(message);
+    
+    // Generate appropriate response
+    const response = await this.generateResponse(message, context);
+    
+    // Score appropriateness
+    const score = await this.scoreResponse(response, context);
+    
+    if (score < 70) {
+      console.log('[AutoReply] Response quality too low, skipping');
+      return null;
+    }
+
+    // Random delay (5-30 seconds)
+    const delay = this.randomDelay(5000, 30000);
+    await this.sleep(delay);
+    
+    // Send reply
+    return response;
+  }
+
+  shouldReply(message) {
+    // Minimal chat philosophy
+    const hoursSinceLastReply = this.getHoursSinceLastReply(message.userId);
+    
+    // Don't reply if we replied recently
+    if (hoursSinceLastReply < 2) {
+      return false;
+    }
+
+    // Check message importance
+    const importance = this.assessImportance(message);
+    
+    // Only reply to important messages
+    return importance > 70;
+  }
+
+  async generateResponse(message, context) {
+    const prompt = `You are chatting naturally in a casino chat. 
+    Someone said: "${message.text}"
+    
+    Context: ${context.summary}
+    Conversation tone: ${context.tone}
+    
+    Generate a brief, natural response (1-10 words).
+    Follow "chat as needed, as little as possible" - be concise.
+    Match the conversation tone and style.
+    
+    Response:`;
+
+    return await this.aiEngine.generate(prompt, {
+      maxLength: 50,
+      temperature: 0.8
+    });
+  }
+}
+```
+
+**Benefits**:
+- Appears genuinely human
+- Reduces manual interaction needed
+- Maintains natural conversation flow
+- Avoids over-chatting
+- Context-appropriate responses
 
 ---
 
