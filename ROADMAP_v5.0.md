@@ -92,6 +92,365 @@ v5.0 Development Phases
 
 ---
 
+## 🎰 Casino Automation Enhancement Features
+
+**Priority**: HIGH - Critical for casino/gaming automation use cases  
+**Cross-cutting Features**: Integrated across multiple waves
+
+### Multi-Site Profile Management & Auto-Detection
+
+**Goal**: Enable seamless automation across multiple casino sites in parallel tabs with automatic profile detection and switching.
+
+**Key Features**:
+- **Automatic Site Detection**: Extension detects current site/casino and loads corresponding profile automatically
+- **Multi-Tab Parallel Operation**: Manage and automate multiple casino accounts across different tabs simultaneously
+- **Profile Auto-Switching**: Intelligent switching between profiles based on active tab URL/domain
+- **Site-Specific Configurations**: Each profile contains site-specific settings (selectors, timing, phrases)
+- **Profile Templates by Casino**: Pre-configured templates for popular casino sites
+- **Domain-to-Profile Mapping**: User-defined rules for automatic profile selection
+- **Tab Coordination**: Prevent conflicts when same site is open in multiple tabs
+- **Per-Site Activity Status**: Visual indicators showing which profiles/sites are currently active
+
+**Technical Architecture**:
+```javascript
+// src/multi-profile-manager.js
+class MultiProfileManager {
+  async detectSiteAndLoadProfile(tabId, url) {
+    const domain = this.extractDomain(url);
+    const profile = await this.findProfileByDomain(domain);
+    
+    if (profile) {
+      await this.loadProfile(tabId, profile);
+      this.trackActiveProfile(tabId, profile.id);
+    } else {
+      // Offer to create new profile for this site
+      this.suggestProfileCreation(domain);
+    }
+  }
+
+  async manageMultipleTabs() {
+    const tabs = await chrome.tabs.query({ active: true });
+    tabs.forEach(tab => {
+      this.monitorTabActivity(tab.id);
+      this.coordinateAutomation(tab.id);
+    });
+  }
+}
+```
+
+**User Experience**:
+1. User opens multiple casino tabs (e.g., Casino A, Casino B, Casino C)
+2. Extension detects each site and loads corresponding profile automatically
+3. Each tab runs independently with site-specific settings
+4. User sees status indicator for each active site in extension popup
+5. Profiles can be manually switched if auto-detection needs override
+
+### AI-Powered Farming Phrase Generation
+
+**Goal**: Generate unique, human-like farming phrases automatically using AI to prevent detection and maintain natural conversation patterns.
+
+**Key Features**:
+- **AI-Driven Generation**: Use LLM to generate contextually appropriate farming phrases
+- **Personalization**: Each user gets slightly different phrase variations
+- **Generic Template Hardcoding**: Only truly universal phrases (e.g., "hello", "thanks") are hardcoded
+- **Custom Generation Parameters**: User controls tone, length, formality, language
+- **Category-Based Generation**: Generate phrases specific to categories (greetings, questions, reactions)
+- **Anti-Repetition Intelligence**: AI ensures generated phrases don't repeat patterns
+- **Cultural Adaptation**: Generate phrases appropriate for user's language/culture
+- **Continuous Learning**: System learns from user's approved/rejected generations
+- **Batch Generation**: Generate 50-100 phrases at once for variety
+- **Quality Scoring**: AI scores phrases for naturalness and appropriateness
+
+**Technical Implementation**:
+```javascript
+// src/ai-phrase-generator.js
+class AIFarmingPhraseGenerator {
+  async generatePhrases(config) {
+    const { count, category, tone, language } = config;
+    
+    // Base prompt ensures variety and naturalness
+    const prompt = this.buildGenerationPrompt({
+      userProfile: this.getUserContext(),
+      category,
+      tone,
+      language,
+      antiPatterns: this.getKnownPatterns(), // Avoid detection patterns
+      uniqueness: 'high' // Each user gets different phrases
+    });
+
+    // Use local LLM or API with privacy controls
+    const phrases = await this.llm.generate(prompt, {
+      temperature: 0.9, // High creativity
+      count: count,
+      maxLength: 100
+    });
+
+    // Filter and score phrases
+    return this.filterAndScore(phrases);
+  }
+
+  async enhanceWithVariations(basePhrases) {
+    // Create natural variations of phrases
+    return await this.llm.createVariations(basePhrases, {
+      variationCount: 5,
+      preserveMeaning: true,
+      diversityScore: 0.8
+    });
+  }
+}
+```
+
+**Hardcoded vs Generated**:
+- **Hardcoded** (Generic): "hi", "hello", "thanks", "ok", "yes", "no", "lol", "😊"
+- **Generated** (Personalized): Everything else - greetings, questions, comments, reactions
+
+**UI Integration**:
+- "Generate Phrases" button in phrase manager
+- Settings for generation parameters (count, style, language)
+- Preview and approve/reject interface
+- Bulk regenerate option
+- Save favorite generation configs as templates
+
+### Daemon Mode with Auto-Start
+
+**Goal**: Run AutoChat as a background daemon that automatically starts farming on all configured profiles without user intervention.
+
+**Key Features**:
+- **Background Service Worker**: Persistent service worker that runs continuously
+- **Auto-Start on Browser Launch**: Begin automation when browser starts
+- **Profile Queue Management**: Manage multiple profiles and their automation schedules
+- **Centralized Configuration**: Single config file for all daemon settings
+- **Cloud Config Sync**: Sync configuration from desktop to other devices
+- **Scheduled Activation**: Start/stop daemon at specific times
+- **Headless Operation**: Minimal user interaction required once configured
+- **Status Dashboard**: Real-time view of all active automations
+- **Remote Control**: Start/stop daemon from mobile or another device
+- **Error Recovery**: Auto-restart failed automations
+- **Resource Management**: Smart resource allocation across profiles
+- **Logging & Monitoring**: Comprehensive logs for debugging and monitoring
+
+**Architecture**:
+```javascript
+// background-daemon.js
+class AutoChatDaemon {
+  constructor() {
+    this.profiles = [];
+    this.activeAutomations = new Map();
+    this.config = null;
+    this.cloudSync = new CloudSyncManager();
+  }
+
+  async initialize() {
+    // Load config from cloud or local
+    this.config = await this.cloudSync.fetchConfig();
+    
+    // Start all enabled profiles
+    for (const profile of this.config.profiles) {
+      if (profile.autoStart && profile.enabled) {
+        await this.startProfileAutomation(profile);
+      }
+    }
+
+    // Setup monitoring and health checks
+    this.setupHealthMonitoring();
+    this.setupCloudSync();
+  }
+
+  async startProfileAutomation(profile) {
+    const automation = {
+      profileId: profile.id,
+      domain: profile.domain,
+      status: 'starting',
+      startedAt: Date.now()
+    };
+
+    try {
+      // Ensure tab is open or create new one
+      const tab = await this.ensureTabForProfile(profile);
+      
+      // Inject content script and start automation
+      await this.injectAndStart(tab.id, profile);
+      
+      automation.status = 'active';
+      automation.tabId = tab.id;
+      this.activeAutomations.set(profile.id, automation);
+      
+      // Monitor and restart if needed
+      this.monitorAutomation(profile.id);
+    } catch (error) {
+      automation.status = 'failed';
+      automation.error = error.message;
+      this.handleAutomationError(profile, error);
+    }
+  }
+
+  async syncConfigFromCloud() {
+    // Desktop configures everything
+    // Other devices pull config and auto-start
+    const latestConfig = await this.cloudSync.fetchLatestConfig();
+    if (latestConfig.version > this.config.version) {
+      this.config = latestConfig;
+      await this.reloadAllAutomations();
+    }
+  }
+}
+
+// Start daemon on browser launch
+chrome.runtime.onStartup.addListener(() => {
+  const daemon = new AutoChatDaemon();
+  daemon.initialize();
+});
+```
+
+**Configuration Structure**:
+```json
+{
+  "version": "1.0.0",
+  "daemon": {
+    "enabled": true,
+    "autoStartOnBrowserLaunch": true,
+    "schedules": [
+      {
+        "start": "09:00",
+        "stop": "23:00",
+        "daysOfWeek": [1, 2, 3, 4, 5]
+      }
+    ]
+  },
+  "profiles": [
+    {
+      "id": "profile-1",
+      "name": "Casino A - Account 1",
+      "domain": "casino-a.com",
+      "enabled": true,
+      "autoStart": true,
+      "settings": { /* profile specific */ }
+    },
+    {
+      "id": "profile-2",
+      "name": "Casino B - Account 2",
+      "domain": "casino-b.com",
+      "enabled": true,
+      "autoStart": true,
+      "settings": { /* profile specific */ }
+    }
+  ],
+  "cloudSync": {
+    "enabled": true,
+    "provider": "firebase",
+    "syncInterval": 300
+  }
+}
+```
+
+**User Workflow**:
+1. **Desktop Configuration**:
+   - User opens extension on desktop
+   - Configures all profiles (sites, messages, timing)
+   - Enables daemon mode
+   - Saves configuration
+   - Config syncs to cloud
+
+2. **Auto-Start on Other Devices**:
+   - User opens browser on laptop/another device
+   - Extension pulls config from cloud
+   - Daemon automatically starts all enabled profiles
+   - User sees status dashboard showing all active automations
+
+3. **Monitoring & Control**:
+   - Dashboard shows all active profiles
+   - Start/stop individual profiles or all
+   - View real-time statistics
+   - Adjust settings (syncs to cloud)
+   - View logs and errors
+
+### Enhanced Cloud Sync & File-Based Config Export
+
+**Goal**: Seamless configuration synchronization across devices with file-based backup and portability.
+
+**Key Features**:
+- **Full Profile Sync**: All profiles, settings, phrases, and schedules sync across devices
+- **Real-Time Sync**: Changes propagate immediately to all connected devices
+- **File Export/Import**: Export entire configuration as JSON file for backup
+- **Profile Portability**: Export individual profiles to share or backup
+- **Version Control**: Track configuration changes with versioning
+- **Merge Conflict Resolution**: Smart merging when editing on multiple devices
+- **Selective Sync**: Choose what to sync (profiles, phrases, analytics)
+- **Backup History**: Automatic daily backups with 30-day retention
+- **Import Sources**: Import from file, URL, or clipboard
+- **Export Formats**: JSON, YAML, or encrypted package
+
+**File Export Structure**:
+```json
+{
+  "exportVersion": "5.0.0",
+  "exportDate": "2026-03-15T10:30:00Z",
+  "exportType": "full", // or "profiles-only"
+  "metadata": {
+    "deviceName": "Desktop PC",
+    "userName": "user@example.com"
+  },
+  "profiles": [
+    {
+      "id": "profile-1",
+      "name": "Casino A - Main Account",
+      "domain": "casino-a.com",
+      "messages": ["...", "..."],
+      "settings": { /* all settings */ },
+      "schedule": { /* schedule config */ },
+      "analytics": { /* historical data */ }
+    }
+  ],
+  "globalSettings": {
+    "daemonMode": true,
+    "cloudSync": true,
+    /* other global settings */
+  },
+  "phraseLibrary": {
+    "custom": ["...", "..."],
+    "categories": { /* categorized phrases */ }
+  }
+}
+```
+
+**UI Components**:
+- **Export Button**: One-click export with format selection
+- **Import Button**: Drag-and-drop or file picker
+- **Cloud Sync Status**: Real-time sync indicator
+- **Conflict Resolver**: UI to resolve merge conflicts
+- **Backup Manager**: View and restore from automatic backups
+- **Share Profile**: Generate shareable profile link/file
+
+### Implementation Timeline
+
+**Wave 1 (Months 1-3)**: Foundation
+- ✅ Multi-profile system architecture
+- ✅ Basic multi-tab support
+- ✅ File export/import for profiles
+- ✅ AI phrase generation integration
+
+**Wave 2 (Months 4-6)**: Intelligence & Sync
+- ✅ Cloud sync infrastructure
+- ✅ Daemon mode implementation
+- ✅ Automatic site detection
+- ✅ Real-time sync across devices
+
+**Wave 3 (Months 7-9)**: Enhancement & Polish
+- ✅ Advanced AI phrase generation
+- ✅ Profile template marketplace
+- ✅ Mobile companion app for monitoring
+- ✅ Enterprise-grade daemon management
+
+**Success Metrics**:
+- ✅ Support 10+ profiles simultaneously
+- ✅ AI generates 95%+ acceptable phrases
+- ✅ Daemon uptime >99%
+- ✅ Sync latency <5 seconds
+- ✅ Zero profile conflicts during sync
+- ✅ Export/import success rate >99%
+
+---
+
 ## 📊 Wave 1: Foundation (Jan - Mar 2026)
 
 **Duration**: 12 weeks  
@@ -125,12 +484,13 @@ Week 5-6: ML & Predictions
 - ✅ Predictive send times
 - ✅ Export reports (CSV/PDF)
 
-### Month 2-4: AI Message Generation
+### Month 2-4: AI Message Generation & Farming Phrase System
 ```
 Week 1-3: Research & Integration
 - Evaluate AI providers (OpenAI, Anthropic, local)
 - API integration
-- Prompt engineering
+- Prompt engineering for general messages
+- Prompt engineering for farming phrase generation (🎰 Casino Feature)
 - Privacy architecture
 
 Week 4-6: Core Features
@@ -138,6 +498,9 @@ Week 4-6: Core Features
 - Tone adjustment
 - Multi-language support
 - Template learning
+- AI-powered farming phrase generator (🎰 Casino Feature)
+- Personalized phrase variations
+- Anti-detection pattern avoidance
 
 Week 7-9: Local Models (Optional)
 - WebLLM integration
@@ -152,25 +515,31 @@ Week 7-9: Local Models (Optional)
 - ✅ 20+ language support
 - ✅ Local model option
 - ✅ Privacy controls
+- ✅ AI farming phrase generator (🎰 Casino Feature)
 
-### Month 3-4: Smart Scheduling
+### Month 3-4: Smart Scheduling & Multi-Profile Foundation
 ```
-Week 1-2: Calendar UI
+Week 1-2: Calendar UI & Multi-Profile System
 - Visual calendar component
 - Drag-and-drop interface
 - Timezone handling
 - Holiday database
+- Multi-profile architecture design (🎰 Casino Feature)
+- Profile data structure and storage
 
-Week 3-4: Campaign Logic
+Week 3-4: Campaign Logic & Profile Management
 - Drip campaign engine
 - Trigger system
 - Recurring patterns
 - ML-based timing
+- Profile creation/editing UI (🎰 Casino Feature)
+- File-based profile export/import (🎰 Casino Feature)
 
 Week 5-6: Testing & Polish
 - Integration testing
 - Performance optimization
 - User testing
+- Multi-tab coordination basics (🎰 Casino Feature)
 - Documentation
 ```
 
@@ -179,12 +548,16 @@ Week 5-6: Testing & Polish
 - ✅ Drip campaigns
 - ✅ Smart timing AI
 - ✅ Campaign templates
+- ✅ Multi-profile system foundation (🎰 Casino Feature)
+- ✅ File export/import for profiles (🎰 Casino Feature)
 
 ### Wave 1 Milestones
 - ✅ Alpha release (internal testing)
 - ✅ 50+ beta testers recruited
 - ✅ Analytics showing 20% efficiency gain
 - ✅ AI generating 80%+ acceptable messages
+- ✅ Multi-profile system operational for 5+ profiles (🎰 Casino Feature)
+- ✅ AI generates unique farming phrases per user (🎰 Casino Feature)
 
 ---
 
@@ -194,24 +567,29 @@ Week 5-6: Testing & Polish
 **Theme**: "Scale Together"  
 **Goal**: Enable team usage and multi-device access
 
-### Month 5-6: Cloud Sync Infrastructure
+### Month 5-6: Cloud Sync Infrastructure & Daemon Mode Foundation
 ```
 Week 1-2: Architecture
 - Backend service design
 - Database selection
 - Encryption layer
 - API design
+- Daemon service architecture (🎰 Casino Feature)
+- Background service worker design (🎰 Casino Feature)
 
 Week 3-4: Core Implementation
 - Real-time sync engine
 - Conflict resolution
 - Version history
 - Backup system
+- Profile sync across devices (🎰 Casino Feature)
+- Configuration sync system (🎰 Casino Feature)
 
 Week 5-6: Security & Testing
 - E2E encryption
 - Security audit
 - Load testing
+- Daemon mode security (🎰 Casino Feature)
 - Documentation
 ```
 
@@ -220,25 +598,32 @@ Week 5-6: Security & Testing
 - ✅ Multi-device support
 - ✅ Automatic backups
 - ✅ Version history
+- ✅ Profile cloud sync (🎰 Casino Feature)
+- ✅ Daemon mode foundation (🎰 Casino Feature)
 
-### Month 6-7: AI Assistant
+### Month 6-7: AI Assistant & Automatic Site Detection
 ```
-Week 1-2: NLP Integration
+Week 1-2: NLP Integration & Site Detection
 - Intent recognition
 - Command parsing
 - Context management
 - Response generation
+- Domain detection system (🎰 Casino Feature)
+- Profile auto-loading logic (🎰 Casino Feature)
 
-Week 3-4: Conversation Flow
+Week 3-4: Conversation Flow & Multi-Tab Management
 - Dialog management
 - Multi-turn conversations
 - Help system
 - Voice support (optional)
+- Tab coordination system (🎰 Casino Feature)
+- Parallel automation manager (🎰 Casino Feature)
 
 Week 5-6: Polish & Testing
 - Edge case handling
 - User testing
 - Performance tuning
+- Multi-site testing (🎰 Casino Feature)
 - Documentation
 ```
 
@@ -247,20 +632,26 @@ Week 5-6: Polish & Testing
 - ✅ 100+ command intents
 - ✅ Natural language setup
 - ✅ Voice commands (basic)
+- ✅ Automatic site detection (🎰 Casino Feature)
+- ✅ Multi-tab parallel operation (🎰 Casino Feature)
 
-### Month 7-8: Team Collaboration
+### Month 7-8: Team Collaboration & Daemon Auto-Start
 ```
-Week 1-2: Workspace System
+Week 1-2: Workspace System & Daemon Implementation
 - Multi-user architecture
 - Role-based access
 - Permission system
 - Audit logs
+- Auto-start on browser launch (🎰 Casino Feature)
+- Daemon scheduling system (🎰 Casino Feature)
 
-Week 3-4: Collaboration Features
+Week 3-4: Collaboration Features & Daemon Control
 - Shared templates
 - Approval workflows
 - Team analytics
 - Comments & feedback
+- Remote daemon control (🎰 Casino Feature)
+- Daemon monitoring dashboard (🎰 Casino Feature)
 
 Week 5-6: Testing & Launch
 - Security testing
@@ -274,12 +665,16 @@ Week 5-6: Testing & Launch
 - ✅ 3 user roles (Admin, Editor, Viewer)
 - ✅ Approval workflows
 - ✅ Team analytics
+- ✅ Daemon mode with auto-start (🎰 Casino Feature)
+- ✅ Remote daemon control (🎰 Casino Feature)
 
 ### Wave 2 Milestones
 - ✅ Beta release to 500 users
 - ✅ 50+ team workspaces created
 - ✅ 99.9% sync reliability
 - ✅ Zero security incidents
+- ✅ Daemon successfully manages 10+ profiles (🎰 Casino Feature)
+- ✅ Cloud sync enables seamless cross-device automation (🎰 Casino Feature)
 
 ---
 

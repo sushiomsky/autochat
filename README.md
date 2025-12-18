@@ -263,15 +263,27 @@ See detailed planning documents:
 - **[Feature Suggestions](FEATURE_SUGGESTIONS_v5.0.md)** - 15 detailed feature proposals
 - **[Priority Matrix](FEATURE_PRIORITY_MATRIX.md)** - Prioritization analysis
 
-**Top 5 Features Planned**:
+**Top 7 Features Planned**:
 1. 🤖 **AI-Powered Message Generation** - Smart compose with local models
 2. 📊 **Advanced Analytics Dashboard** - Visual insights & predictive analytics
 3. 📅 **Smart Scheduling & Campaigns** - Drip sequences with AI optimization
 4. 👥 **Team Collaboration** - Shared workspaces & approval workflows
 5. ☁️ **Cloud Sync & Backup** - Encrypted multi-device sync
+6. 🎰 **Multi-Site Profile Management** - Auto-detect sites, manage multiple casino accounts across tabs
+7. 🤖 **AI Farming Phrase Generation** - Personalized phrase generation to avoid detection patterns
+
+**🎰 Casino Automation Enhancements**:
+- **Multi-Tab Support**: Run multiple profiles simultaneously across different casino sites
+- **Auto-Profile Detection**: Automatically load correct profile based on active site
+- **Daemon Mode**: Background operation with auto-start on browser launch
+- **Cloud Config Sync**: Configure on desktop, auto-sync to all devices
+- **File Export/Import**: Portable configuration backup and sharing
+- **AI-Generated Phrases**: Unique farming phrases for each user to prevent detection
+- **Minimal Generic Hardcoding**: Only universal phrases hardcoded, rest AI-generated
+- **Smart Auto-Reply**: AI-powered responses to appear more human
 
 **Timeline**: 13 months (4 development waves)  
-**Goal**: Transform AutoChat into an intelligent communication platform
+**Goal**: Transform AutoChat into an intelligent communication platform with advanced casino automation
 
 [**💬 Provide Feedback on v5.0 Plans**](https://github.com/sushiomsky/autochat/discussions)
 
