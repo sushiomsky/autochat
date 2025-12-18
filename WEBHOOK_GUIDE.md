@@ -41,11 +41,13 @@ After creating a webhook, click the **🧪 Test** button to send a test payload 
 ## Event Types
 
 ### 1. Message Sent
+
 **Event**: `message_sent`
 
 Triggered when AutoChat successfully sends a message.
 
 **Payload Example**:
+
 ```json
 {
   "event": "message_sent",
@@ -61,17 +63,20 @@ Triggered when AutoChat successfully sends a message.
 ```
 
 **Use Cases**:
+
 - Log each message to a database
 - Track message volume in real-time
 - Update analytics dashboards
 - Trigger follow-up actions
 
 ### 2. Campaign Started
+
 **Event**: `campaign_started`
 
 Triggered when auto-send campaign begins.
 
 **Payload Example**:
+
 ```json
 {
   "event": "campaign_started",
@@ -85,17 +90,20 @@ Triggered when auto-send campaign begins.
 ```
 
 **Use Cases**:
+
 - Notify team when campaigns start
 - Log campaign start times
 - Update status dashboards
 - Start related monitoring services
 
 ### 3. Campaign Stopped
+
 **Event**: `campaign_stopped`
 
 Triggered when auto-send campaign ends.
 
 **Payload Example**:
+
 ```json
 {
   "event": "campaign_stopped",
@@ -113,17 +121,20 @@ Triggered when auto-send campaign ends.
 ```
 
 **Use Cases**:
+
 - Generate campaign reports
 - Calculate campaign metrics
 - Archive campaign data
 - Notify stakeholders of completion
 
 ### 4. Campaign Paused
+
 **Event**: `campaign_paused`
 
 Triggered when auto-send is temporarily paused.
 
 **Payload Example**:
+
 ```json
 {
   "event": "campaign_paused",
@@ -141,16 +152,19 @@ Triggered when auto-send is temporarily paused.
 ```
 
 **Use Cases**:
+
 - Track pause events
 - Alert on unexpected pauses
 - Log campaign interruptions
 
 ### 5. Campaign Resumed
+
 **Event**: `campaign_resumed`
 
 Triggered when auto-send resumes after being paused.
 
 **Payload Example**:
+
 ```json
 {
   "event": "campaign_resumed",
@@ -164,16 +178,19 @@ Triggered when auto-send resumes after being paused.
 ```
 
 **Use Cases**:
+
 - Track campaign continuity
 - Calculate downtime
 - Notify when campaigns resume
 
 ### 6. Daily Limit Reached
+
 **Event**: `daily_limit_reached`
 
 Triggered when the configured daily message limit is reached.
 
 **Payload Example**:
+
 ```json
 {
   "event": "daily_limit_reached",
@@ -189,17 +206,20 @@ Triggered when the configured daily message limit is reached.
 ```
 
 **Use Cases**:
+
 - Alert when limits are reached
 - Adjust limits dynamically
 - Generate daily reports
 - Plan next day's campaign
 
 ### 7. Error
+
 **Event**: `error`
 
 Triggered when an error occurs during automation.
 
 **Payload Example**:
+
 ```json
 {
   "event": "error",
@@ -214,17 +234,20 @@ Triggered when an error occurs during automation.
 ```
 
 **Use Cases**:
+
 - Monitor for errors
 - Alert on-call team
 - Log errors for debugging
 - Track error patterns
 
 ### 8. Milestone
+
 **Event**: `milestone`
 
 Triggered when significant milestones are reached.
 
 **Payload Example**:
+
 ```json
 {
   "event": "milestone",
@@ -240,6 +263,7 @@ Triggered when significant milestones are reached.
 ```
 
 **Use Cases**:
+
 - Celebrate achievements
 - Trigger rewards or bonuses
 - Generate milestone reports
@@ -252,6 +276,7 @@ Triggered when significant milestones are reached.
 Create a Slack Incoming Webhook at: https://api.slack.com/messaging/webhooks
 
 **Configuration**:
+
 - **Name**: Slack Notifications
 - **URL**: `https://hooks.slack.com/services/YOUR/WEBHOOK/URL`
 - **Method**: POST
@@ -266,11 +291,13 @@ Slack will show the raw JSON payload. You can use a Slack App with custom format
 Create a Discord Webhook in your server's channel settings.
 
 **Configuration**:
+
 - **Name**: Discord Notifications
 - **URL**: `https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN`
 - **Method**: POST
 - **Events**: campaign_started, campaign_stopped, daily_limit_reached
-- **Headers**: 
+- **Headers**:
+
 ```json
 {
   "Content-Type": "application/json"
@@ -279,14 +306,17 @@ Create a Discord Webhook in your server's channel settings.
 
 **Transform for Discord** (requires middleware):
 Discord expects a different format. You'll need a middleware service to transform the payload:
+
 ```json
 {
   "content": "Campaign started!",
-  "embeds": [{
-    "title": "AutoChat Event",
-    "description": "Campaign has started",
-    "color": 5814783
-  }]
+  "embeds": [
+    {
+      "title": "AutoChat Event",
+      "description": "Campaign has started",
+      "color": 5814783
+    }
+  ]
 }
 ```
 
@@ -295,6 +325,7 @@ Discord expects a different format. You'll need a middleware service to transfor
 Create a Webhook trigger in Zapier.
 
 **Configuration**:
+
 - **Name**: Zapier Automation
 - **URL**: `https://hooks.zapier.com/hooks/catch/YOUR_WEBHOOK_ID/`
 - **Method**: POST
@@ -302,6 +333,7 @@ Create a Webhook trigger in Zapier.
 - **Headers**: Leave empty
 
 **What you can do**:
+
 - Log to Google Sheets
 - Send emails via Gmail
 - Create tasks in Trello/Asana
@@ -313,6 +345,7 @@ Create a Webhook trigger in Zapier.
 Create a Webhooks applet in IFTTT.
 
 **Configuration**:
+
 - **Name**: IFTTT Trigger
 - **URL**: `https://maker.ifttt.com/trigger/YOUR_EVENT/with/key/YOUR_KEY`
 - **Method**: POST
@@ -322,11 +355,13 @@ Create a Webhooks applet in IFTTT.
 ### Custom API Integration
 
 **Configuration**:
+
 - **Name**: Custom API
 - **URL**: `https://api.yourservice.com/autochat/events`
 - **Method**: POST
 - **Events**: All events
 - **Headers**:
+
 ```json
 {
   "Authorization": "Bearer YOUR_API_TOKEN",
@@ -335,15 +370,16 @@ Create a Webhooks applet in IFTTT.
 ```
 
 **Server-side handling** (Node.js example):
+
 ```javascript
 app.post('/autochat/events', (req, res) => {
   const { event, timestamp, data, source, version } = req.body;
-  
+
   console.log(`Received ${event} from ${source} v${version}`);
   console.log('Data:', data);
-  
+
   // Process the event
-  switch(event) {
+  switch (event) {
     case 'message_sent':
       // Log message to database
       database.logMessage(data);
@@ -354,7 +390,7 @@ app.post('/autochat/events', (req, res) => {
       break;
     // ... handle other events
   }
-  
+
   res.json({ success: true });
 });
 ```
@@ -379,14 +415,17 @@ Use custom headers for authentication, API keys, or custom metadata:
 Instead of sending all events to one webhook, create multiple webhooks for different purposes:
 
 **Webhook 1: Real-time Monitoring**
+
 - Events: message_sent, error
 - URL: Real-time dashboard API
 
 **Webhook 2: Daily Reports**
+
 - Events: daily_limit_reached, campaign_stopped
 - URL: Reporting service
 
 **Webhook 3: Alerting**
+
 - Events: error, daily_limit_reached
 - URL: PagerDuty or Slack
 
@@ -459,17 +498,17 @@ AutoChat implements sensible defaults:
 
 ```typescript
 interface Webhook {
-  id: string;              // Unique identifier
-  name: string;            // Display name
-  url: string;             // Endpoint URL
-  method: string;          // HTTP method (POST, GET, PUT, PATCH)
-  events: string[];        // Array of event types
-  headers: object;         // Custom headers
-  enabled: boolean;        // Enable/disable flag
-  createdAt: string;       // ISO timestamp
-  lastTriggered: string;   // ISO timestamp or null
-  triggerCount: number;    // Number of successful triggers
-  failureCount: number;    // Number of failed triggers
+  id: string; // Unique identifier
+  name: string; // Display name
+  url: string; // Endpoint URL
+  method: string; // HTTP method (POST, GET, PUT, PATCH)
+  events: string[]; // Array of event types
+  headers: object; // Custom headers
+  enabled: boolean; // Enable/disable flag
+  createdAt: string; // ISO timestamp
+  lastTriggered: string; // ISO timestamp or null
+  triggerCount: number; // Number of successful triggers
+  failureCount: number; // Number of failed triggers
 }
 ```
 
@@ -479,11 +518,11 @@ All webhook payloads follow this structure:
 
 ```typescript
 interface WebhookPayload {
-  event: string;           // Event type
-  timestamp: string;       // ISO timestamp
-  data: object;            // Event-specific data
-  source: string;          // Always "AutoChat"
-  version: string;         // Extension version
+  event: string; // Event type
+  timestamp: string; // ISO timestamp
+  data: object; // Event-specific data
+  source: string; // Always "AutoChat"
+  version: string; // Extension version
 }
 ```
 

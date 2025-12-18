@@ -7,11 +7,13 @@ The Manual Message Detection feature automatically detects when you manually sen
 ## Why This Matters
 
 When using AutoChat's automation, you might want to send manual messages occasionally. Without manual detection:
+
 - The automation timer continues independently
 - Messages might be sent too close together
 - The pattern looks less natural
 
 With manual detection:
+
 - ✅ Timer resets when you send a manual message
 - ✅ Natural spacing between messages
 - ✅ Seamless transition between manual and automated
@@ -31,11 +33,13 @@ The feature monitors the chat input field for changes:
 ### Technical Details
 
 **Monitoring Approach**:
+
 - Lightweight interval check (500ms)
 - No impact on typing performance
 - Works with all input types (input, textarea, contenteditable)
 
 **False Positive Prevention**:
+
 - Tracks automated messages for 10 seconds
 - Ignores input clears from automation
 - Only triggers on genuine manual sends
@@ -68,6 +72,7 @@ The feature monitors the chat input field for changes:
 4. **Status**: Check console for confirmation (development mode)
 
 **Example Timeline**:
+
 ```
 00:00 - Automated message sent
 02:00 - You manually send a message
@@ -78,6 +83,7 @@ The feature monitors the chat input field for changes:
 ```
 
 Without manual detection:
+
 ```
 00:00 - Automated message sent
 02:00 - You manually send a message
@@ -97,12 +103,14 @@ Without manual detection:
 **Location**: Settings Modal → Manual Message Detection
 
 **Options**:
+
 - **Enable/Disable**: Toggle checkbox
 - **Status Indicator**: Shows current state
 
 ### Storage
 
 Preference saved in `chrome.storage.local`:
+
 ```javascript
 {
   "manualDetectionEnabled": true/false
@@ -114,6 +122,7 @@ Preference saved in `chrome.storage.local`:
 ### Architecture
 
 **Components**:
+
 1. **Manual Detector** (inline in content-enhanced.js)
    - Monitors input field
    - Detects manual sends
@@ -134,19 +143,19 @@ Preference saved in `chrome.storage.local`:
 // Pseudo-code
 function checkForManualSend() {
   currentValue = getInputValue();
-  
+
   if (lastValue.length > 0 && currentValue.length === 0) {
     // Input was cleared
-    
+
     if (!isAutomatedMessage(lastValue)) {
       // Manual send detected!
       triggerCallback({
         text: lastValue,
-        timestamp: now
+        timestamp: now,
       });
     }
   }
-  
+
   lastValue = currentValue;
 }
 ```
@@ -154,6 +163,7 @@ function checkForManualSend() {
 ### Message Fingerprinting
 
 **Automated Message Tracking**:
+
 ```javascript
 // When automation sends message
 markAsAutomated(message);
@@ -165,6 +175,7 @@ setTimeout(() => {
 ```
 
 **Why 10 seconds?**
+
 - Covers send + confirm time
 - Accounts for slow networks
 - Prevents late false positives
@@ -174,11 +185,13 @@ setTimeout(() => {
 ### Auto-Send
 
 **Seamless Integration**:
+
 - Works alongside auto-send automation
 - Resets timer when manual send detected
 - Maintains configured intervals
 
 **Example**:
+
 - Auto-send configured: 2-5 minute intervals
 - You manually send at 00:30
 - Next automated send: 02:30-05:30 (from your manual send)
@@ -186,6 +199,7 @@ setTimeout(() => {
 ### Chat Logging
 
 **Complementary Features**:
+
 - Chat logging captures both manual and automated
 - Manual detection ensures proper timing
 - Logs distinguish message types
@@ -193,6 +207,7 @@ setTimeout(() => {
 ### Mention Detection
 
 **Works Together**:
+
 - Auto-reply to mentions (automated)
 - Your manual replies detected
 - Timer respects both types
@@ -202,12 +217,14 @@ setTimeout(() => {
 ### Resource Usage
 
 **Low Impact**:
+
 - Check interval: 500ms
 - Lightweight string comparison
 - No DOM manipulation
 - Minimal memory (WeakSet for tracking)
 
 **Comparison**:
+
 ```
 Without detection: 0% CPU overhead
 With detection:    <0.1% CPU overhead
@@ -216,6 +233,7 @@ With detection:    <0.1% CPU overhead
 ### Memory
 
 **Efficient Storage**:
+
 - Recent automated messages: ~100 bytes
 - Automatic cleanup after 10 seconds
 - No long-term storage
@@ -225,12 +243,14 @@ With detection:    <0.1% CPU overhead
 ### Not Detecting Manual Sends
 
 **Check**:
+
 1. ✓ Feature enabled in settings
 2. ✓ Input field marked correctly
 3. ✓ Input field visible on page
 4. ✓ Messages actually sending
 
 **Solutions**:
+
 - Re-mark input field
 - Disable and re-enable feature
 - Check browser console for errors
@@ -238,11 +258,13 @@ With detection:    <0.1% CPU overhead
 ### False Positives
 
 **Rare Cases**:
+
 - Copy/paste then clear
 - Multiple fast sends
 - Input cleared by website
 
 **Solutions**:
+
 - Usually harmless (just resets timer)
 - Will self-correct on next automated send
 - Consider disabling if frequent
@@ -250,15 +272,17 @@ With detection:    <0.1% CPU overhead
 ### Timer Not Resetting
 
 **Check**:
+
 1. ✓ Auto-send is active
 2. ✓ Timer was running
 3. ✓ Message actually sent
 
 **Debug**:
+
 ```javascript
 // Check console for:
-"[AutoChat] Manual message detected: <message>"
-"[AutoChat] Timer reset. Next message in X.XXm"
+'[AutoChat] Manual message detected: <message>';
+'[AutoChat] Timer reset. Next message in X.XXm';
 ```
 
 ## API Reference
@@ -266,42 +290,58 @@ With detection:    <0.1% CPU overhead
 ### Content Script Messages
 
 **Start Monitoring**:
+
 ```javascript
-chrome.tabs.sendMessage(tabId, {
-  action: 'startManualDetection'
-}, (response) => {
-  console.log('Started:', response.ok);
-});
+chrome.tabs.sendMessage(
+  tabId,
+  {
+    action: 'startManualDetection',
+  },
+  (response) => {
+    console.log('Started:', response.ok);
+  }
+);
 ```
 
 **Stop Monitoring**:
+
 ```javascript
-chrome.tabs.sendMessage(tabId, {
-  action: 'stopManualDetection'
-}, (response) => {
-  console.log('Stopped:', response.ok);
-});
+chrome.tabs.sendMessage(
+  tabId,
+  {
+    action: 'stopManualDetection',
+  },
+  (response) => {
+    console.log('Stopped:', response.ok);
+  }
+);
 ```
 
 **Get Status**:
+
 ```javascript
-chrome.tabs.sendMessage(tabId, {
-  action: 'getManualDetectionStatus'
-}, (response) => {
-  console.log('Enabled:', response.enabled);
-  console.log('Monitoring:', response.isMonitoring);
-});
+chrome.tabs.sendMessage(
+  tabId,
+  {
+    action: 'getManualDetectionStatus',
+  },
+  (response) => {
+    console.log('Enabled:', response.enabled);
+    console.log('Monitoring:', response.isMonitoring);
+  }
+);
 ```
 
 ### Events
 
 **Manual Send Detected**:
+
 ```javascript
 // Sent to background.js
 chrome.runtime.sendMessage({
   action: 'manualMessageDetected',
   message: 'Message text',
-  timestamp: '2025-12-18T05:43:29.096Z'
+  timestamp: '2025-12-18T05:43:29.096Z',
 });
 ```
 
@@ -310,12 +350,14 @@ chrome.runtime.sendMessage({
 ### When to Enable
 
 **Recommended**:
+
 - ✅ Using auto-send regularly
 - ✅ Occasionally sending manual messages
 - ✅ Want natural message spacing
 - ✅ Testing automation behavior
 
 **Not Needed**:
+
 - ❌ Only using manual messages
 - ❌ Never mixing manual + automated
 - ❌ Using other timing mechanisms
@@ -330,6 +372,7 @@ chrome.runtime.sendMessage({
 ### Timing Considerations
 
 **Interval Adjustment**:
+
 ```
 Without manual sends:
 - Interval: 2-5 minutes
@@ -354,6 +397,7 @@ With manual sends:
 ### Webhook Integration
 
 **Optional Notification**:
+
 ```javascript
 // Background.js sends webhook event
 {
@@ -371,6 +415,7 @@ Enable in Settings → Webhooks
 ## Future Enhancements
 
 Planned features:
+
 - [ ] Configurable detection delay
 - [ ] Manual send statistics
 - [ ] Custom timer reset strategies
@@ -388,22 +433,22 @@ Planned features:
 
 ### vs. No Detection
 
-| Aspect | Without Detection | With Detection |
-|--------|------------------|----------------|
-| Manual Send | Independent | Integrated |
-| Message Spacing | Can be too close | Always proper |
-| Naturalness | Less natural | More human-like |
-| Complexity | Simple | Slightly more |
-| CPU Usage | 0% | <0.1% |
+| Aspect          | Without Detection | With Detection  |
+| --------------- | ----------------- | --------------- |
+| Manual Send     | Independent       | Integrated      |
+| Message Spacing | Can be too close  | Always proper   |
+| Naturalness     | Less natural      | More human-like |
+| Complexity      | Simple            | Slightly more   |
+| CPU Usage       | 0%                | <0.1%           |
 
 ### vs. Manual Timer Reset
 
-| Aspect | Manual Reset | Auto Detection |
-|--------|--------------|----------------|
-| Convenience | Need to click | Automatic |
-| Accuracy | Depends on user | Always accurate |
-| Reliability | Can forget | Never misses |
-| Overhead | None | Minimal |
+| Aspect      | Manual Reset    | Auto Detection  |
+| ----------- | --------------- | --------------- |
+| Convenience | Need to click   | Automatic       |
+| Accuracy    | Depends on user | Always accurate |
+| Reliability | Can forget      | Never misses    |
+| Overhead    | None            | Minimal         |
 
 ## Examples
 
@@ -436,12 +481,14 @@ Planned features:
 ## Changelog
 
 ### v4.5.3 (Current)
+
 - Initial release of manual message detection
 - Integration with auto-send timer
 - Basic detection algorithm
 - Storage preferences
 
 ### Planned (v4.6)
+
 - Enhanced detection accuracy
 - Statistics tracking
 - UI improvements

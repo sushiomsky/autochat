@@ -96,7 +96,7 @@ class BackgroundTabManager {
    */
   async registerTab(tabId, config = {}) {
     const tab = await chrome.tabs.get(tabId);
-    
+
     const tabState = {
       tabId,
       url: tab.url,
@@ -104,7 +104,7 @@ class BackgroundTabManager {
       isRunning: false,
       lastActivity: new Date().toISOString(),
       config: config,
-      registered: new Date().toISOString()
+      registered: new Date().toISOString(),
     };
 
     this.activeTabs.set(tabId, tabState);
@@ -159,7 +159,7 @@ class BackgroundTabManager {
         tabs.push({
           ...state,
           isActive: tab.active,
-          windowId: tab.windowId
+          windowId: tab.windowId,
         });
       } catch (error) {
         // Tab no longer exists, remove it
@@ -263,7 +263,7 @@ class BackgroundTabManager {
    */
   async cleanupInactiveTabs() {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    
+
     for (const [tabId, state] of this.activeTabs.entries()) {
       const lastActivity = new Date(state.lastActivity);
       if (lastActivity < oneDayAgo) {

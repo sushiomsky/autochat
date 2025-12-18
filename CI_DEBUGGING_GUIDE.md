@@ -13,9 +13,11 @@
 ### Latest Fixes (Commit 871c7a5)
 
 1. **Added Fallback Installation**
+
    ```yaml
    run: npm ci --legacy-peer-deps || npm install --legacy-peer-deps
    ```
+
    - If `npm ci` fails, falls back to `npm install`
    - More resilient to lock file issues
 
@@ -34,17 +36,22 @@
 ## 📋 Check CI Status
 
 ### Step 1: View Workflow Runs
+
 Go to: https://github.com/sushiomsky/autochat/actions
 
 You should see:
+
 - ✅ "CI Simple" workflow
 - ✅ "CI/CD Pipeline" workflow
 
 ### Step 2: Check Latest Run
+
 Click on the most recent run for commit `871c7a5`
 
 ### Step 3: Identify Issues
+
 If still failing, check which step fails:
+
 - [ ] Checkout - Should never fail
 - [ ] Setup Node - Should never fail
 - [ ] Install dependencies - May fail if package issues
@@ -56,25 +63,31 @@ If still failing, check which step fails:
 ## 🐛 Common Issues & Solutions
 
 ### Issue 1: npm ci fails
+
 **Symptom**: "npm ci can only install packages when your package.json and package-lock.json are in sync"
 
 **Solution**: Already fixed with fallback
+
 ```yaml
 npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 ```
 
 ### Issue 2: Peer dependency warnings
+
 **Symptom**: "ERESOLVE unable to resolve dependency tree"
 
 **Solution**: Using `--legacy-peer-deps` flag
+
 ```yaml
 npm ci --legacy-peer-deps
 ```
 
 ### Issue 3: Tests fail in CI but pass locally
+
 **Symptom**: Tests pass on local machine but fail in GitHub Actions
 
 **Possible causes**:
+
 - Environment differences
 - Missing dependencies
 - Timing issues
@@ -82,9 +95,11 @@ npm ci --legacy-peer-deps
 **Solution**: Check test logs in Actions tab
 
 ### Issue 4: Build fails
+
 **Symptom**: "Build extension" step fails
 
 **Solution**: Verify locally first
+
 ```bash
 npm run build:prod
 ls -la dist/
@@ -125,9 +140,11 @@ ls -la dist/
 ## 📊 Expected CI Behavior
 
 ### CI Simple Workflow
+
 **File**: `.github/workflows/ci-simple.yml`
 
 **Steps**:
+
 1. ✅ Checkout code
 2. ✅ Setup Node 18
 3. ✅ Install dependencies (with fallback)
@@ -139,9 +156,11 @@ ls -la dist/
 **Duration**: ~2-3 minutes
 
 ### Main CI Workflow
+
 **File**: `.github/workflows/ci.yml`
 
 **Jobs**:
+
 1. **Test** (runs on Node 16, 18, 20)
    - Install dependencies
    - Lint (non-blocking)
@@ -166,12 +185,14 @@ ls -la dist/
 ## 🎯 What Should Happen
 
 ### On Push to Main
+
 - ✅ Both workflows triggered
 - ✅ CI Simple completes in ~2-3 min
 - ✅ Main CI Test+Build complete in ~5 min
-- ⏭️  Package job skipped (no tag)
+- ⏭️ Package job skipped (no tag)
 
 ### On Tag Push (e.g., v4.2.1)
+
 - ✅ Both workflows triggered
 - ✅ All jobs run including Package
 - ✅ GitHub release created automatically
@@ -184,6 +205,7 @@ ls -la dist/
 ### If CI Still Fails:
 
 #### 1. Check the Error Message
+
 ```bash
 # Go to Actions tab
 # Click failing workflow
@@ -192,6 +214,7 @@ ls -la dist/
 ```
 
 #### 2. Reproduce Locally
+
 ```bash
 # Try to reproduce the exact error
 cd /home/dennis/autochat
@@ -208,6 +231,7 @@ echo $?  # Should be 0 if passed
 ```
 
 #### 3. Check Package Lock
+
 ```bash
 # Verify package-lock.json exists
 ls -la package-lock.json
@@ -217,6 +241,7 @@ git diff package-lock.json
 ```
 
 #### 4. Simplify Further
+
 If still failing, we can create an even simpler workflow:
 
 ```yaml
@@ -239,12 +264,14 @@ jobs:
 ## 📝 Current CI Files
 
 ### 1. Main CI: `.github/workflows/ci.yml`
+
 - Full featured
 - Multi-node testing
 - Artifacts & releases
 - May be more fragile
 
 ### 2. Simple CI: `.github/workflows/ci-simple.yml`
+
 - Minimal steps
 - Single Node version
 - Quick feedback
@@ -259,13 +286,16 @@ jobs:
 ### Nuclear Option: Disable CI Temporarily
 
 Create `.github/workflows/ci-disabled.yml` (rename ci.yml to this):
+
 ```yaml
 # Disabled for debugging
 # Rename back to ci.yml when fixed
 ```
 
 ### Or Add Skip Marker
+
 In commit message add:
+
 ```
 [skip ci]
 ```
@@ -290,12 +320,14 @@ After each fix attempt:
 ## 📞 Getting Help
 
 ### Check These First:
+
 1. Actions tab: https://github.com/sushiomsky/autochat/actions
 2. Latest workflow run
 3. Error logs in failed steps
 4. This guide's solutions
 
 ### Information to Provide:
+
 - Which workflow failed? (CI Simple or CI/CD Pipeline)
 - Which step failed? (Install, Test, Build, etc.)
 - Error message (copy exact text)
@@ -306,6 +338,7 @@ After each fix attempt:
 ## 🎯 Success Indicators
 
 You'll know it's working when:
+
 - ✅ Green checkmark appears in repo
 - ✅ Workflows show "Success" or "Passing"
 - ✅ No red X marks in Actions tab
@@ -316,15 +349,18 @@ You'll know it's working when:
 ## 📈 Recent Changes
 
 ### Commit 871c7a5 (Latest)
+
 - Added fallback installation
 - Created simple CI workflow
 - Improved error handling
 
 ### Commit 7c7581b
+
 - Simplified tests (removed coverage)
 - Improved Jest config
 
 ### Commit 461f96b
+
 - Added --legacy-peer-deps
 - Made linter non-blocking
 - Fixed package job
@@ -334,9 +370,11 @@ You'll know it's working when:
 ## 🔮 Next Steps
 
 ### If CI Passes:
+
 🎉 Success! No further action needed.
 
 ### If CI Still Fails:
+
 1. Check error message in Actions tab
 2. Find matching issue in "Common Issues" above
 3. Apply solution
@@ -350,6 +388,7 @@ You'll know it's working when:
 ## 💡 Pro Tips
 
 1. **Always test locally first**
+
    ```bash
    npm test && npm run build:prod
    ```

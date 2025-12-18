@@ -202,6 +202,7 @@ npm run lint
 ### VS Code (Recommended)
 
 Install extensions:
+
 - ESLint
 - Prettier
 - EditorConfig
@@ -222,6 +223,7 @@ EditorConfig settings in `.editorconfig` will work with most modern editors.
 ## Next Steps
 
 ### For Users
+
 1. **Explore v4.4 Features**:
    - Press Ctrl+K to try the Command Palette
    - Click 🔔 to view Notification Center
@@ -241,6 +243,7 @@ EditorConfig settings in `.editorconfig` will work with most modern editors.
    - [MULTI_ACCOUNT_FEATURE.md](MULTI_ACCOUNT_FEATURE.md) - Account management
 
 ### For Developers
+
 1. **Read Documentation**:
    - [CONTRIBUTING.md](CONTRIBUTING.md) - Development guidelines
    - [KEYBOARD_SHORTCUTS.md](KEYBOARD_SHORTCUTS.md) - Shortcuts reference
@@ -284,6 +287,7 @@ npm update              # Update dependencies
 ## Support
 
 Need help? Check:
+
 1. README.md - Full documentation
 2. CONTRIBUTING.md - Development guide
 3. GitHub Issues - Known issues and solutions

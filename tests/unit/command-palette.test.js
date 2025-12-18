@@ -28,7 +28,7 @@ describe('CommandPalette', () => {
             icon: '▶️',
             keywords: ['start', 'begin', 'run'],
             category: 'Controls',
-            action: () => console.log('Start')
+            action: () => console.log('Start'),
           },
           {
             id: 'stop',
@@ -37,7 +37,7 @@ describe('CommandPalette', () => {
             icon: '⏹️',
             keywords: ['stop', 'end'],
             category: 'Controls',
-            action: () => console.log('Stop')
+            action: () => console.log('Stop'),
           },
           {
             id: 'settings',
@@ -46,8 +46,8 @@ describe('CommandPalette', () => {
             icon: '⚙️',
             keywords: ['settings', 'options', 'config'],
             category: 'Settings',
-            action: () => console.log('Settings')
-          }
+            action: () => console.log('Settings'),
+          },
         ];
       }
 
@@ -59,7 +59,7 @@ describe('CommandPalette', () => {
           icon: command.icon || '⚡',
           keywords: command.keywords || [],
           category: command.category || 'Custom',
-          action: command.action
+          action: command.action,
         });
       }
 
@@ -69,15 +69,15 @@ describe('CommandPalette', () => {
         }
 
         const lowerQuery = query.toLowerCase();
-        const scored = this.commands.map(cmd => {
+        const scored = this.commands.map((cmd) => {
           let score = 0;
 
           if (cmd.name.toLowerCase() === lowerQuery) score += 100;
           if (cmd.name.toLowerCase().startsWith(lowerQuery)) score += 50;
           if (cmd.name.toLowerCase().includes(lowerQuery)) score += 25;
           if (cmd.description.toLowerCase().includes(lowerQuery)) score += 10;
-          
-          cmd.keywords.forEach(keyword => {
+
+          cmd.keywords.forEach((keyword) => {
             if (keyword.toLowerCase().includes(lowerQuery)) score += 15;
           });
 
@@ -86,13 +86,11 @@ describe('CommandPalette', () => {
           return { ...cmd, score };
         });
 
-        return scored
-          .filter(cmd => cmd.score > 0)
-          .sort((a, b) => b.score - a.score);
+        return scored.filter((cmd) => cmd.score > 0).sort((a, b) => b.score - a.score);
       }
 
       execute(commandId) {
-        const command = this.commands.find(cmd => cmd.id === commandId);
+        const command = this.commands.find((cmd) => cmd.id === commandId);
         if (command && command.action) {
           command.action();
           this.addToRecent(commandId);
@@ -101,9 +99,9 @@ describe('CommandPalette', () => {
       }
 
       addToRecent(commandId) {
-        this.recentCommands = this.recentCommands.filter(id => id !== commandId);
+        this.recentCommands = this.recentCommands.filter((id) => id !== commandId);
         this.recentCommands.unshift(commandId);
-        
+
         if (this.recentCommands.length > this.maxRecent) {
           this.recentCommands.pop();
         }
@@ -133,10 +131,7 @@ describe('CommandPalette', () => {
         if (direction === 'up') {
           this.selectedIndex = Math.max(0, this.selectedIndex - 1);
         } else if (direction === 'down') {
-          this.selectedIndex = Math.min(
-            this.filteredCommands.length - 1,
-            this.selectedIndex + 1
-          );
+          this.selectedIndex = Math.min(this.filteredCommands.length - 1, this.selectedIndex + 1);
         }
       }
 
@@ -158,16 +153,16 @@ describe('CommandPalette', () => {
 
   test('should register custom command', () => {
     const initialCount = palette.commands.length;
-    
+
     palette.register({
       id: 'custom-1',
       name: 'Custom Command',
       description: 'Does custom thing',
-      action: () => {}
+      action: () => {},
     });
-    
+
     expect(palette.commands).toHaveLength(initialCount + 1);
-    const customCmd = palette.commands.find(c => c.id === 'custom-1');
+    const customCmd = palette.commands.find((c) => c.id === 'custom-1');
     expect(customCmd).toBeDefined();
     expect(customCmd.name).toBe('Custom Command');
   });
@@ -189,7 +184,7 @@ describe('CommandPalette', () => {
       name: 'settings',
       description: 'Exact match test',
       keywords: [],
-      action: () => {}
+      action: () => {},
     });
 
     const results = palette.search('settings');
@@ -198,7 +193,7 @@ describe('CommandPalette', () => {
 
   test('should search by keywords', () => {
     const results = palette.search('begin');
-    const startCmd = results.find(r => r.id === 'start');
+    const startCmd = results.find((r) => r.id === 'start');
     expect(startCmd).toBeDefined(); // 'begin' is in keywords
   });
 
@@ -207,7 +202,7 @@ describe('CommandPalette', () => {
     palette.register({
       id: 'test-cmd',
       name: 'Test',
-      action: mockAction
+      action: mockAction,
     });
 
     palette.execute('test-cmd');
@@ -216,7 +211,7 @@ describe('CommandPalette', () => {
 
   test('should add command to recent on execute', () => {
     expect(palette.recentCommands).toHaveLength(0);
-    
+
     palette.execute('start');
     expect(palette.recentCommands).toContain('start');
     expect(palette.recentCommands[0]).toBe('start');
@@ -224,21 +219,21 @@ describe('CommandPalette', () => {
 
   test('should limit recent commands', () => {
     palette.maxRecent = 2;
-    
+
     palette.execute('start');
     palette.execute('stop');
     palette.execute('settings');
-    
+
     expect(palette.recentCommands).toHaveLength(2);
     expect(palette.recentCommands).toEqual(['settings', 'stop']);
   });
 
   test('should open and close palette', () => {
     expect(palette.isOpen).toBe(false);
-    
+
     palette.open();
     expect(palette.isOpen).toBe(true);
-    
+
     palette.close();
     expect(palette.isOpen).toBe(false);
   });
@@ -246,7 +241,7 @@ describe('CommandPalette', () => {
   test('should toggle palette state', () => {
     palette.toggle();
     expect(palette.isOpen).toBe(true);
-    
+
     palette.toggle();
     expect(palette.isOpen).toBe(false);
   });
@@ -254,15 +249,15 @@ describe('CommandPalette', () => {
   test('should navigate selection', () => {
     palette.open();
     palette.filteredCommands = palette.commands;
-    
+
     expect(palette.selectedIndex).toBe(0);
-    
+
     palette.navigate('down');
     expect(palette.selectedIndex).toBe(1);
-    
+
     palette.navigate('down');
     expect(palette.selectedIndex).toBe(2);
-    
+
     palette.navigate('up');
     expect(palette.selectedIndex).toBe(1);
   });
@@ -270,10 +265,10 @@ describe('CommandPalette', () => {
   test('should not navigate beyond bounds', () => {
     palette.open();
     palette.filteredCommands = palette.commands;
-    
+
     palette.navigate('up');
     expect(palette.selectedIndex).toBe(0); // Can't go below 0
-    
+
     palette.selectedIndex = palette.filteredCommands.length - 1;
     palette.navigate('down');
     expect(palette.selectedIndex).toBe(palette.filteredCommands.length - 1); // Can't exceed max
@@ -284,24 +279,24 @@ describe('CommandPalette', () => {
     palette.register({
       id: 'selected-test',
       name: 'Selected Test',
-      action: mockAction
+      action: mockAction,
     });
 
     palette.open();
     palette.filteredCommands = palette.commands;
     palette.selectedIndex = palette.commands.length - 1; // Select the new command
-    
+
     palette.executeSelected();
     expect(mockAction).toHaveBeenCalled();
   });
 
   test('should boost score for recent commands', () => {
     palette.addToRecent('stop');
-    
+
     const results = palette.search('st'); // Matches both 'start' and 'stop'
-    const stopCmd = results.find(r => r.id === 'stop');
-    const startCmd = results.find(r => r.id === 'start');
-    
+    const stopCmd = results.find((r) => r.id === 'stop');
+    const startCmd = results.find((r) => r.id === 'start');
+
     expect(stopCmd.score).toBeGreaterThan(startCmd.score - 5); // Recent bonus
   });
 });

@@ -25,6 +25,7 @@ Common issues and solutions for AutoChat Enhanced.
 **Symptoms**: Error when loading unpacked extension
 
 **Solutions**:
+
 1. Ensure you're loading the correct folder (should contain `manifest.json`)
 2. Check Chrome version (requires Chrome 88+)
 3. Enable "Developer mode" in chrome://extensions
@@ -43,6 +44,7 @@ npm run build
 **Symptoms**: `npm run build` fails
 
 **Solutions**:
+
 1. Delete `node_modules` and `package-lock.json`
 2. Run `npm install` (use `--legacy-peer-deps` if needed)
 3. Ensure Node.js version 14+ is installed
@@ -68,10 +70,11 @@ npm run build
    - Some sites use custom input components
 
 3. **Refresh and retry**
+
    ```javascript
    // In console, check if field exists:
-   document.querySelector('textarea')
-   document.querySelector('[contenteditable="true"]')
+   document.querySelector('textarea');
+   document.querySelector('[contenteditable="true"]');
    ```
 
 4. **Check for iframes**
@@ -83,6 +86,7 @@ npm run build
 **Symptoms**: Field selector disappears after closing popup
 
 **Solutions**:
+
 1. Click "Mark Chat Input Field" button
 2. Wait for green highlight on hover
 3. Click the actual input field
@@ -127,6 +131,7 @@ npm run build
 **Symptoms**: "Click a Send button" method doesn't work
 
 **Solutions**:
+
 1. Switch send method to "Click a Send button"
 2. Click "Mark Send Button"
 3. Hover over send button (should highlight green)
@@ -134,6 +139,7 @@ npm run build
 5. Verify button selector is saved
 
 Common send button selectors:
+
 - `button[type="submit"]`
 - `.send-button`
 - `[aria-label="Send"]`
@@ -143,6 +149,7 @@ Common send button selectors:
 **Symptoms**: Getting rate limited or detected
 
 **Solutions**:
+
 1. Increase minimum interval (try 120+ seconds)
 2. Increase maximum interval (try 300+ seconds)
 3. Enable typing simulation (40-80 WPM)
@@ -159,6 +166,7 @@ Common send button selectors:
 **Symptoms**: Characters appear unrealistically
 
 **Solutions**:
+
 1. Default is 40-80 WPM (Words Per Minute)
 2. Adjust in settings if available
 3. Clear browser cache
@@ -169,6 +177,7 @@ Common send button selectors:
 **Symptoms**: Messages paste instantly
 
 **Solutions**:
+
 1. Open Settings
 2. Check "Enable Typing Simulation"
 3. Save settings
@@ -185,9 +194,10 @@ Common send button selectors:
 **Solutions**:
 
 1. **Check storage permissions**
+
    ```javascript
    // In popup console:
-   chrome.storage.local.get(null, console.log)
+   chrome.storage.local.get(null, console.log);
    ```
 
 2. **Storage quota**
@@ -209,6 +219,7 @@ Common send button selectors:
 **Symptoms**: Import button does nothing or shows error
 
 **Solutions**:
+
 1. Verify JSON file is valid
 2. Check file encoding (should be UTF-8)
 3. Ensure file was exported from same or newer version
@@ -220,11 +231,12 @@ Common send button selectors:
 **Symptoms**: Export button doesn't download file
 
 **Solutions**:
+
 1. Check download permissions
 2. Try different browser
 3. Copy settings from storage manually:
    ```javascript
-   chrome.storage.local.get(null, data => {
+   chrome.storage.local.get(null, (data) => {
      console.log(JSON.stringify(data, null, 2));
    });
    ```
@@ -238,6 +250,7 @@ Common send button selectors:
 **Symptoms**: Chrome lags when extension is active
 
 **Solutions**:
+
 1. Reduce message list size (< 1000 messages)
 2. Increase interval between sends
 3. Close other tabs
@@ -250,6 +263,7 @@ Common send button selectors:
 **Symptoms**: Extension uses excessive RAM
 
 **Solutions**:
+
 1. Reload extension
 2. Clear notification history
 3. Reduce phrase library size
@@ -265,6 +279,7 @@ Common send button selectors:
 **Symptoms**: Theme toggle doesn't change colors
 
 **Solutions**:
+
 1. Click theme toggle button (🌙/☀️)
 2. Close and reopen popup
 3. Check if system theme is interfering
@@ -276,6 +291,7 @@ Common send button selectors:
 **Symptoms**: Can't close settings or other modals
 
 **Solutions**:
+
 1. Press `Escape` key
 2. Click outside modal
 3. Click X or Close button
@@ -287,6 +303,7 @@ Common send button selectors:
 **Symptoms**: Bell icon shows wrong count
 
 **Solutions**:
+
 1. Open Notification Center
 2. Click "Mark All Read"
 3. Close and reopen popup
@@ -298,6 +315,7 @@ Common send button selectors:
 **Symptoms**: Buttons or sections not visible
 
 **Solutions**:
+
 1. Reload popup
 2. Resize popup window
 3. Check zoom level (should be 100%)
@@ -313,6 +331,7 @@ Common send button selectors:
 **Symptoms**: UI shows wrong language
 
 **Solutions**:
+
 1. Click language dropdown
 2. Select correct language (English, Urdu, Spanish)
 3. Settings auto-save
@@ -323,6 +342,7 @@ Common send button selectors:
 **Symptoms**: Default phrases don't appear
 
 **Solutions**:
+
 1. Check internet connection
 2. Verify phrase files exist in extension
 3. Look for errors in browser console
@@ -334,6 +354,7 @@ Common send button selectors:
 **Symptoms**: Right-to-left text displays incorrectly
 
 **Solutions**:
+
 1. Select Urdu from language dropdown
 2. Ensure browser supports RTL
 3. Check font rendering
@@ -349,6 +370,7 @@ Common send button selectors:
 **Symptoms**: Account dropdown doesn't work
 
 **Solutions**:
+
 1. Click ⚙️ button next to account dropdown
 2. Create at least 2 profiles
 3. Select from dropdown
@@ -360,10 +382,11 @@ Common send button selectors:
 **Symptoms**: All accounts share settings
 
 **Solutions**:
+
 1. Ensure each account has unique name
 2. Check storage for account data:
    ```javascript
-   chrome.storage.local.get(['accounts'], console.log)
+   chrome.storage.local.get(['accounts'], console.log);
    ```
 3. Export account settings separately
 4. Reload extension
@@ -375,12 +398,14 @@ Common send button selectors:
 ### Chrome Version Issues
 
 **Minimum Requirements**:
+
 - Chrome 88+ (Manifest V3 support)
 - Edge 88+ (Chromium-based)
 - Opera 74+ (Chromium-based)
 - Brave 1.20+ (Chromium-based)
 
 **Not Supported**:
+
 - Firefox (WebExtensions port coming in v4.5)
 - Safari (not planned)
 - Chrome < 88
@@ -388,21 +413,25 @@ Common send button selectors:
 ### Site-Specific Issues
 
 #### Discord
+
 - Use "Press Enter key" method
 - May need to mark `[contenteditable]` div
 - Rate limiting is aggressive (increase intervals)
 
 #### WhatsApp Web
+
 - Works best with default settings
 - Use "Press Enter key"
 - Mark the `contenteditable` div
 
 #### Telegram Web
+
 - Use "Press Enter key"
 - May detect automation (use slower intervals)
 - Enable typing simulation
 
 #### Slack
+
 - Use "Press Enter key"
 - Works in DMs and channels
 - May need to mark `contenteditable` div
@@ -424,7 +453,7 @@ Common send button selectors:
 
 ```javascript
 // In popup console:
-chrome.runtime.getBackgroundPage(bg => {
+chrome.runtime.getBackgroundPage((bg) => {
   console.log(bg.console);
 });
 ```
@@ -441,7 +470,7 @@ chrome.runtime.getBackgroundPage(bg => {
 
 ```javascript
 // Get all storage
-chrome.storage.local.get(null, data => {
+chrome.storage.local.get(null, (data) => {
   console.log(JSON.stringify(data, null, 2));
 });
 
@@ -472,7 +501,7 @@ chrome.storage.local.clear(() => {
 ```javascript
 // Check if extension can access URLs
 fetch(chrome.runtime.getURL('farming_phrases_en.txt'))
-  .then(r => r.text())
+  .then((r) => r.text())
   .then(console.log)
   .catch(console.error);
 ```
@@ -532,21 +561,27 @@ Include the following information:
 ## FAQ
 
 ### Q: Why do my messages send instantly?
+
 **A**: Typing simulation might be disabled. Enable it in Settings.
 
 ### Q: Can I use on multiple sites simultaneously?
+
 **A**: Yes, each tab runs independently. Use multi-account profiles.
 
 ### Q: Will this work on mobile?
+
 **A**: Not currently. Mobile app planned for v5.0.
 
 ### Q: Is this detectable?
+
 **A**: Advanced systems may detect automation. Use realistic intervals and typing simulation.
 
 ### Q: Can I schedule messages for specific times?
+
 **A**: Yes, use Active Hours feature. Advanced scheduling coming in v4.5.
 
 ### Q: How do I backup my settings?
+
 **A**: Use Import/Export feature in Settings modal or Command Palette.
 
 ---
@@ -554,13 +589,16 @@ Include the following information:
 ## Version-Specific Issues
 
 ### v4.4.0 Known Issues
+
 - None reported yet
 
 ### v4.3.0 Known Issues
+
 - Some RTL fonts may not render on older systems
 - Language detection might default to English on first load
 
 ### v4.2.0 Known Issues
+
 - Notification sound might not play on some systems
 - Category manager doesn't filter phrases yet (planned)
 

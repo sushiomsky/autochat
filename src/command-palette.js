@@ -11,7 +11,7 @@ export class CommandPalette {
     this.isOpen = false;
     this.selectedIndex = 0;
     this.filteredCommands = [];
-    
+
     this.registerDefaultCommands();
     this.loadRecent();
   }
@@ -29,7 +29,7 @@ export class CommandPalette {
         icon: '▶️',
         keywords: ['start', 'begin', 'run', 'go'],
         category: 'Controls',
-        action: () => document.getElementById('startAutoSend')?.click()
+        action: () => document.getElementById('startAutoSend')?.click(),
       },
       {
         id: 'stop',
@@ -38,7 +38,7 @@ export class CommandPalette {
         icon: '⏹️',
         keywords: ['stop', 'end', 'halt'],
         category: 'Controls',
-        action: () => document.getElementById('stopAutoSend')?.click()
+        action: () => document.getElementById('stopAutoSend')?.click(),
       },
       {
         id: 'pause',
@@ -48,7 +48,7 @@ export class CommandPalette {
         keywords: ['pause', 'resume', 'toggle'],
         category: 'Controls',
         shortcut: 'Ctrl+P',
-        action: () => document.getElementById('pauseAutoSend')?.click()
+        action: () => document.getElementById('pauseAutoSend')?.click(),
       },
       {
         id: 'send-once',
@@ -57,7 +57,7 @@ export class CommandPalette {
         icon: '📤',
         keywords: ['send', 'once', 'single', 'test'],
         category: 'Controls',
-        action: () => document.getElementById('sendRandomOnce')?.click()
+        action: () => document.getElementById('sendRandomOnce')?.click(),
       },
 
       // Field management
@@ -68,7 +68,7 @@ export class CommandPalette {
         icon: '🎯',
         keywords: ['mark', 'select', 'field', 'input'],
         category: 'Setup',
-        action: () => document.getElementById('markChatInput')?.click()
+        action: () => document.getElementById('markChatInput')?.click(),
       },
 
       // Settings
@@ -79,7 +79,7 @@ export class CommandPalette {
         icon: '⚙️',
         keywords: ['settings', 'options', 'configure', 'advanced'],
         category: 'Settings',
-        action: () => document.getElementById('openSettings')?.click()
+        action: () => document.getElementById('openSettings')?.click(),
       },
       {
         id: 'toggle-theme',
@@ -88,7 +88,7 @@ export class CommandPalette {
         icon: '🌙',
         keywords: ['theme', 'dark', 'light', 'mode'],
         category: 'Settings',
-        action: () => document.getElementById('themeToggle')?.click()
+        action: () => document.getElementById('themeToggle')?.click(),
       },
       {
         id: 'import-settings',
@@ -97,7 +97,7 @@ export class CommandPalette {
         icon: '📥',
         keywords: ['import', 'load', 'restore'],
         category: 'Settings',
-        action: () => document.getElementById('importSettings')?.click()
+        action: () => document.getElementById('importSettings')?.click(),
       },
       {
         id: 'export-settings',
@@ -106,7 +106,7 @@ export class CommandPalette {
         icon: '📤',
         keywords: ['export', 'save', 'backup'],
         category: 'Settings',
-        action: () => document.getElementById('exportSettings')?.click()
+        action: () => document.getElementById('exportSettings')?.click(),
       },
 
       // Analytics
@@ -117,7 +117,7 @@ export class CommandPalette {
         icon: '📊',
         keywords: ['analytics', 'stats', 'statistics', 'data'],
         category: 'Analytics',
-        action: () => document.getElementById('openAnalytics')?.click()
+        action: () => document.getElementById('openAnalytics')?.click(),
       },
       {
         id: 'export-analytics',
@@ -126,7 +126,7 @@ export class CommandPalette {
         icon: '💾',
         keywords: ['export', 'download', 'analytics', 'data'],
         category: 'Analytics',
-        action: () => document.getElementById('exportAnalytics')?.click()
+        action: () => document.getElementById('exportAnalytics')?.click(),
       },
       {
         id: 'reset-stats',
@@ -135,7 +135,7 @@ export class CommandPalette {
         icon: '🔄',
         keywords: ['reset', 'clear', 'stats'],
         category: 'Analytics',
-        action: () => document.getElementById('resetStats')?.click()
+        action: () => document.getElementById('resetStats')?.click(),
       },
 
       // Phrases
@@ -146,7 +146,7 @@ export class CommandPalette {
         icon: '📝',
         keywords: ['phrases', 'messages', 'manage'],
         category: 'Phrases',
-        action: () => document.getElementById('managePhrases')?.click()
+        action: () => document.getElementById('managePhrases')?.click(),
       },
       {
         id: 'load-default-phrases',
@@ -155,7 +155,7 @@ export class CommandPalette {
         icon: '📚',
         keywords: ['load', 'default', 'library'],
         category: 'Phrases',
-        action: () => document.getElementById('loadDefaultPhrases')?.click()
+        action: () => document.getElementById('loadDefaultPhrases')?.click(),
       },
 
       // Mode switches
@@ -172,7 +172,7 @@ export class CommandPalette {
             select.value = 'random';
             select.dispatchEvent(new Event('change'));
           }
-        }
+        },
       },
       {
         id: 'mode-sequential',
@@ -187,7 +187,7 @@ export class CommandPalette {
             select.value = 'sequential';
             select.dispatchEvent(new Event('change'));
           }
-        }
+        },
       },
 
       // Preview
@@ -198,7 +198,7 @@ export class CommandPalette {
         icon: '👁️',
         keywords: ['preview', 'test', 'dry-run'],
         category: 'Preview',
-        action: () => this.togglePreviewMode()
+        action: () => this.togglePreviewMode(),
       },
 
       // Help
@@ -209,7 +209,7 @@ export class CommandPalette {
         icon: '⌨️',
         keywords: ['shortcuts', 'keys', 'keyboard', 'help'],
         category: 'Help',
-        action: () => this.showShortcuts()
+        action: () => this.showShortcuts(),
       },
       {
         id: 'show-help',
@@ -218,8 +218,8 @@ export class CommandPalette {
         icon: '❓',
         keywords: ['help', 'docs', 'documentation'],
         category: 'Help',
-        action: () => this.showHelp()
-      }
+        action: () => this.showHelp(),
+      },
     ];
   }
 
@@ -236,7 +236,7 @@ export class CommandPalette {
       keywords: command.keywords || [],
       category: command.category || 'Custom',
       shortcut: command.shortcut,
-      action: command.action
+      action: command.action,
     });
   }
 
@@ -248,33 +248,29 @@ export class CommandPalette {
   search(query) {
     if (!query || query.trim() === '') {
       // Show recent commands first, then all commands
-      const recent = this.commands.filter(cmd => 
-        this.recentCommands.includes(cmd.id)
-      );
-      const others = this.commands.filter(cmd => 
-        !this.recentCommands.includes(cmd.id)
-      );
+      const recent = this.commands.filter((cmd) => this.recentCommands.includes(cmd.id));
+      const others = this.commands.filter((cmd) => !this.recentCommands.includes(cmd.id));
       return [...recent, ...others];
     }
 
     const lowerQuery = query.toLowerCase();
-    const scored = this.commands.map(cmd => {
+    const scored = this.commands.map((cmd) => {
       let score = 0;
 
       // Exact name match
       if (cmd.name.toLowerCase() === lowerQuery) score += 100;
-      
+
       // Name starts with query
       if (cmd.name.toLowerCase().startsWith(lowerQuery)) score += 50;
-      
+
       // Name contains query
       if (cmd.name.toLowerCase().includes(lowerQuery)) score += 25;
-      
+
       // Description contains query
       if (cmd.description.toLowerCase().includes(lowerQuery)) score += 10;
-      
+
       // Keywords match
-      cmd.keywords.forEach(keyword => {
+      cmd.keywords.forEach((keyword) => {
         if (keyword.toLowerCase().includes(lowerQuery)) score += 15;
       });
 
@@ -284,9 +280,7 @@ export class CommandPalette {
       return { ...cmd, score };
     });
 
-    return scored
-      .filter(cmd => cmd.score > 0)
-      .sort((a, b) => b.score - a.score);
+    return scored.filter((cmd) => cmd.score > 0).sort((a, b) => b.score - a.score);
   }
 
   /**
@@ -294,7 +288,7 @@ export class CommandPalette {
    * @param {string} commandId - Command ID
    */
   execute(commandId) {
-    const command = this.commands.find(cmd => cmd.id === commandId);
+    const command = this.commands.find((cmd) => cmd.id === commandId);
     if (command && command.action) {
       command.action();
       this.addToRecent(commandId);
@@ -308,11 +302,11 @@ export class CommandPalette {
    */
   addToRecent(commandId) {
     // Remove if already in recent
-    this.recentCommands = this.recentCommands.filter(id => id !== commandId);
-    
+    this.recentCommands = this.recentCommands.filter((id) => id !== commandId);
+
     // Add to beginning
     this.recentCommands.unshift(commandId);
-    
+
     // Keep only maxRecent
     if (this.recentCommands.length > this.maxRecent) {
       this.recentCommands.pop();
@@ -373,10 +367,7 @@ export class CommandPalette {
     if (direction === 'up') {
       this.selectedIndex = Math.max(0, this.selectedIndex - 1);
     } else if (direction === 'down') {
-      this.selectedIndex = Math.min(
-        this.filteredCommands.length - 1,
-        this.selectedIndex + 1
-      );
+      this.selectedIndex = Math.min(this.filteredCommands.length - 1, this.selectedIndex + 1);
     }
   }
 
@@ -396,7 +387,7 @@ export class CommandPalette {
    */
   getByCategory() {
     const grouped = {};
-    this.commands.forEach(cmd => {
+    this.commands.forEach((cmd) => {
       if (!grouped[cmd.category]) {
         grouped[cmd.category] = [];
       }
@@ -421,8 +412,8 @@ export class CommandPalette {
    */
   showShortcuts() {
     const shortcuts = this.commands
-      .filter(cmd => cmd.shortcut)
-      .map(cmd => `${cmd.icon} ${cmd.name}: ${cmd.shortcut}`)
+      .filter((cmd) => cmd.shortcut)
+      .map((cmd) => `${cmd.icon} ${cmd.name}: ${cmd.shortcut}`)
       .join('\n');
 
     alert(`Keyboard Shortcuts:\n\n${shortcuts}\n\nCtrl+K: Open Command Palette\nEsc: Close modals`);
@@ -432,7 +423,9 @@ export class CommandPalette {
    * Show help
    */
   showHelp() {
-    alert('AutoChat Enhanced Help\n\nUse Ctrl+K to open the command palette and quickly access any feature.\n\nFor full documentation, visit the GitHub repository.');
+    alert(
+      'AutoChat Enhanced Help\n\nUse Ctrl+K to open the command palette and quickly access any feature.\n\nFor full documentation, visit the GitHub repository.'
+    );
   }
 }
 

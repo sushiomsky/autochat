@@ -13,18 +13,21 @@
 ### Developer Experience
 
 #### Build System & Tooling
+
 - ✨ **Modern Build Pipeline**: Added Node.js build system with npm scripts
 - 📦 **Package Management**: Comprehensive `package.json` with all dev dependencies
 - 🔨 **Build Scripts**: Automated build, watch, and packaging scripts
 - 🗜️ **Production Builds**: Minification and optimization for Chrome Web Store
 
 #### Code Quality
+
 - ✅ **ESLint Integration**: Enforced coding standards and best practices
 - 💅 **Prettier Formatting**: Consistent code formatting across all files
 - 📝 **EditorConfig**: Cross-editor consistency configuration
 - 🧪 **Jest Testing**: Comprehensive test suite with >80% coverage goal
 
 #### Testing
+
 - 🧪 **Unit Tests**: Tests for template variables, anti-repetition, active hours
 - 🔬 **Integration Tests**: Storage and chrome API mocking
 - 📊 **Coverage Reports**: Track code coverage with Jest
@@ -33,25 +36,29 @@
 ### User Features
 
 #### Dark Mode 🌙
+
 - **Theme Toggle**: Click moon/sun icon to switch themes
 - **Smooth Transitions**: Elegant color scheme changes
 - **Persistent**: Theme preference saved across sessions
 - **System Respect**: Future: Auto-detect system preference
 
 #### Keyboard Shortcuts ⌨️
+
 - `Ctrl+S` - Start Auto-Send
-- `Ctrl+X` - Stop Auto-Send  
+- `Ctrl+X` - Stop Auto-Send
 - `Ctrl+P` - Pause/Resume
 - `Escape` - Close modals
 - Clear on-screen indicator of available shortcuts
 
 #### Pause/Resume ⏸️
+
 - **Pause Button**: Temporarily halt sending without stopping
 - **Smart Resume**: Continue from where you left off
 - **Visual Feedback**: Button changes state clearly
 - **Keyboard Control**: Use Ctrl+P for quick pause/resume
 
 #### Analytics Export 💾
+
 - **Export Data**: Download all analytics as JSON
 - **Includes**: Statistics, settings, timestamps
 - **Backup**: Create backups of your configuration
@@ -60,11 +67,13 @@
 ### Performance Improvements
 
 #### Debouncing
+
 - **Auto-save Debouncing**: Reduces storage writes from every keystroke to 1-second delay
 - **Event Throttling**: Improved responsiveness without overload
 - **Memory Optimization**: Better cleanup of event listeners
 
 #### Lazy Loading
+
 - **Phrase Loading**: Default phrases loaded on-demand
 - **Modal Rendering**: Content rendered only when opened
 - **Reduced Startup Time**: Faster initial popup load
@@ -72,12 +81,14 @@
 ### Security Enhancements
 
 #### Input Validation
+
 - **XSS Protection**: Sanitize all user inputs before display
 - **Settings Validation**: Validate imported settings structure
 - **Message Validation**: Check for suspicious patterns
 - **CSP Compliance**: Content Security Policy adherence
 
 #### Rate Limiting
+
 - **Abuse Prevention**: Rate limiter utility to prevent spam
 - **Configurable Limits**: Adjust thresholds as needed
 - **Graceful Degradation**: Clear error messages
@@ -85,11 +96,13 @@
 ### Accessibility Improvements
 
 #### ARIA Labels
+
 - **Screen Reader Support**: Proper ARIA labels on all interactive elements
 - **Focus Management**: Visible focus indicators for keyboard navigation
 - **Semantic HTML**: Improved HTML structure for assistive technologies
 
 #### Keyboard Navigation
+
 - **Tab Order**: Logical tab order through interface
 - **Focus Indicators**: Clear visual feedback on focus
 - **Skip Links**: Future: Add skip navigation links
@@ -97,6 +110,7 @@
 ### Documentation
 
 #### Contributing Guide
+
 - 📖 **CONTRIBUTING.md**: Complete guide for contributors
 - 🏗️ **Architecture**: File structure and organization explained
 - ✍️ **Coding Standards**: Style guide and best practices
@@ -104,12 +118,14 @@
 - 🔄 **PR Process**: Pull request template and requirements
 
 #### CI/CD Documentation
+
 - 🤖 **GitHub Actions**: Automated testing on push/PR
 - 📦 **Release Workflow**: Automated packaging for releases
 - ✅ **Status Badges**: Future: Add build status badges
 - 📊 **Code Coverage**: Future: Codecov integration
 
 #### Developer Docs
+
 - 🗂️ **File Organization**: src/, tests/, scripts/ structure
 - 🔧 **Build Commands**: npm run commands documented
 - 📝 **JSDoc Comments**: Type hints and documentation in code
@@ -120,6 +136,7 @@
 ## 🔧 Technical Changes
 
 ### File Structure
+
 ```
 autochat/
 ├── src/                    # NEW: Source utilities
@@ -145,6 +162,7 @@ autochat/
 ```
 
 ### Dependencies Added
+
 ```json
 {
   "devDependencies": {
@@ -160,6 +178,7 @@ autochat/
 ```
 
 ### Scripts Available
+
 ```bash
 npm test              # Run tests
 npm run lint          # Check code style
@@ -189,6 +208,7 @@ npm run package       # Create distribution zip
 No action required! All your existing settings will work with v4.1.
 
 **New Features to Try:**
+
 1. Click the 🌙 icon to enable dark mode
 2. Try keyboard shortcuts (Ctrl+S, Ctrl+X, Ctrl+P)
 3. Use the new Pause button when auto-send is active
@@ -220,6 +240,7 @@ npm run package
 ```
 
 **Before Committing:**
+
 ```bash
 # Format code
 npm run format

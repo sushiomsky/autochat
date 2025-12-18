@@ -37,7 +37,7 @@ class ChatLogger {
       captureOutgoing: true,
       captureIncoming: true,
       captureSender: true,
-      ...options
+      ...options,
     };
 
     // Capture existing messages
@@ -51,7 +51,7 @@ class ChatLogger {
     this.observer.observe(container, {
       childList: true,
       subtree: true,
-      characterData: true
+      characterData: true,
     });
 
     // Flush queue periodically (every 5 seconds)
@@ -103,7 +103,8 @@ class ChatLogger {
     for (const mutation of mutations) {
       if (mutation.type === 'childList') {
         for (const node of mutation.addedNodes) {
-          if (node.nodeType === 1) { // Element node
+          if (node.nodeType === 1) {
+            // Element node
             this.processNewElement(node);
           }
         }
@@ -130,12 +131,21 @@ class ChatLogger {
    */
   extractMessagesFromContainer(container) {
     const messages = [];
-    
+
     // Common message selectors for various chat platforms
     const selectors = [
-      '.message', '.msg', '.message-text', '.bubble', '.chat-message',
-      '.text', '.reply', '.chat__message', '[role="article"]', 
-      '[class*="message"]', '[class*="msg"]', '[data-message-id]'
+      '.message',
+      '.msg',
+      '.message-text',
+      '.bubble',
+      '.chat-message',
+      '.text',
+      '.reply',
+      '.chat__message',
+      '[role="article"]',
+      '[class*="message"]',
+      '[class*="msg"]',
+      '[data-message-id]',
     ];
 
     for (const selector of selectors) {
@@ -159,7 +169,7 @@ class ChatLogger {
    */
   extractMessagesFromElement(element) {
     const messages = [];
-    
+
     // Check if element itself is a message
     const message = this.extractMessageFromElement(element);
     if (message) {
@@ -186,7 +196,7 @@ class ChatLogger {
 
     // Extract metadata
     const timestamp = this.extractTimestamp(element);
-    const sender = (this.options && this.options.captureSender) ? this.extractSender(element) : null;
+    const sender = this.options && this.options.captureSender ? this.extractSender(element) : null;
     const direction = this.detectMessageDirection(element);
 
     // Skip based on options
@@ -200,7 +210,7 @@ class ChatLogger {
       timestamp: timestamp,
       direction: direction,
       url: window.location.href,
-      platform: this.detectPlatform()
+      platform: this.detectPlatform(),
     };
   }
 
@@ -210,16 +220,22 @@ class ChatLogger {
   extractTimestamp(element) {
     // Try to find timestamp in element or nearby
     const timeSelectors = [
-      '[data-timestamp]', '[datetime]', 'time', '.time', '.timestamp',
-      '[class*="time"]', '[class*="timestamp"]'
+      '[data-timestamp]',
+      '[datetime]',
+      'time',
+      '.time',
+      '.timestamp',
+      '[class*="time"]',
+      '[class*="timestamp"]',
     ];
 
     for (const selector of timeSelectors) {
       const timeEl = element.querySelector(selector) || element.closest(selector);
       if (timeEl) {
-        const timestamp = timeEl.getAttribute('data-timestamp') || 
-                         timeEl.getAttribute('datetime') ||
-                         timeEl.textContent;
+        const timestamp =
+          timeEl.getAttribute('data-timestamp') ||
+          timeEl.getAttribute('datetime') ||
+          timeEl.textContent;
         if (timestamp) {
           const parsed = new Date(timestamp);
           if (!isNaN(parsed.getTime())) {
@@ -238,16 +254,23 @@ class ChatLogger {
    */
   extractSender(element) {
     const senderSelectors = [
-      '[data-sender]', '[data-author]', '.sender', '.author', '.username',
-      '[class*="sender"]', '[class*="author"]', '[class*="username"]'
+      '[data-sender]',
+      '[data-author]',
+      '.sender',
+      '.author',
+      '.username',
+      '[class*="sender"]',
+      '[class*="author"]',
+      '[class*="username"]',
     ];
 
     for (const selector of senderSelectors) {
       const senderEl = element.querySelector(selector) || element.closest(selector);
       if (senderEl) {
-        const sender = senderEl.getAttribute('data-sender') ||
-                      senderEl.getAttribute('data-author') ||
-                      senderEl.textContent?.trim();
+        const sender =
+          senderEl.getAttribute('data-sender') ||
+          senderEl.getAttribute('data-author') ||
+          senderEl.textContent?.trim();
         if (sender && sender.length > 0 && sender.length < 100) {
           return sender;
         }
@@ -263,16 +286,20 @@ class ChatLogger {
   detectMessageDirection(element) {
     const classes = element.className || '';
     const id = element.id || '';
-    
+
     // Common patterns for outgoing messages
-    if (classes.match(/\b(me|self|own|sent|outgoing|right)\b/i) ||
-        id.match(/\b(me|self|own|sent|outgoing)\b/i)) {
+    if (
+      classes.match(/\b(me|self|own|sent|outgoing|right)\b/i) ||
+      id.match(/\b(me|self|own|sent|outgoing)\b/i)
+    ) {
       return 'outgoing';
     }
 
     // Common patterns for incoming messages
-    if (classes.match(/\b(them|other|received|incoming|left)\b/i) ||
-        id.match(/\b(them|other|received|incoming)\b/i)) {
+    if (
+      classes.match(/\b(them|other|received|incoming|left)\b/i) ||
+      id.match(/\b(them|other|received|incoming)\b/i)
+    ) {
       return 'incoming';
     }
 
@@ -284,12 +311,16 @@ class ChatLogger {
    */
   detectPlatform() {
     const hostname = window.location.hostname.toLowerCase();
-    if (hostname.endsWith('.web.whatsapp.com') || hostname === 'web.whatsapp.com') return 'WhatsApp';
+    if (hostname.endsWith('.web.whatsapp.com') || hostname === 'web.whatsapp.com')
+      return 'WhatsApp';
     if (hostname.endsWith('.discord.com') || hostname === 'discord.com') return 'Discord';
-    if (hostname.endsWith('.web.telegram.org') || hostname === 'web.telegram.org') return 'Telegram';
-    if (hostname.endsWith('.messenger.com') || hostname === 'messenger.com') return 'Facebook Messenger';
+    if (hostname.endsWith('.web.telegram.org') || hostname === 'web.telegram.org')
+      return 'Telegram';
+    if (hostname.endsWith('.messenger.com') || hostname === 'messenger.com')
+      return 'Facebook Messenger';
     if (hostname.endsWith('.slack.com') || hostname === 'slack.com') return 'Slack';
-    if (hostname.endsWith('.teams.microsoft.com') || hostname === 'teams.microsoft.com') return 'Microsoft Teams';
+    if (hostname.endsWith('.teams.microsoft.com') || hostname === 'teams.microsoft.com')
+      return 'Microsoft Teams';
     return 'Unknown';
   }
 
@@ -302,7 +333,7 @@ class ChatLogger {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32bit integer
     }
     return `msg_${Math.abs(hash)}_${Date.now()}`;
@@ -313,9 +344,10 @@ class ChatLogger {
    */
   queueMessage(message) {
     // Check for duplicates in queue
-    const isDuplicate = this.messageQueue.some(m => 
-      m.text === message.text && 
-      Math.abs(new Date(m.timestamp) - new Date(message.timestamp)) < 1000
+    const isDuplicate = this.messageQueue.some(
+      (m) =>
+        m.text === message.text &&
+        Math.abs(new Date(m.timestamp) - new Date(message.timestamp)) < 1000
     );
 
     if (!isDuplicate) {
@@ -397,34 +429,35 @@ class ChatLogger {
         // Apply filters
         if (options.search) {
           const searchLower = options.search.toLowerCase();
-          messages = messages.filter(m => 
-            m.text.toLowerCase().includes(searchLower) ||
-            m.sender.toLowerCase().includes(searchLower)
+          messages = messages.filter(
+            (m) =>
+              m.text.toLowerCase().includes(searchLower) ||
+              m.sender.toLowerCase().includes(searchLower)
           );
         }
 
         if (options.startDate) {
           const start = new Date(options.startDate);
-          messages = messages.filter(m => new Date(m.timestamp) >= start);
+          messages = messages.filter((m) => new Date(m.timestamp) >= start);
         }
 
         if (options.endDate) {
           const end = new Date(options.endDate);
-          messages = messages.filter(m => new Date(m.timestamp) <= end);
+          messages = messages.filter((m) => new Date(m.timestamp) <= end);
         }
 
         if (options.sender) {
-          messages = messages.filter(m => 
+          messages = messages.filter((m) =>
             m.sender.toLowerCase().includes(options.sender.toLowerCase())
           );
         }
 
         if (options.direction) {
-          messages = messages.filter(m => m.direction === options.direction);
+          messages = messages.filter((m) => m.direction === options.direction);
         }
 
         if (options.platform) {
-          messages = messages.filter(m => m.platform === options.platform);
+          messages = messages.filter((m) => m.platform === options.platform);
         }
 
         // Sort by timestamp (newest first by default)
@@ -460,26 +493,26 @@ class ChatLogger {
 
         const stats = {
           total: messages.length,
-          incoming: messages.filter(m => m.direction === 'incoming').length,
-          outgoing: messages.filter(m => m.direction === 'outgoing').length,
-          unknown: messages.filter(m => m.direction === 'unknown').length,
+          incoming: messages.filter((m) => m.direction === 'incoming').length,
+          outgoing: messages.filter((m) => m.direction === 'outgoing').length,
+          unknown: messages.filter((m) => m.direction === 'unknown').length,
           platforms: {},
           senders: {},
           dateRange: {
             earliest: null,
-            latest: null
-          }
+            latest: null,
+          },
         };
 
         // Count by platform
-        messages.forEach(m => {
+        messages.forEach((m) => {
           stats.platforms[m.platform] = (stats.platforms[m.platform] || 0) + 1;
           stats.senders[m.sender] = (stats.senders[m.sender] || 0) + 1;
         });
 
         // Date range
         if (messages.length > 0) {
-          const timestamps = messages.map(m => new Date(m.timestamp)).sort((a, b) => a - b);
+          const timestamps = messages.map((m) => new Date(m.timestamp)).sort((a, b) => a - b);
           stats.dateRange.earliest = timestamps[0].toISOString();
           stats.dateRange.latest = timestamps[timestamps.length - 1].toISOString();
         }
@@ -512,12 +545,16 @@ class ChatLogger {
   async exportToJSON() {
     const messages = await this.getMessages();
     const stats = await this.getStats();
-    
-    return JSON.stringify({
-      exportDate: new Date().toISOString(),
-      stats: stats,
-      messages: messages
-    }, null, 2);
+
+    return JSON.stringify(
+      {
+        exportDate: new Date().toISOString(),
+        stats: stats,
+        messages: messages,
+      },
+      null,
+      2
+    );
   }
 
   /**
@@ -525,22 +562,22 @@ class ChatLogger {
    */
   async exportToCSV() {
     const messages = await this.getMessages();
-    
+
     const headers = ['ID', 'Timestamp', 'Sender', 'Direction', 'Platform', 'Text'];
     const rows = [headers];
 
-    messages.forEach(m => {
+    messages.forEach((m) => {
       rows.push([
         m.id,
         m.timestamp,
         m.sender,
         m.direction,
         m.platform,
-        `"${m.text.replace(/"/g, '""')}"` // Escape quotes
+        `"${m.text.replace(/"/g, '""')}"`, // Escape quotes
       ]);
     });
 
-    return rows.map(row => row.join(',')).join('\n');
+    return rows.map((row) => row.join(',')).join('\n');
   }
 }
 

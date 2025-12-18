@@ -5,14 +5,14 @@
 // Helper function to simulate phrase loading
 const createLoadPhrasesFunction = () => {
   return async () => {
-    const storageData = await new Promise(resolve => {
+    const storageData = await new Promise((resolve) => {
       chrome.storage.local.get(['locale'], resolve);
     });
     const locale = storageData.locale || chrome.i18n.getUILanguage().split('-')[0] || 'en';
-    
+
     let phraseFile = `farming_phrases_${locale}.txt`;
     let response;
-    
+
     try {
       response = await fetch(chrome.runtime.getURL(phraseFile));
       if (!response.ok) throw new Error('File not found');
@@ -20,9 +20,12 @@ const createLoadPhrasesFunction = () => {
       phraseFile = 'farming_phrases_en.txt';
       response = await fetch(chrome.runtime.getURL(phraseFile));
     }
-    
+
     const text = await response.text();
-    return text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    return text
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
   };
 };
 
@@ -38,7 +41,7 @@ describe('Language-specific Phrase Loading', () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
         ok: true,
-        text: () => Promise.resolve('English phrase 1\nEnglish phrase 2\nEnglish phrase 3')
+        text: () => Promise.resolve('English phrase 1\nEnglish phrase 2\nEnglish phrase 3'),
       })
     );
 
@@ -50,7 +53,7 @@ describe('Language-specific Phrase Loading', () => {
 
     const loadPhrases = createLoadPhrasesFunction();
     const phrases = await loadPhrases();
-    
+
     expect(phrases).toHaveLength(3);
     expect(phrases[0]).toBe('English phrase 1');
     expect(fetch).toHaveBeenCalled();
@@ -60,7 +63,7 @@ describe('Language-specific Phrase Loading', () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
         ok: true,
-        text: () => Promise.resolve('اردو جملہ 1\nاردو جملہ 2')
+        text: () => Promise.resolve('اردو جملہ 1\nاردو جملہ 2'),
       })
     );
 
@@ -70,7 +73,7 @@ describe('Language-specific Phrase Loading', () => {
 
     const loadPhrases = createLoadPhrasesFunction();
     const phrases = await loadPhrases();
-    
+
     expect(phrases).toHaveLength(2);
     expect(phrases[0]).toBe('اردو جملہ 1');
     expect(fetch).toHaveBeenCalledWith(expect.stringContaining('farming_phrases_ur.txt'));
@@ -80,7 +83,7 @@ describe('Language-specific Phrase Loading', () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
         ok: true,
-        text: () => Promise.resolve('Frase española 1\nFrase española 2\nFrase española 3')
+        text: () => Promise.resolve('Frase española 1\nFrase española 2\nFrase española 3'),
       })
     );
 
@@ -90,7 +93,7 @@ describe('Language-specific Phrase Loading', () => {
 
     const loadPhrases = createLoadPhrasesFunction();
     const phrases = await loadPhrases();
-    
+
     expect(phrases).toHaveLength(3);
     expect(phrases[0]).toBe('Frase española 1');
     expect(fetch).toHaveBeenCalledWith(expect.stringContaining('farming_phrases_es.txt'));
@@ -103,12 +106,12 @@ describe('Language-specific Phrase Loading', () => {
       if (callCount === 1) {
         return Promise.resolve({
           ok: false,
-          text: () => Promise.reject('File not found')
+          text: () => Promise.reject('File not found'),
         });
       }
       return Promise.resolve({
         ok: true,
-        text: () => Promise.resolve('English fallback phrase 1\nEnglish fallback phrase 2')
+        text: () => Promise.resolve('English fallback phrase 1\nEnglish fallback phrase 2'),
       });
     });
 
@@ -118,7 +121,7 @@ describe('Language-specific Phrase Loading', () => {
 
     const loadPhrases = createLoadPhrasesFunction();
     const phrases = await loadPhrases();
-    
+
     expect(phrases).toHaveLength(2);
     expect(phrases[0]).toBe('English fallback phrase 1');
     expect(fetch).toHaveBeenCalledTimes(2);
@@ -128,7 +131,7 @@ describe('Language-specific Phrase Loading', () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
         ok: true,
-        text: () => Promise.resolve('English phrase from en-US')
+        text: () => Promise.resolve('English phrase from en-US'),
       })
     );
 
@@ -140,7 +143,7 @@ describe('Language-specific Phrase Loading', () => {
 
     const loadPhrases = createLoadPhrasesFunction();
     const phrases = await loadPhrases();
-    
+
     expect(phrases).toHaveLength(1);
     expect(phrases[0]).toBe('English phrase from en-US');
     expect(fetch).toHaveBeenCalledWith(expect.stringContaining('farming_phrases_en.txt'));

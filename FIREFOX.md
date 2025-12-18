@@ -5,6 +5,7 @@ AutoChat is now available for Firefox! This guide will help you install and use 
 ## 🦊 Browser Compatibility
 
 AutoChat supports:
+
 - **Firefox**: Version 109.0 and later
 - **Firefox Developer Edition**: Latest version
 - **Firefox Nightly**: Latest version
@@ -14,17 +15,20 @@ AutoChat supports:
 ### Method 1: Build from Source (Development)
 
 1. **Clone the repository**:
+
 ```bash
 git clone https://github.com/sushiomsky/autochat.git
 cd autochat
 ```
 
 2. **Install dependencies**:
+
 ```bash
 npm install --legacy-peer-deps
 ```
 
 3. **Build for Firefox**:
+
 ```bash
 npm run build:firefox
 ```
@@ -83,6 +87,7 @@ npm run build:firefox
 ```
 
 This creates a development build in `dist-firefox/` with:
+
 - Source maps enabled
 - Debugging information
 - Non-minified code
@@ -94,6 +99,7 @@ npm run build:firefox:prod
 ```
 
 This creates a production build with:
+
 - Minified code
 - Optimized performance
 - Removed comments and debug code
@@ -146,16 +152,19 @@ npm test
 ### Troubleshooting
 
 #### Extension doesn't load
+
 - Check Firefox version (must be 109.0+)
 - Verify manifest.json is valid
 - Check browser console for errors
 
 #### Features not working
+
 - Clear extension storage: `about:debugging` → Storage → Clear
 - Check permissions in manifest
 - Review browser console logs
 
 #### Performance issues
+
 - Disable other extensions temporarily
 - Check Firefox Developer Tools Performance tab
 - Reduce auto-send frequency
@@ -172,12 +181,14 @@ npm test
 AutoChat maintains feature parity between Chrome and Firefox. Your settings and data can be transferred:
 
 ### Export from Chrome
+
 1. Open AutoChat in Chrome
 2. Go to Settings
 3. Click "Export Settings"
 4. Save the JSON file
 
 ### Import to Firefox
+
 1. Open AutoChat in Firefox
 2. Go to Settings
 3. Click "Import Settings"
@@ -194,12 +205,14 @@ Having issues with the Firefox version?
 ## 📝 Version History
 
 ### v4.5.2 (Current)
+
 - ✅ Firefox Manifest V2 support
 - ✅ Full feature parity with Chrome
 - ✅ Automated build system
 - ✅ Browser API compatibility layer
 
 ### v4.5.1
+
 - ✅ Firefox Manifest V2 support
 - ✅ Full feature parity with Chrome
 - ✅ Webhook integration
@@ -208,6 +221,7 @@ Having issues with the Firefox version?
 - ✅ Natural language phrases
 
 ### Future Plans
+
 - 🔜 Firefox Add-ons publication
 - 🔜 Manifest V3 migration (when Firefox fully supports it)
 - 🔜 Firefox-specific optimizations

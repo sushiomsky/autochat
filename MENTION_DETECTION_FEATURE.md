@@ -90,7 +90,7 @@ Once configured, the feature will automatically start monitoring for mentions. Y
 ### Keywords
 
 - **Format**: One keyword per line
-- **Examples**: 
+- **Examples**:
   - `@john`
   - `john doe`
   - `hey john`
@@ -118,6 +118,7 @@ Once configured, the feature will automatically start monitoring for mentions. Y
 ### Scenario 1: Team Chat Monitoring
 
 **Setup**:
+
 - Keywords: `@yourname`, `your actual name`
 - Replies: `Got it! I'll respond soon.`, `Thanks for the ping!`, `Acknowledged {time}`
 
@@ -126,6 +127,7 @@ Once configured, the feature will automatically start monitoring for mentions. Y
 ### Scenario 2: Customer Support
 
 **Setup**:
+
 - Keywords: `support`, `help`, `@support`
 - Replies: `Thanks for reaching out! A team member will assist you shortly.`, `We've received your request {time}`
 
@@ -134,6 +136,7 @@ Once configured, the feature will automatically start monitoring for mentions. Y
 ### Scenario 3: Group Chat Engagement
 
 **Setup**:
+
 - Keywords: `@everyone`, `team`
 - Replies: `Noted!`, `I'm here {random_emoji}`, `Copy that`
 
@@ -144,6 +147,7 @@ Once configured, the feature will automatically start monitoring for mentions. Y
 ### Mention detection not working
 
 **Possible causes**:
+
 1. Message container not marked
    - **Solution**: Click "📌 Mark Message Container" and select the chat area
 2. Keywords not configured
@@ -156,16 +160,19 @@ Once configured, the feature will automatically start monitoring for mentions. Y
 ### Replying to wrong messages
 
 **Possible cause**: Keywords too generic
+
 - **Solution**: Use more specific keywords like `@username` instead of common words
 
 ### Not replying fast enough
 
 **Current behavior**: 1-3 second delay is intentional for natural appearance
+
 - **Note**: Cannot be configured (hard-coded for anti-detection)
 
 ### Duplicate replies
 
 **Possible cause**: Message container changed or page reloaded
+
 - **Solution**: The feature tracks last 100 messages. If you reload the page, the history resets. This is expected behavior.
 
 ## Technical Details
@@ -239,7 +246,7 @@ Once configured, the feature will automatically start monitoring for mentions. Y
 
 - **Platforms**: Works on any website where AutoChat works
 - **Browsers**: Chrome, Edge, Brave (Chromium-based)
-- **Requirements**: 
+- **Requirements**:
   - Message container must be marked
   - Chat input field must be marked
   - Page must not heavily modify DOM structure
@@ -263,17 +270,17 @@ Once configured, the feature will automatically start monitoring for mentions. Y
 chrome.tabs.sendMessage(tabId, {
   action: 'startMentionDetection',
   keywords: ['@username', 'john'],
-  replyMessages: ['Thanks!', 'Hi!']
+  replyMessages: ['Thanks!', 'Hi!'],
 });
 
 // Stop monitoring
 chrome.tabs.sendMessage(tabId, {
-  action: 'stopMentionDetection'
+  action: 'stopMentionDetection',
 });
 
 // Get status
 chrome.tabs.sendMessage(tabId, {
-  action: 'getMentionStatus'
+  action: 'getMentionStatus',
 });
 // Returns: { enabled: boolean, keywords: string[], replyMessages: string[] }
 ```
@@ -294,6 +301,7 @@ Potential improvements for future versions:
 ## Changelog
 
 ### v4.3.0 (2025-11-22)
+
 - ✨ Initial release of mention detection feature
 - ✅ Support for @mention and plain keyword detection
 - ✅ Random reply selection

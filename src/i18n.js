@@ -8,7 +8,7 @@ class I18n {
     this.currentLocale = chrome.i18n.getUILanguage();
     this.defaultLocale = 'en';
     this.supportedLocales = ['en', 'ur', 'es'];
-    
+
     // Load user preference
     chrome.storage.local.get(['locale'], (data) => {
       if (data.locale && this.supportedLocales.includes(data.locale)) {
@@ -68,7 +68,7 @@ class I18n {
     return [
       { code: 'en', name: 'English', nativeName: 'English' },
       { code: 'ur', name: 'Urdu', nativeName: 'اردو' },
-      { code: 'es', name: 'Spanish', nativeName: 'Español' }
+      { code: 'es', name: 'Spanish', nativeName: 'Español' },
     ];
   }
 
@@ -88,31 +88,31 @@ class I18n {
 
     // Localize elements with data-i18n attribute
     const elements = root.querySelectorAll('[data-i18n]');
-    elements.forEach(element => {
+    elements.forEach((element) => {
       const key = element.getAttribute('data-i18n');
       const substitutions = element.getAttribute('data-i18n-subs');
       const subs = substitutions ? JSON.parse(substitutions) : [];
-      
+
       element.textContent = this.getMessage(key, subs);
     });
 
     // Localize placeholders
     const placeholders = root.querySelectorAll('[data-i18n-placeholder]');
-    placeholders.forEach(element => {
+    placeholders.forEach((element) => {
       const key = element.getAttribute('data-i18n-placeholder');
       element.placeholder = this.getMessage(key);
     });
 
     // Localize titles
     const titles = root.querySelectorAll('[data-i18n-title]');
-    titles.forEach(element => {
+    titles.forEach((element) => {
       const key = element.getAttribute('data-i18n-title');
       element.title = this.getMessage(key);
     });
 
     // Localize aria-labels
     const ariaLabels = root.querySelectorAll('[data-i18n-aria]');
-    ariaLabels.forEach(element => {
+    ariaLabels.forEach((element) => {
       const key = element.getAttribute('data-i18n-aria');
       element.setAttribute('aria-label', this.getMessage(key));
     });

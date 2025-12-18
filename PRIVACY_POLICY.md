@@ -29,6 +29,7 @@ This data is stored **only on your device** and is never transmitted to external
 The extension requires the following permissions:
 
 ### 1. `scripting`
+
 **Purpose:** To inject automation scripts into web pages to send messages.
 
 **Usage:** Required to interact with chat input fields on websites.
@@ -36,6 +37,7 @@ The extension requires the following permissions:
 **Data Access:** No data is collected. Only used to automate typing and sending.
 
 ### 2. `activeTab`
+
 **Purpose:** To interact with the currently active browser tab.
 
 **Usage:** Required to mark input fields and send messages on the active page.
@@ -43,6 +45,7 @@ The extension requires the following permissions:
 **Data Access:** Only accesses the tab when you explicitly use the extension features.
 
 ### 3. `storage`
+
 **Purpose:** To save your settings and preferences locally.
 
 **Usage:** Stores configuration data in Chrome's local storage.
@@ -50,6 +53,7 @@ The extension requires the following permissions:
 **Data Access:** All data stays on your device.
 
 ### 4. `host_permissions` (`<all_urls>`)
+
 **Purpose:** To work on any chat website.
 
 **Usage:** Allows the extension to function on any website you choose to use it on.

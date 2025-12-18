@@ -32,10 +32,13 @@ export class WebhookManager {
    */
   async saveWebhooks() {
     return new Promise((resolve) => {
-      chrome.storage.local.set({ 
-        webhooks: this.webhooks,
-        webhooksEnabled: this.enabled
-      }, () => resolve());
+      chrome.storage.local.set(
+        {
+          webhooks: this.webhooks,
+          webhooksEnabled: this.enabled,
+        },
+        () => resolve()
+      );
     });
   }
 
@@ -71,7 +74,7 @@ export class WebhookManager {
       createdAt: new Date().toISOString(),
       lastTriggered: null,
       triggerCount: 0,
-      failureCount: 0
+      failureCount: 0,
     };
 
     this.webhooks.push(newWebhook);
@@ -86,7 +89,7 @@ export class WebhookManager {
    * @returns {object} Updated webhook
    */
   async updateWebhook(id, updates) {
-    const webhook = this.webhooks.find(w => w.id === id);
+    const webhook = this.webhooks.find((w) => w.id === id);
     if (!webhook) {
       throw new Error('Webhook not found');
     }
@@ -106,7 +109,7 @@ export class WebhookManager {
    * @param {string} id - Webhook ID
    */
   async deleteWebhook(id) {
-    const index = this.webhooks.findIndex(w => w.id === id);
+    const index = this.webhooks.findIndex((w) => w.id === id);
     if (index === -1) {
       throw new Error('Webhook not found');
     }
@@ -129,7 +132,7 @@ export class WebhookManager {
    * @returns {object} Webhook
    */
   getWebhook(id) {
-    return this.webhooks.find(w => w.id === id);
+    return this.webhooks.find((w) => w.id === id);
   }
 
   /**
@@ -143,19 +146,17 @@ export class WebhookManager {
       return;
     }
 
-    const activeWebhooks = this.webhooks.filter(
-      w => w.enabled && w.events.includes(eventType)
-    );
+    const activeWebhooks = this.webhooks.filter((w) => w.enabled && w.events.includes(eventType));
 
     if (activeWebhooks.length === 0) {
       return;
     }
 
-    console.log(`[Webhooks] Triggering ${activeWebhooks.length} webhook(s) for event: ${eventType}`);
-
-    const promises = activeWebhooks.map(webhook => 
-      this.sendWebhook(webhook, eventType, data)
+    console.log(
+      `[Webhooks] Triggering ${activeWebhooks.length} webhook(s) for event: ${eventType}`
     );
+
+    const promises = activeWebhooks.map((webhook) => this.sendWebhook(webhook, eventType, data));
 
     await Promise.allSettled(promises);
   }
@@ -172,7 +173,7 @@ export class WebhookManager {
       timestamp: new Date().toISOString(),
       data: data,
       source: 'AutoChat',
-      version: chrome.runtime.getManifest().version
+      version: chrome.runtime.getManifest().version,
     };
 
     let lastError = null;
@@ -186,10 +187,10 @@ export class WebhookManager {
           method: webhook.method,
           headers: {
             'Content-Type': 'application/json',
-            ...webhook.headers
+            ...webhook.headers,
           },
           body: JSON.stringify(payload),
-          signal: controller.signal
+          signal: controller.signal,
         });
 
         clearTimeout(timeoutId);
@@ -205,10 +206,12 @@ export class WebhookManager {
 
         console.log(`[Webhooks] Successfully sent to ${webhook.name}`);
         return { success: true, webhook: webhook.name };
-
       } catch (error) {
         lastError = error;
-        console.warn(`[Webhooks] Attempt ${attempt}/${this.retryAttempts} failed for ${webhook.name}:`, error.message);
+        console.warn(
+          `[Webhooks] Attempt ${attempt}/${this.retryAttempts} failed for ${webhook.name}:`,
+          error.message
+        );
 
         if (attempt < this.retryAttempts) {
           await this.sleep(this.retryDelay * attempt); // Exponential backoff
@@ -220,7 +223,10 @@ export class WebhookManager {
     webhook.failureCount++;
     await this.saveWebhooks();
 
-    console.error(`[Webhooks] Failed to send webhook ${webhook.name} after ${this.retryAttempts} attempts:`, lastError);
+    console.error(
+      `[Webhooks] Failed to send webhook ${webhook.name} after ${this.retryAttempts} attempts:`,
+      lastError
+    );
     return { success: false, webhook: webhook.name, error: lastError.message };
   }
 
@@ -230,14 +236,14 @@ export class WebhookManager {
    * @returns {object} Test result
    */
   async testWebhook(id) {
-    const webhook = this.webhooks.find(w => w.id === id);
+    const webhook = this.webhooks.find((w) => w.id === id);
     if (!webhook) {
       throw new Error('Webhook not found');
     }
 
     const testData = {
       test: true,
-      message: 'This is a test webhook from AutoChat'
+      message: 'This is a test webhook from AutoChat',
     };
 
     return await this.sendWebhook(webhook, 'test', testData);
@@ -260,7 +266,7 @@ export class WebhookManager {
    * @param {boolean} enabled - Enable state
    */
   async setWebhookEnabled(id, enabled) {
-    const webhook = this.webhooks.find(w => w.id === id);
+    const webhook = this.webhooks.find((w) => w.id === id);
     if (!webhook) {
       throw new Error('Webhook not found');
     }
@@ -276,10 +282,10 @@ export class WebhookManager {
   getStats() {
     return {
       total: this.webhooks.length,
-      enabled: this.webhooks.filter(w => w.enabled).length,
-      disabled: this.webhooks.filter(w => !w.enabled).length,
+      enabled: this.webhooks.filter((w) => w.enabled).length,
+      disabled: this.webhooks.filter((w) => !w.enabled).length,
       totalTriggers: this.webhooks.reduce((sum, w) => sum + w.triggerCount, 0),
-      totalFailures: this.webhooks.reduce((sum, w) => sum + w.failureCount, 0)
+      totalFailures: this.webhooks.reduce((sum, w) => sum + w.failureCount, 0),
     };
   }
 
@@ -289,14 +295,14 @@ export class WebhookManager {
    */
   async clearStats(id = null) {
     if (id) {
-      const webhook = this.webhooks.find(w => w.id === id);
+      const webhook = this.webhooks.find((w) => w.id === id);
       if (webhook) {
         webhook.triggerCount = 0;
         webhook.failureCount = 0;
         webhook.lastTriggered = null;
       }
     } else {
-      this.webhooks.forEach(webhook => {
+      this.webhooks.forEach((webhook) => {
         webhook.triggerCount = 0;
         webhook.failureCount = 0;
         webhook.lastTriggered = null;
@@ -310,7 +316,7 @@ export class WebhookManager {
    * @param {number} ms - Milliseconds to sleep
    */
   sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -319,14 +325,42 @@ export class WebhookManager {
    */
   static getEventTypes() {
     return [
-      { value: 'message_sent', label: 'Message Sent', description: 'Triggered when a message is sent' },
-      { value: 'campaign_started', label: 'Campaign Started', description: 'Triggered when auto-send starts' },
-      { value: 'campaign_stopped', label: 'Campaign Stopped', description: 'Triggered when auto-send stops' },
-      { value: 'campaign_paused', label: 'Campaign Paused', description: 'Triggered when auto-send is paused' },
-      { value: 'campaign_resumed', label: 'Campaign Resumed', description: 'Triggered when auto-send is resumed' },
-      { value: 'daily_limit_reached', label: 'Daily Limit Reached', description: 'Triggered when daily limit is reached' },
+      {
+        value: 'message_sent',
+        label: 'Message Sent',
+        description: 'Triggered when a message is sent',
+      },
+      {
+        value: 'campaign_started',
+        label: 'Campaign Started',
+        description: 'Triggered when auto-send starts',
+      },
+      {
+        value: 'campaign_stopped',
+        label: 'Campaign Stopped',
+        description: 'Triggered when auto-send stops',
+      },
+      {
+        value: 'campaign_paused',
+        label: 'Campaign Paused',
+        description: 'Triggered when auto-send is paused',
+      },
+      {
+        value: 'campaign_resumed',
+        label: 'Campaign Resumed',
+        description: 'Triggered when auto-send is resumed',
+      },
+      {
+        value: 'daily_limit_reached',
+        label: 'Daily Limit Reached',
+        description: 'Triggered when daily limit is reached',
+      },
       { value: 'error', label: 'Error', description: 'Triggered when an error occurs' },
-      { value: 'milestone', label: 'Milestone', description: 'Triggered when a milestone is reached' }
+      {
+        value: 'milestone',
+        label: 'Milestone',
+        description: 'Triggered when a milestone is reached',
+      },
     ];
   }
 
@@ -356,7 +390,7 @@ export class WebhookManager {
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 }

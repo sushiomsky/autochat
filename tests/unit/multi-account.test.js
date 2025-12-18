@@ -10,10 +10,10 @@ describe('Multi-Account Support', () => {
         accounts: {
           default: {
             name: 'Default Account',
-            settings: {}
-          }
+            settings: {},
+          },
         },
-        currentAccount: 'default'
+        currentAccount: 'default',
       });
     });
 
@@ -25,23 +25,23 @@ describe('Multi-Account Support', () => {
       const accounts = {
         default: {
           name: 'Default Account',
-          settings: {}
+          settings: {},
         },
         account_123: {
           name: 'Casino Account 1',
           settings: {
             messageList: 'Hello\nThanks',
             minInterval: '1',
-            maxInterval: '2'
-          }
-        }
+            maxInterval: '2',
+          },
+        },
       };
 
       global.chrome.storage.local.set({ accounts, currentAccount: 'default' });
-      
+
       expect(global.chrome.storage.local.set).toHaveBeenCalledWith({
         accounts,
-        currentAccount: 'default'
+        currentAccount: 'default',
       });
     });
 
@@ -49,9 +49,9 @@ describe('Multi-Account Support', () => {
       const mockData = {
         accounts: {
           default: { name: 'Default Account', settings: {} },
-          account_456: { name: 'Test Account', settings: {} }
+          account_456: { name: 'Test Account', settings: {} },
         },
-        currentAccount: 'account_456'
+        currentAccount: 'account_456',
       };
 
       global.chrome.storage.local.get = jest.fn((keys, callback) => {
@@ -69,21 +69,21 @@ describe('Multi-Account Support', () => {
   describe('Account Switching', () => {
     test('should switch between accounts', () => {
       const accounts = {
-        default: { 
-          name: 'Default Account', 
-          settings: { messageList: 'Default messages' } 
+        default: {
+          name: 'Default Account',
+          settings: { messageList: 'Default messages' },
         },
-        account_789: { 
-          name: 'Account 2', 
-          settings: { messageList: 'Account 2 messages' } 
-        }
+        account_789: {
+          name: 'Account 2',
+          settings: { messageList: 'Account 2 messages' },
+        },
       };
 
       let currentAccount = 'default';
-      
+
       // Simulate switching
       currentAccount = 'account_789';
-      
+
       expect(currentAccount).toBe('account_789');
       expect(accounts[currentAccount].name).toBe('Account 2');
       expect(accounts[currentAccount].settings.messageList).toBe('Account 2 messages');
@@ -93,12 +93,12 @@ describe('Multi-Account Support', () => {
       const accounts = {
         default: {
           name: 'Default Account',
-          settings: { messageList: 'Default', minInterval: '1' }
+          settings: { messageList: 'Default', minInterval: '1' },
         },
         account_abc: {
           name: 'Casino Account',
-          settings: { messageList: 'Casino', minInterval: '2' }
-        }
+          settings: { messageList: 'Casino', minInterval: '2' },
+        },
       };
 
       // Get settings from default
@@ -110,7 +110,7 @@ describe('Multi-Account Support', () => {
       const casinoSettings = accounts.account_abc.settings;
       expect(casinoSettings.messageList).toBe('Casino');
       expect(casinoSettings.minInterval).toBe('2');
-      
+
       // Original settings should be unchanged
       expect(accounts.default.settings.messageList).toBe('Default');
     });
@@ -120,10 +120,10 @@ describe('Multi-Account Support', () => {
     test('should create new account with unique ID', () => {
       const accountName = 'New Casino Account';
       const accountId = 'account_' + Date.now();
-      
+
       const newAccount = {
         name: accountName,
-        settings: {}
+        settings: {},
       };
 
       expect(newAccount.name).toBe(accountName);
@@ -134,7 +134,7 @@ describe('Multi-Account Support', () => {
     test('should validate account name length', () => {
       const shortName = 'Valid';
       const longName = 'A'.repeat(51); // 51 characters
-      
+
       expect(shortName.length).toBeLessThanOrEqual(50);
       expect(longName.length).toBeGreaterThan(50);
     });
@@ -142,7 +142,7 @@ describe('Multi-Account Support', () => {
     test('should not allow empty account names', () => {
       const emptyName = '';
       const whitespace = '   ';
-      
+
       expect(emptyName.trim()).toBe('');
       expect(whitespace.trim()).toBe('');
     });
@@ -152,7 +152,7 @@ describe('Multi-Account Support', () => {
     test('should not allow deletion of default account', () => {
       const accountId = 'default';
       const canDelete = accountId !== 'default';
-      
+
       expect(canDelete).toBe(false);
     });
 
@@ -160,7 +160,7 @@ describe('Multi-Account Support', () => {
       const currentAccount = 'account_123';
       const accountToDelete = 'account_123';
       const canDelete = accountToDelete !== currentAccount;
-      
+
       expect(canDelete).toBe(false);
     });
 
@@ -168,7 +168,7 @@ describe('Multi-Account Support', () => {
       const currentAccount = 'default';
       const accountToDelete = 'account_456';
       const canDelete = accountToDelete !== 'default' && accountToDelete !== currentAccount;
-      
+
       expect(canDelete).toBe(true);
     });
   });
@@ -181,14 +181,14 @@ describe('Multi-Account Support', () => {
           messageList: 'Hello\nWorld',
           minInterval: '1',
           maxInterval: '3',
-          mentionKeywords: ['@user', 'hello']
-        }
+          mentionKeywords: ['@user', 'hello'],
+        },
       };
 
       const exportData = {
         name: account.name,
         settings: account.settings,
-        exportDate: new Date().toISOString()
+        exportDate: new Date().toISOString(),
       };
 
       const jsonString = JSON.stringify(exportData, null, 2);
@@ -203,7 +203,7 @@ describe('Multi-Account Support', () => {
       const accountName = 'Casino Account 1';
       const expectedFilename = 'autochat-casino-account-1.json';
       const generatedFilename = `autochat-${accountName.toLowerCase().replace(/\s+/g, '-')}.json`;
-      
+
       expect(generatedFilename).toBe(expectedFilename);
     });
   });
@@ -215,20 +215,22 @@ describe('Multi-Account Support', () => {
           name: 'Account 1',
           settings: {
             messageList: 'Messages for account 1',
-            mentionKeywords: ['@user1']
-          }
+            mentionKeywords: ['@user1'],
+          },
         },
         account_2: {
           name: 'Account 2',
           settings: {
             messageList: 'Messages for account 2',
-            mentionKeywords: ['@user2']
-          }
-        }
+            mentionKeywords: ['@user2'],
+          },
+        },
       };
 
       // Verify isolation
-      expect(accounts.account_1.settings.messageList).not.toBe(accounts.account_2.settings.messageList);
+      expect(accounts.account_1.settings.messageList).not.toBe(
+        accounts.account_2.settings.messageList
+      );
       expect(accounts.account_1.settings.mentionKeywords[0]).toBe('@user1');
       expect(accounts.account_2.settings.mentionKeywords[0]).toBe('@user2');
     });
@@ -242,8 +244,8 @@ describe('Multi-Account Support', () => {
             mentionKeywords: ['rain', 'drop', 'giveaway'],
             mentionReplyMessages: ['Thanks!', 'ty', '🎉'],
             minInterval: '1',
-            maxInterval: '2'
-          }
+            maxInterval: '2',
+          },
         },
         regular_chat: {
           name: 'Regular Chat',
@@ -251,9 +253,9 @@ describe('Multi-Account Support', () => {
             mentionDetectionEnabled: false,
             messageList: 'Regular messages',
             minInterval: '5',
-            maxInterval: '10'
-          }
-        }
+            maxInterval: '10',
+          },
+        },
       };
 
       expect(accounts.rain_farmer.settings.mentionDetectionEnabled).toBe(true);

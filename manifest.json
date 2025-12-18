@@ -4,12 +4,7 @@
   "version": "4.5.3",
   "description": "__MSG_extDescription__",
   "default_locale": "en",
-  "permissions": [
-    "storage",
-    "activeTab",
-    "scripting",
-    "alarms"
-  ],
+  "permissions": ["storage", "activeTab", "scripting", "alarms"],
   "host_permissions": ["<all_urls>"],
   "action": {
     "default_popup": "popup-enhanced.html",
@@ -29,7 +24,12 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["farming_phrases.txt", "farming_phrases_en.txt", "farming_phrases_ur.txt", "farming_phrases_es.txt"],
+      "resources": [
+        "farming_phrases.txt",
+        "farming_phrases_en.txt",
+        "farming_phrases_ur.txt",
+        "farming_phrases_es.txt"
+      ],
       "matches": ["<all_urls>"]
     }
   ],

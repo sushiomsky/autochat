@@ -39,7 +39,7 @@ export function sanitizeInput(input) {
  */
 export function validateSettings(data, requiredKeys = []) {
   if (typeof data !== 'object' || data === null) return false;
-  return requiredKeys.every(key => key in data);
+  return requiredKeys.every((key) => key in data);
 }
 
 /**
@@ -102,14 +102,14 @@ export function importJSON() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    
+
     input.onchange = (e) => {
       const file = e.target.files[0];
       if (!file) {
         reject(new Error('No file selected'));
         return;
       }
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
@@ -122,7 +122,7 @@ export function importJSON() {
       reader.onerror = () => reject(new Error('Failed to read file'));
       reader.readAsText(file);
     };
-    
+
     input.click();
   });
 }
@@ -147,9 +147,7 @@ export class RateLimiter {
     const userAttempts = this.attempts.get(key) || [];
 
     // Remove old attempts outside the window
-    const recentAttempts = userAttempts.filter(
-      timestamp => now - timestamp < this.windowMs
-    );
+    const recentAttempts = userAttempts.filter((timestamp) => now - timestamp < this.windowMs);
 
     if (recentAttempts.length >= this.maxAttempts) {
       return false;
@@ -177,9 +175,7 @@ export class RateLimiter {
   getRemainingAttempts(key) {
     const now = Date.now();
     const userAttempts = this.attempts.get(key) || [];
-    const recentAttempts = userAttempts.filter(
-      timestamp => now - timestamp < this.windowMs
-    );
+    const recentAttempts = userAttempts.filter((timestamp) => now - timestamp < this.windowMs);
     return Math.max(0, this.maxAttempts - recentAttempts.length);
   }
 
@@ -192,7 +188,7 @@ export class RateLimiter {
     const now = Date.now();
     const userAttempts = this.attempts.get(key) || [];
     if (userAttempts.length === 0) return 0;
-    
+
     const oldestAttempt = Math.min(...userAttempts);
     return Math.max(0, this.windowMs - (now - oldestAttempt));
   }

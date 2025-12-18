@@ -7,6 +7,7 @@ This guide provides step-by-step instructions for creating professional screensh
 ## 📸 Required Screenshots
 
 ### Specifications
+
 - **Format**: PNG (high quality)
 - **Dimensions**: 1280x800 pixels (preferred) or 640x400 pixels
 - **Quantity**: 5 minimum, 8 maximum
@@ -53,6 +54,7 @@ location.reload();
 **Purpose**: Show the primary user interface and core features
 
 ### Setup
+
 1. Open extension popup
 2. Add sample messages:
    ```
@@ -68,12 +70,14 @@ location.reload();
 6. Keep theme as Light mode
 
 ### Capture Points
+
 - Full popup visible (all buttons, inputs)
 - Message list populated
 - Controls clearly shown
 - Status showing "Ready" or "Active"
 
 ### Annotations (add with image editor)
+
 - Arrow pointing to "Start Auto-Send" button
 - Label: "Easy one-click automation"
 - Highlight message count: "5 messages"
@@ -86,6 +90,7 @@ location.reload();
 **Purpose**: Showcase webhook management and integration capabilities
 
 ### Setup
+
 1. Click "⚙️ Settings" → Webhooks section
 2. Or use direct button if available
 3. Add sample webhook:
@@ -102,6 +107,7 @@ location.reload();
    - Enabled: ✓
 
 ### Capture Points
+
 - Webhook list with 2 entries visible
 - Statistics showing: "2 enabled, 15 triggers, 0 failures"
 - Event checkboxes visible
@@ -109,6 +115,7 @@ location.reload();
 - CRUD buttons (Add, Edit, Delete) visible
 
 ### Annotations
+
 - Arrow to "Test Webhook" button: "Test before deploying"
 - Circle around statistics: "Track performance"
 - Label on event checkboxes: "8 event types"
@@ -120,6 +127,7 @@ location.reload();
 **Purpose**: Highlight performance tracking and optimization features
 
 ### Setup
+
 1. Click "⚡ Performance" button
 2. Ensure some metrics are populated (run extension for a few minutes first)
 3. Sample data:
@@ -130,12 +138,14 @@ location.reload();
 4. Show recommendations (green checkmark if all optimal)
 
 ### Capture Points
+
 - All 4 stat categories visible
 - Grid layout with cards
 - Recommendations section showing
 - Refresh/Export/Clear buttons visible
 
 ### Annotations
+
 - Arrow to success rate: "Monitor reliability"
 - Highlight recommendations: "Smart optimization tips"
 - Badge on typing speed: "Human-like performance"
@@ -147,6 +157,7 @@ location.reload();
 **Purpose**: Show configuration options and customization
 
 ### Setup
+
 1. Open Settings modal
 2. Show multiple tabs/sections:
    - Message Settings
@@ -157,12 +168,14 @@ location.reload();
    - Template Variables examples
 
 ### Capture Points
+
 - Multiple setting categories visible
 - Toggles, sliders, inputs shown
 - Active hours visualization
 - Language selector showing options
 
 ### Annotations
+
 - Arrow to Active Hours: "Schedule automation"
 - Highlight Anti-Detection: "Bypass detection systems"
 - Label on Template Variables: "Dynamic content"
@@ -174,6 +187,7 @@ location.reload();
 **Purpose**: Demonstrate tracking and reporting capabilities
 
 ### Setup
+
 1. Click "📊 Stats" button
 2. Show analytics dashboard with:
    - Messages Sent Today: 42
@@ -183,12 +197,14 @@ location.reload();
    - Recent activity log
 
 ### Capture Points
+
 - Statistics prominently displayed
 - Charts/graphs visible
 - Export button shown
 - Time-based data
 
 ### Annotations
+
 - Arrow to total messages: "Track all activity"
 - Highlight success rate: "94% reliability"
 - Label on chart: "Visualize trends"
@@ -233,6 +249,7 @@ Use image editing software (Photoshop, GIMP, Figma, Canva):
 ### 3. Quality Check
 
 ✅ **Before uploading, verify:**
+
 - All text is readable at actual size
 - No personal information visible
 - Colors are vibrant and professional
@@ -247,6 +264,7 @@ Use image editing software (Photoshop, GIMP, Figma, Canva):
 ### Small Tile (440x280)
 
 **Template Structure**:
+
 ```
 ┌────────────────────────────────────┐
 │  [Icon 64px]   AutoChat Enhanced   │
@@ -262,6 +280,7 @@ Use image editing software (Photoshop, GIMP, Figma, Canva):
 ```
 
 **Colors**:
+
 - Background: Linear gradient #667eea → #764ba2
 - Text: White (#ffffff)
 - Accent: Light purple (#e0d4f7)
@@ -269,6 +288,7 @@ Use image editing software (Photoshop, GIMP, Figma, Canva):
 ### Large Tile (920x680)
 
 **Template Structure**:
+
 ```
 ┌──────────────────────────────────────────────────┐
 │                                                  │
@@ -292,6 +312,7 @@ Use image editing software (Photoshop, GIMP, Figma, Canva):
 ### Marquee (1400x560)
 
 **Template Structure**:
+
 ```
 ┌────────────────────────────────────────────────────────────────┐
 │  [Icon]  AutoChat Enhanced                                     │
@@ -312,6 +333,7 @@ Use image editing software (Photoshop, GIMP, Figma, Canva):
 ## 🛠️ Tools Recommendations
 
 ### Screenshot Capture
+
 - **Chrome DevTools**: Built-in, free
 - **Lightshot**: Quick annotations
 - **ShareX**: Windows, powerful
@@ -319,6 +341,7 @@ Use image editing software (Photoshop, GIMP, Figma, Canva):
 - **Snagit**: Professional (paid)
 
 ### Image Editing
+
 - **Figma**: Web-based, free for basics
 - **Canva**: Templates available
 - **GIMP**: Free Photoshop alternative
@@ -326,6 +349,7 @@ Use image editing software (Photoshop, GIMP, Figma, Canva):
 - **Sketch**: Mac only (paid)
 
 ### Optimization
+
 - **TinyPNG**: Web-based compression
 - **ImageOptim**: Mac, automatic
 - **PNGGauntlet**: Windows
@@ -394,6 +418,7 @@ Before submitting screenshots:
 ## 🎯 Success Metrics
 
 Good screenshots should:
+
 - ✅ Immediately convey the extension's purpose
 - ✅ Highlight unique features (webhooks, performance)
 - ✅ Look professional and trustworthy
@@ -404,6 +429,7 @@ Good screenshots should:
 ---
 
 **Need Help?**
+
 - Check Chrome Web Store best practices
 - Review successful extension listings
 - Ask for feedback on GitHub discussions

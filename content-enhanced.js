@@ -85,7 +85,7 @@ function processTemplateVariables(text) {
 function addHumanImperfections(text) {
   // Only apply to 10% of messages to stay natural
   if (Math.random() > 0.1) return text;
-  
+
   const imperfections = [
     // Common typos (swap adjacent letters)
     () => {
@@ -101,9 +101,10 @@ function addHumanImperfections(text) {
       return words.join(' ');
     },
     // Missing punctuation at end
-    () => text.endsWith('.') || text.endsWith('!') || text.endsWith('?') ? text.slice(0, -1) : text,
+    () =>
+      text.endsWith('.') || text.endsWith('!') || text.endsWith('?') ? text.slice(0, -1) : text,
     // Double space
-    () => text.replace(/ /g, (match) => Math.random() > 0.95 ? '  ' : match),
+    () => text.replace(/ /g, (match) => (Math.random() > 0.95 ? '  ' : match)),
     // Lowercase start (casual)
     () => text.charAt(0).toLowerCase() + text.slice(1),
     // Extra letter
@@ -115,9 +116,9 @@ function addHumanImperfections(text) {
       const charIdx = Math.floor(Math.random() * word.length);
       words[wordIdx] = word.slice(0, charIdx) + word.charAt(charIdx) + word.slice(charIdx);
       return words.join(' ');
-    }
+    },
   ];
-  
+
   // Randomly pick one imperfection
   const imperfection = imperfections[Math.floor(Math.random() * imperfections.length)];
   return imperfection();
@@ -137,7 +138,10 @@ async function confirmMessageSent(inputEl, expectedText, timeoutMs = 3000) {
       if (inputEl.tagName === 'INPUT' || inputEl.tagName === 'TEXTAREA') {
         return String(inputEl.value || '').trim() !== String(expectedText || '').trim();
       }
-      if (inputEl.contentEditable === 'true' || inputEl.getAttribute('contenteditable') === 'true') {
+      if (
+        inputEl.contentEditable === 'true' ||
+        inputEl.getAttribute('contenteditable') === 'true'
+      ) {
         return String(inputEl.textContent || '').trim() !== String(expectedText || '').trim();
       }
       return true;
@@ -186,7 +190,10 @@ async function confirmMessageSent(inputEl, expectedText, timeoutMs = 3000) {
             if (node.nodeType !== 1) continue;
             const txt = (node.textContent || '').trim();
             if (!txt) continue;
-            if (txt.includes(String(expectedText).trim()) || String(expectedText).trim().includes(txt)) {
+            if (
+              txt.includes(String(expectedText).trim()) ||
+              String(expectedText).trim().includes(txt)
+            ) {
               clearTimeout(obsTimeout);
               observer.disconnect();
               resolve(true);
@@ -196,7 +203,9 @@ async function confirmMessageSent(inputEl, expectedText, timeoutMs = 3000) {
         }
       });
 
-      const observeTarget = messageContainerSelector ? document.querySelector(messageContainerSelector) || document.body : document.body;
+      const observeTarget = messageContainerSelector
+        ? document.querySelector(messageContainerSelector) || document.body
+        : document.body;
       observer.observe(observeTarget, { childList: true, subtree: true });
     });
   }
@@ -210,7 +219,14 @@ function findMessageInDOM(expectedText) {
   const norm = String(expectedText).trim();
   // Check common chat container selectors first for efficiency
   const selectors = [
-    '.message', '.msg', '.message-text', '.bubble', '.chat-message', '.text', '.reply', '.chat__message'
+    '.message',
+    '.msg',
+    '.message-text',
+    '.bubble',
+    '.chat-message',
+    '.text',
+    '.reply',
+    '.chat__message',
   ];
 
   for (const sel of selectors) {
@@ -275,9 +291,9 @@ function checkDailyLimit() {
 // Check if a message contains any of the mention keywords
 function containsMention(text) {
   if (!text || mentionKeywords.length === 0) return false;
-  
+
   const lowerText = text.toLowerCase();
-  return mentionKeywords.some(keyword => {
+  return mentionKeywords.some((keyword) => {
     const lowerKeyword = keyword.toLowerCase();
     // Check for @mention or plain keyword
     return lowerText.includes(`@${lowerKeyword}`) || lowerText.includes(lowerKeyword);
@@ -287,7 +303,10 @@ function containsMention(text) {
 // Generate unique identifier for a message to avoid processing duplicates
 function getMessageId(element) {
   const text = (element.textContent || '').trim();
-  const timestamp = element.getAttribute('data-timestamp') || element.querySelector('[data-timestamp]')?.getAttribute('data-timestamp') || '';
+  const timestamp =
+    element.getAttribute('data-timestamp') ||
+    element.querySelector('[data-timestamp]')?.getAttribute('data-timestamp') ||
+    '';
   return `${text}-${timestamp}`.substring(0, 100);
 }
 
@@ -306,11 +325,11 @@ async function handleMentionDetected(messageElement) {
 
   // Mark as processed
   lastProcessedMessages.add(msgId);
-  
+
   // Limit the set size to prevent memory issues
   if (lastProcessedMessages.size > 100) {
     const oldestEntries = Array.from(lastProcessedMessages).slice(0, 50);
-    oldestEntries.forEach(entry => lastProcessedMessages.delete(entry));
+    oldestEntries.forEach((entry) => lastProcessedMessages.delete(entry));
   }
 
   console.log('[AutoChat] Mention detected! Preparing reply...');
@@ -320,11 +339,12 @@ async function handleMentionDetected(messageElement) {
   await sleep(replyDelay);
 
   // Pick a random reply message
-  const replyMessage = mentionReplyMessages[Math.floor(Math.random() * mentionReplyMessages.length)];
-  
+  const replyMessage =
+    mentionReplyMessages[Math.floor(Math.random() * mentionReplyMessages.length)];
+
   // Process template variables
   let processedMessage = processTemplateVariables(replyMessage);
-  
+
   // Add human-like imperfections
   processedMessage = addHumanImperfections(processedMessage);
 
@@ -353,8 +373,10 @@ function startMentionDetection() {
   console.log('[AutoChat] Starting mention detection...');
 
   // Process existing messages
-  const existingMessages = container.querySelectorAll('[class*="message"], [class*="msg"], [class*="chat"]');
-  existingMessages.forEach(msg => {
+  const existingMessages = container.querySelectorAll(
+    '[class*="message"], [class*="msg"], [class*="chat"]'
+  );
+  existingMessages.forEach((msg) => {
     const text = (msg.textContent || '').trim();
     if (text) {
       lastProcessedMessages.add(getMessageId(msg));
@@ -369,20 +391,22 @@ function startMentionDetection() {
 
         // Check if this node or its children contain messages
         const messagesToCheck = [];
-        
+
         // Check the node itself
         if (node.textContent && node.textContent.trim()) {
           messagesToCheck.push(node);
         }
 
         // Check children (common in chat apps)
-        const childMessages = node.querySelectorAll?.('[class*="message"], [class*="msg"], [class*="chat"]');
+        const childMessages = node.querySelectorAll?.(
+          '[class*="message"], [class*="msg"], [class*="chat"]'
+        );
         if (childMessages) {
           messagesToCheck.push(...Array.from(childMessages));
         }
 
         // Process each potential message
-        messagesToCheck.forEach(msgElement => {
+        messagesToCheck.forEach((msgElement) => {
           const text = (msgElement.textContent || '').trim();
           if (!text) return;
 
@@ -403,7 +427,7 @@ function startMentionDetection() {
 
   mentionObserver.observe(container, {
     childList: true,
-    subtree: true
+    subtree: true,
   });
 
   console.log('[AutoChat] Mention detection active');
@@ -446,7 +470,7 @@ function startChatLogging() {
   chatLogger.startLogging(messageContainerSelector, {
     captureOutgoing: true,
     captureIncoming: true,
-    captureSender: true
+    captureSender: true,
   });
 
   chatLoggingEnabled = true;
@@ -541,7 +565,7 @@ function createChatLogger() {
         timestamp: new Date().toISOString(),
         direction: this.detectDirection(element),
         url: window.location.href,
-        platform: this.detectPlatform()
+        platform: this.detectPlatform(),
       };
 
       this.messageQueue.push(message);
@@ -569,9 +593,11 @@ function createChatLogger() {
     detectPlatform() {
       const url = window.location.href.toLowerCase();
       const hostname = window.location.hostname.toLowerCase();
-      if (hostname === 'web.whatsapp.com' || hostname.endsWith('.web.whatsapp.com')) return 'WhatsApp';
+      if (hostname === 'web.whatsapp.com' || hostname.endsWith('.web.whatsapp.com'))
+        return 'WhatsApp';
       if (hostname === 'discord.com' || hostname.endsWith('.discord.com')) return 'Discord';
-      if (hostname === 'web.telegram.org' || hostname.endsWith('.web.telegram.org')) return 'Telegram';
+      if (hostname === 'web.telegram.org' || hostname.endsWith('.web.telegram.org'))
+        return 'Telegram';
       return 'Unknown';
     },
 
@@ -583,7 +609,7 @@ function createChatLogger() {
       chrome.storage.local.get(['chatLogs'], (data) => {
         let logs = data.chatLogs || [];
         logs.push(...messages);
-        
+
         // Keep last 10000 messages
         if (logs.length > 10000) {
           logs = logs.slice(-10000);
@@ -591,7 +617,7 @@ function createChatLogger() {
 
         chrome.storage.local.set({ chatLogs: logs });
       });
-    }
+    },
   };
 }
 
@@ -609,28 +635,28 @@ function startManualDetection() {
 
   manualDetector.startMonitoring(chatInputSelector, (event) => {
     console.log('[AutoChat] Manual message detected:', event.text);
-    
+
     // Reset the timer as if an automated message was sent
     if (autoSendInterval) {
       // Clear existing timeout
       if (autoSendInterval !== true) {
         clearTimeout(autoSendInterval);
       }
-      
+
       // Schedule next message with normal interval
       const nextInterval = getRandomInterval();
-      console.log(`[AutoChat] Timer reset. Next message in ${(nextInterval/60000).toFixed(2)}m`);
-      
+      console.log(`[AutoChat] Timer reset. Next message in ${(nextInterval / 60000).toFixed(2)}m`);
+
       autoSendInterval = setTimeout(() => {
         scheduleNextMessage();
       }, nextInterval);
     }
-    
+
     // Notify background of manual send
     chrome.runtime.sendMessage({
       action: 'manualMessageDetected',
       message: event.text,
-      timestamp: event.timestamp
+      timestamp: event.timestamp,
     });
   });
 
@@ -653,7 +679,7 @@ function createManualDetector() {
     isMonitoring: false,
     lastValue: '',
     automatedMessages: new Set(),
-    
+
     startMonitoring(inputSelector, callback) {
       if (this.isMonitoring) return;
       const inputEl = document.querySelector(inputSelector);
@@ -672,7 +698,7 @@ function createManualDetector() {
           if (!this.automatedMessages.has(this.lastValue.trim())) {
             callback({
               text: this.lastValue,
-              timestamp: new Date().toISOString()
+              timestamp: new Date().toISOString(),
             });
           }
         }
@@ -702,7 +728,7 @@ function createManualDetector() {
       setTimeout(() => {
         this.automatedMessages.delete(trimmed);
       }, 10000);
-    }
+    },
   };
 }
 
@@ -783,8 +809,12 @@ function startMarkingMode() {
   const hoverHandler = (e) => {
     if (!markingMode) return;
     const target = e.target;
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' ||
-        target.contentEditable === 'true' || target.getAttribute('contenteditable') === 'true') {
+    if (
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.contentEditable === 'true' ||
+      target.getAttribute('contenteditable') === 'true'
+    ) {
       createHighlight(target);
     } else {
       removeHighlight();
@@ -795,8 +825,12 @@ function startMarkingMode() {
     if (!markingMode) return;
     const target = e.target;
 
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' ||
-        target.contentEditable === 'true' || target.getAttribute('contenteditable') === 'true') {
+    if (
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.contentEditable === 'true' ||
+      target.getAttribute('contenteditable') === 'true'
+    ) {
       e.preventDefault();
       e.stopPropagation();
 
@@ -947,7 +981,10 @@ function startMarkingMessageContainerMode() {
 
 function isClickableButton(el) {
   if (!el) return false;
-  if (el.matches('button, [role="button"], input[type="submit"], input[type="button"], .btn, .send')) return true;
+  if (
+    el.matches('button, [role="button"], input[type="submit"], input[type="button"], .btn, .send')
+  )
+    return true;
   // Some UIs use SVG icons inside a button; climb up a bit
   const btn = el.closest('button, [role="button"], input[type="submit"], input[type="button"]');
   return !!btn;
@@ -962,24 +999,27 @@ async function simulateTyping(inputEl, text, wpm = 60) {
     const delayPerChar = 60000 / cpm; // milliseconds per character
 
     let i = 0;
-    const typeInterval = setInterval(() => {
-      if (i < text.length) {
-        const currentText = text.substring(0, i + 1);
+    const typeInterval = setInterval(
+      () => {
+        if (i < text.length) {
+          const currentText = text.substring(0, i + 1);
 
-        if (inputEl.tagName === 'INPUT' || inputEl.tagName === 'TEXTAREA') {
-          inputEl.value = currentText;
-          inputEl.dispatchEvent(new Event('input', { bubbles: true }));
-        } else if (inputEl.contentEditable === 'true') {
-          inputEl.textContent = currentText;
-          inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+          if (inputEl.tagName === 'INPUT' || inputEl.tagName === 'TEXTAREA') {
+            inputEl.value = currentText;
+            inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+          } else if (inputEl.contentEditable === 'true') {
+            inputEl.textContent = currentText;
+            inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+
+          i++;
+        } else {
+          clearInterval(typeInterval);
+          resolve();
         }
-
-        i++;
-      } else {
-        clearInterval(typeInterval);
-        resolve();
-      }
-    }, delayPerChar + (Math.random() * 50 - 25)); // Add randomness ±25ms
+      },
+      delayPerChar + (Math.random() * 50 - 25)
+    ); // Add randomness ±25ms
   });
 }
 
@@ -997,7 +1037,7 @@ async function sendMessage(text, retries = 3) {
       console.warn('[AutoChat] Input field not found:', chatInputSelector);
       if (retries > 0) {
         console.log('[AutoChat] Retrying...', retries, 'attempts left');
-        await new Promise(r => setTimeout(r, 1000));
+        await new Promise((r) => setTimeout(r, 1000));
         return sendMessage(text, retries - 1);
       }
       return false;
@@ -1007,7 +1047,7 @@ async function sendMessage(text, retries = 3) {
 
     // Variable delay before typing (simulate thinking time)
     if (enableVariableDelays) {
-      await new Promise(r => setTimeout(r, 500 + Math.random() * 1500));
+      await new Promise((r) => setTimeout(r, 500 + Math.random() * 1500));
     }
 
     // Process template variables
@@ -1030,7 +1070,7 @@ async function sendMessage(text, retries = 3) {
     }
 
     // Small delay before sending
-    await new Promise(r => setTimeout(r, 200 + Math.random() * 300));
+    await new Promise((r) => setTimeout(r, 200 + Math.random() * 300));
 
     // Try to send the message according to selected method
     let sent = false;
@@ -1038,7 +1078,14 @@ async function sendMessage(text, retries = 3) {
     if (sendMethod === 'enter') {
       // Dispatch a realistic sequence of keyboard events (keydown, keypress, keyup)
       // Many web apps listen for keydown/keypress/keyup; dispatch multiple to increase compatibility.
-      const evtOpts = { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true };
+      const evtOpts = {
+        key: 'Enter',
+        code: 'Enter',
+        keyCode: 13,
+        which: 13,
+        bubbles: true,
+        cancelable: true,
+      };
       const down = new KeyboardEvent('keydown', evtOpts);
       const press = new KeyboardEvent('keypress', evtOpts);
       const up = new KeyboardEvent('keyup', evtOpts);
@@ -1053,10 +1100,17 @@ async function sendMessage(text, retries = 3) {
         // Prefer a visible submit button
         const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
         if (submitBtn) {
-          try { submitBtn.click(); }
-          catch (e) { /* ignore */ }
+          try {
+            submitBtn.click();
+          } catch (e) {
+            /* ignore */
+          }
         } else {
-          try { form.requestSubmit ? form.requestSubmit() : form.submit(); } catch (e) { /* ignore */ }
+          try {
+            form.requestSubmit ? form.requestSubmit() : form.submit();
+          } catch (e) {
+            /* ignore */
+          }
         }
       }
 
@@ -1072,12 +1126,19 @@ async function sendMessage(text, retries = 3) {
       const tryFindButtonNear = () => {
         const parent = inputEl.closest('form') || inputEl.parentElement;
         if (!parent) return null;
-        const candidates = parent.querySelectorAll('button, [role="button"], input[type="submit"], input[type="button"]');
+        const candidates = parent.querySelectorAll(
+          'button, [role="button"], input[type="submit"], input[type="button"]'
+        );
         for (const b of candidates) {
           const btnText = (b.textContent || '').toLowerCase();
           const label = (b.getAttribute('aria-label') || '').toLowerCase();
           const dataTest = (b.getAttribute('data-testid') || '').toLowerCase();
-          if (btnText.includes('send') || btnText.includes('submit') || label.includes('send') || dataTest.includes('send')) {
+          if (
+            btnText.includes('send') ||
+            btnText.includes('submit') ||
+            label.includes('send') ||
+            dataTest.includes('send')
+          ) {
             return b;
           }
         }
@@ -1088,13 +1149,22 @@ async function sendMessage(text, retries = 3) {
 
       if (!btn) {
         // Global search fallback: look for buttons with common send labels
-        const allButtons = document.querySelectorAll('button, [role="button"], input[type="submit"], input[type="button"]');
+        const allButtons = document.querySelectorAll(
+          'button, [role="button"], input[type="submit"], input[type="button"]'
+        );
         for (const b of allButtons) {
           const txt = (b.textContent || '').toLowerCase();
           const label = (b.getAttribute('aria-label') || '').toLowerCase();
           const dataTest = (b.getAttribute('data-testid') || '').toLowerCase();
-          if (txt.includes('send') || txt.includes('senden') || txt.includes('submit') || label.includes('send') || dataTest.includes('send')) {
-            btn = b; break;
+          if (
+            txt.includes('send') ||
+            txt.includes('senden') ||
+            txt.includes('submit') ||
+            label.includes('send') ||
+            dataTest.includes('send')
+          ) {
+            btn = b;
+            break;
           }
         }
       }
@@ -1106,13 +1176,20 @@ async function sendMessage(text, retries = 3) {
           const svgs = parent.querySelectorAll('svg');
           for (const s of svgs) {
             const candidate = s.closest('button, [role="button"]');
-            if (candidate) { btn = candidate; break; }
+            if (candidate) {
+              btn = candidate;
+              break;
+            }
           }
         }
       }
 
       if (btn) {
-        try { btn.click(); } catch (e) { /* some sites block synthetic clicks; ignore */ }
+        try {
+          btn.click();
+        } catch (e) {
+          /* some sites block synthetic clicks; ignore */
+        }
         sent = true;
       } else {
         console.warn('[AutoChat] Send button not found for click method');
@@ -1121,7 +1198,14 @@ async function sendMessage(text, retries = 3) {
 
     if (!sent && sendMethod === 'click') {
       // Fallback: try full Enter sequence if click method failed
-      const evtOpts = { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true };
+      const evtOpts = {
+        key: 'Enter',
+        code: 'Enter',
+        keyCode: 13,
+        which: 13,
+        bubbles: true,
+        cancelable: true,
+      };
       inputEl.dispatchEvent(new KeyboardEvent('keydown', evtOpts));
       inputEl.dispatchEvent(new KeyboardEvent('keypress', evtOpts));
       inputEl.dispatchEvent(new KeyboardEvent('keyup', evtOpts));
@@ -1139,9 +1223,9 @@ async function sendMessage(text, retries = 3) {
       if (confirmed) {
         messagesSentToday++;
         totalMessagesSent++;
-        chrome.runtime.sendMessage({ 
+        chrome.runtime.sendMessage({
           action: 'incrementMessageCount',
-          message: text.substring(0, 100) // Send first 100 chars for webhook
+          message: text.substring(0, 100), // Send first 100 chars for webhook
         });
         console.log('[AutoChat] Message confirmed sent:', text);
         return true;
@@ -1162,7 +1246,7 @@ async function sendMessage(text, retries = 3) {
   } catch (e) {
     console.error('[AutoChat] Error:', e);
     if (retries > 0) {
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise((r) => setTimeout(r, 1000));
       return sendMessage(text, retries - 1);
     }
     return false;
@@ -1230,9 +1314,9 @@ async function scheduleNextMessage() {
     console.log('[AutoChat] Daily limit reached, stopping...');
     stopAutoSend();
     chrome.runtime.sendMessage({ action: 'updateBadge', active: false });
-    chrome.runtime.sendMessage({ 
+    chrome.runtime.sendMessage({
       action: 'dailyLimitReached',
-      limit: dailyLimit
+      limit: dailyLimit,
     });
     return;
   }
@@ -1249,7 +1333,7 @@ async function scheduleNextMessage() {
   await sendMessage(message);
 
   const nextInterval = getRandomInterval();
-  console.log(`[AutoChat] Next message in ${(nextInterval/60000).toFixed(2)}m`);
+  console.log(`[AutoChat] Next message in ${(nextInterval / 60000).toFixed(2)}m`);
 
   autoSendInterval = setTimeout(() => {
     scheduleNextMessage();
@@ -1293,7 +1377,9 @@ function startAutoSend(messages, config = {}) {
   currentMessageIndex = 0;
   recentMessages = [];
 
-  console.log(`[AutoChat] Starting auto-send (${sendMode} mode, ${minInterval}-${maxInterval}m interval)`);
+  console.log(
+    `[AutoChat] Starting auto-send (${sendMode} mode, ${minInterval}-${maxInterval}m interval)`
+  );
 
   // Update badge
   chrome.runtime.sendMessage({ action: 'updateBadge', active: true });
@@ -1305,10 +1391,10 @@ function startAutoSend(messages, config = {}) {
   return true;
 }
 
-  // Allow startAutoSend to also receive updated sendConfirmTimeout in config
-  // (already handled above by reading config when set), but if someone calls
-  // startAutoSend with a config containing sendConfirmTimeout, apply it here
-  // Note: this code path is executed when content script receives startAutoSend message.
+// Allow startAutoSend to also receive updated sendConfirmTimeout in config
+// (already handled above by reading config when set), but if someone calls
+// startAutoSend with a config containing sendConfirmTimeout, apply it here
+// Note: this code path is executed when content script receives startAutoSend message.
 
 function stopAutoSend() {
   if (autoSendInterval) {
@@ -1324,61 +1410,64 @@ function stopAutoSend() {
 // ===== INITIALIZATION =====
 
 // Load saved settings
-chrome.storage.local.get([
-  'chatInputSelector',
-  'sendMethod',
-  'sendButtonSelector',
-  'messagesSentToday',
-  'totalMessagesSent',
-  'lastResetDate',
-  'mentionDetectionEnabled',
-  'mentionKeywords',
-  'mentionReplyMessages',
-  'chatLoggingEnabled',
-  'manualDetectionEnabled'
-], (data) => {
-  if (data.chatInputSelector) {
-    chatInputSelector = data.chatInputSelector;
-    console.log('[AutoChat] Loaded selector:', chatInputSelector);
+chrome.storage.local.get(
+  [
+    'chatInputSelector',
+    'sendMethod',
+    'sendButtonSelector',
+    'messagesSentToday',
+    'totalMessagesSent',
+    'lastResetDate',
+    'mentionDetectionEnabled',
+    'mentionKeywords',
+    'mentionReplyMessages',
+    'chatLoggingEnabled',
+    'manualDetectionEnabled',
+  ],
+  (data) => {
+    if (data.chatInputSelector) {
+      chatInputSelector = data.chatInputSelector;
+      console.log('[AutoChat] Loaded selector:', chatInputSelector);
+    }
+    sendMethod = data.sendMethod || 'enter';
+    sendButtonSelector = data.sendButtonSelector || null;
+
+    messagesSentToday = data.messagesSentToday || 0;
+    totalMessagesSent = data.totalMessagesSent || 0;
+
+    // Reset daily counter if new day
+    const today = new Date().toDateString();
+    if (data.lastResetDate !== today) {
+      messagesSentToday = 0;
+      chrome.storage.local.set({
+        messagesSentToday: 0,
+        lastResetDate: today,
+      });
+    }
+
+    // Load mention detection settings
+    mentionDetectionEnabled = data.mentionDetectionEnabled || false;
+    mentionKeywords = data.mentionKeywords || [];
+    mentionReplyMessages = data.mentionReplyMessages || [];
+
+    // Auto-start mention detection if enabled and container is set
+    if (mentionDetectionEnabled && messageContainerSelector) {
+      setTimeout(() => startMentionDetection(), 1000);
+    }
+
+    // Load chat logging settings
+    chatLoggingEnabled = data.chatLoggingEnabled || false;
+    if (chatLoggingEnabled && messageContainerSelector) {
+      setTimeout(() => startChatLogging(), 1000);
+    }
+
+    // Load manual detection settings
+    manualDetectionEnabled = data.manualDetectionEnabled || false;
+    if (manualDetectionEnabled && chatInputSelector) {
+      setTimeout(() => startManualDetection(), 1000);
+    }
   }
-  sendMethod = data.sendMethod || 'enter';
-  sendButtonSelector = data.sendButtonSelector || null;
-
-  messagesSentToday = data.messagesSentToday || 0;
-  totalMessagesSent = data.totalMessagesSent || 0;
-
-  // Reset daily counter if new day
-  const today = new Date().toDateString();
-  if (data.lastResetDate !== today) {
-    messagesSentToday = 0;
-    chrome.storage.local.set({
-      messagesSentToday: 0,
-      lastResetDate: today
-    });
-  }
-
-  // Load mention detection settings
-  mentionDetectionEnabled = data.mentionDetectionEnabled || false;
-  mentionKeywords = data.mentionKeywords || [];
-  mentionReplyMessages = data.mentionReplyMessages || [];
-
-  // Auto-start mention detection if enabled and container is set
-  if (mentionDetectionEnabled && messageContainerSelector) {
-    setTimeout(() => startMentionDetection(), 1000);
-  }
-
-  // Load chat logging settings
-  chatLoggingEnabled = data.chatLoggingEnabled || false;
-  if (chatLoggingEnabled && messageContainerSelector) {
-    setTimeout(() => startChatLogging(), 1000);
-  }
-
-  // Load manual detection settings
-  manualDetectionEnabled = data.manualDetectionEnabled || false;
-  if (manualDetectionEnabled && chatInputSelector) {
-    setTimeout(() => startManualDetection(), 1000);
-  }
-});
+);
 
 // ===== MESSAGE HANDLERS =====
 
@@ -1403,7 +1492,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 
   if (msg.action === 'sendMessage') {
-    sendMessage(msg.text || '').then(success => {
+    sendMessage(msg.text || '').then((success) => {
       sendResponse({ ok: success });
     });
     return true; // Async response
@@ -1423,7 +1512,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     sendResponse({
       messagesSentToday,
       totalMessagesSent,
-      isActive: !!autoSendInterval
+      isActive: !!autoSendInterval,
     });
   }
 
@@ -1445,7 +1534,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     sendResponse({
       enabled: mentionDetectionEnabled,
       keywords: mentionKeywords,
-      replyMessages: mentionReplyMessages
+      replyMessages: mentionReplyMessages,
     });
   }
 
@@ -1462,7 +1551,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === 'getChatLogStatus') {
     sendResponse({
       enabled: chatLoggingEnabled,
-      isLogging: chatLogger?.isLogging || false
+      isLogging: chatLogger?.isLogging || false,
     });
   }
 
@@ -1479,7 +1568,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === 'getManualDetectionStatus') {
     sendResponse({
       enabled: manualDetectionEnabled,
-      isMonitoring: manualDetector?.isMonitoring || false
+      isMonitoring: manualDetector?.isMonitoring || false,
     });
   }
 

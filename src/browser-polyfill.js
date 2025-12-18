@@ -4,7 +4,7 @@
  */
 
 // Use browser namespace if available (Firefox), otherwise use chrome (Chrome)
-const browserAPI = (typeof browser !== 'undefined') ? browser : chrome;
+const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
 
 // Export unified API
 if (typeof window !== 'undefined') {

@@ -40,13 +40,15 @@ class ManualMessageDetector {
     });
 
     // Observe the input element
-    if (inputElement.contentEditable === 'true' || 
-        inputElement.getAttribute('contenteditable') === 'true') {
+    if (
+      inputElement.contentEditable === 'true' ||
+      inputElement.getAttribute('contenteditable') === 'true'
+    ) {
       // ContentEditable element
       this.inputObserver.observe(inputElement, {
         childList: true,
         subtree: true,
-        characterData: true
+        characterData: true,
       });
     } else {
       // Regular input/textarea - observe parent for value changes via attributes
@@ -54,7 +56,7 @@ class ManualMessageDetector {
       if (parent) {
         this.inputObserver.observe(parent, {
           childList: true,
-          subtree: true
+          subtree: true,
         });
       }
     }
@@ -139,11 +141,11 @@ class ManualMessageDetector {
       // Check if this was NOT an automated message
       if (!this.recentAutomatedMessages.has(previousValue.trim())) {
         console.log('[ManualDetector] Manual send detected:', previousValue);
-        
+
         if (this.onManualSendCallback) {
           this.onManualSendCallback({
             text: previousValue,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
       }
@@ -162,8 +164,7 @@ class ManualMessageDetector {
       return element.value || '';
     }
 
-    if (element.contentEditable === 'true' || 
-        element.getAttribute('contenteditable') === 'true') {
+    if (element.contentEditable === 'true' || element.getAttribute('contenteditable') === 'true') {
       return element.textContent || '';
     }
 

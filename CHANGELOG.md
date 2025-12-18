@@ -5,6 +5,7 @@ All notable changes to AutoChat will be documented in this file.
 ## [4.5.3] - 2025-12-07 - v4.5 Complete Edition
 
 ### Added
+
 - **Performance Monitoring Dashboard**: Real-time performance tracking and optimization
   - Message send statistics (total, success rate, avg duration, failures)
   - Typing speed monitoring (avg WPM, samples)
@@ -22,11 +23,13 @@ All notable changes to AutoChat will be documented in this file.
   - Publishing checklist
 
 ### Changed
+
 - Updated version to 4.5.3
 - Updated popup version display to "v4.5 Integration Foundation"
 - Enhanced UI with performance monitor button
 
 ### Technical
+
 - Performance monitor module (`src/performance.js`)
 - Performance modal with real-time stats
 - Metrics stored in chrome.storage
@@ -34,6 +37,7 @@ All notable changes to AutoChat will be documented in this file.
 - Performance recommendations engine
 
 ### v4.5 Roadmap - ✅ COMPLETE
+
 - ✅ Firefox port (v4.5.2)
 - ✅ Webhook integration (v4.5.0)
 - ✅ Human-like behavior (v4.5.1)
@@ -43,6 +47,7 @@ All notable changes to AutoChat will be documented in this file.
 ## [4.5.2] - 2025-12-07 - Firefox Support
 
 ### Added
+
 - **Firefox Browser Support**: Full cross-browser compatibility
   - Firefox Manifest V2 support
   - `manifest_firefox.json` for Firefox-specific configuration
@@ -57,17 +62,20 @@ All notable changes to AutoChat will be documented in this file.
   - Separate `dist-firefox` output directory
 
 ### Changed
+
 - Updated package.json with Firefox build commands
 - Build system now supports both Chrome and Firefox targets
 - Updated .gitignore to exclude `dist-firefox` directory
 
 ### Technical
+
 - Firefox uses Manifest V2 (browser_action instead of action)
 - Background scripts instead of service workers for Firefox
 - Promise-based browser API namespace
 - Full feature parity with Chrome version
 
 ### Documentation
+
 - Added FIREFOX.md with installation and development guide
 - Firefox-specific troubleshooting section
 - Browser compatibility notes
@@ -76,6 +84,7 @@ All notable changes to AutoChat will be documented in this file.
 ## [4.5.1] - 2025-12-07 - Human-Like Improvements & Donations
 
 ### Added
+
 - **Human-Like Message Imperfections**: Automatic introduction of natural human typing errors (10% of messages)
   - Random typos (adjacent letter swaps)
   - Missing punctuation
@@ -95,12 +104,14 @@ All notable changes to AutoChat will be documented in this file.
   - Reduces detectability when using default phrases
 
 ### Changed
+
 - Completely replaced all farming_phrases files with natural, everyday language
 - Messages now include occasional human-like imperfections for better Turing test performance
 - "Say as less as possible, much as needed" strategy implemented
 - Donation modal accessible from main interface
 
 ### Technical
+
 - Added `addHumanImperfections()` function in content-enhanced.js
 - Applied to both scheduled messages and mention replies
 - Donation modal with clipboard API integration
@@ -109,6 +120,7 @@ All notable changes to AutoChat will be documented in this file.
 ## [4.5.0] - 2025-12-07 - Integration Foundation
 
 ### Added
+
 - **Webhook Integration System**: Complete webhook infrastructure for external integrations
   - 8 event types: message_sent, campaign_started, campaign_stopped, campaign_paused, campaign_resumed, daily_limit_reached, error, milestone
   - Webhook management UI with full CRUD operations
@@ -126,18 +138,20 @@ All notable changes to AutoChat will be documented in this file.
   - Enable/disable webhooks individually
 - **Background Script Integration**: Automatic webhook triggers for all events
 - **Content Script Integration**: Message-level webhook triggers with context data
-- **Documentation**: 
+- **Documentation**:
   - Complete webhook guide (WEBHOOK_GUIDE.md)
   - Integration examples for popular services (WEBHOOK_EXAMPLES.md)
   - Templates for Slack, Discord, Teams, Telegram, and more
 
 ### Changed
+
 - Updated version to 4.5.0
 - Enhanced background script with webhook trigger functionality
 - Enhanced content script to include webhook context in messages
 - Improved CSS with webhook-specific styling (modal-large, webhook-list, etc.)
 
 ### Technical
+
 - Added 33 new tests for webhook functionality (total: 158 tests)
 - All tests passing with zero errors/warnings
 - Build system includes webhook module in dist
@@ -148,12 +162,14 @@ All notable changes to AutoChat will be documented in this file.
 - Maximum 10 webhooks per extension
 
 ### Files Added
+
 - `src/webhooks.js` - Core webhook management module
 - `tests/unit/webhooks.test.js` - Comprehensive webhook tests
 - `WEBHOOK_GUIDE.md` - Complete webhook documentation
 - `WEBHOOK_EXAMPLES.md` - Integration examples and templates
 
 ### Files Modified
+
 - `popup-enhanced.html` - Added webhook management modal and settings
 - `popup-enhanced.js` - Integrated webhook manager UI
 - `styles.css` - Added webhook-specific styles
@@ -165,6 +181,7 @@ All notable changes to AutoChat will be documented in this file.
 ## [4.4.0] - 2025-11-28 - UI Polish Edition
 
 ### Added
+
 - **Notification Center**: In-app notification history panel with full CRUD operations
   - View all notifications with icons based on type
   - Mark notifications as read (individual or all)
@@ -185,18 +202,21 @@ All notable changes to AutoChat will be documented in this file.
 - **Improved UI**: Better button layout and organization
 
 ### Changed
+
 - Updated version to 4.4.0
 - Reorganized category display code to avoid conflicts
 - Enhanced notification module with history tracking
 - Improved button layout in control section
 
 ### Technical
+
 - Added 10 new tests for notification history functionality (119 total tests)
 - Updated `src/notifications.js` with history management
 - Added new UI elements and styles for notification center and category manager
 - Added `header-actions` container for better header organization
 
 ### Files Modified
+
 - `popup-enhanced.html` - Added notification center, category manager, and help modals
 - `popup-enhanced.js` - Added notification center and category manager logic
 - `styles.css` - Added styles for new UI components
@@ -208,6 +228,7 @@ All notable changes to AutoChat will be documented in this file.
 ## [4.3.0] - 2025-11-22 - Multi-Language Phrases Edition
 
 ### Added
+
 - **Multi-Language Farming Phrases**: Language-specific phrase libraries for enhanced user experience
   - English (en): 671+ original phrases
   - Urdu (ur): 300+ culturally adapted phrases
@@ -219,6 +240,7 @@ All notable changes to AutoChat will be documented in this file.
 - **Documentation**: New MULTI_LANGUAGE_PHRASES.md guide for adding languages
 
 ### Changed
+
 - Updated `loadDefaultPhrasesFromFile()` to support dynamic language loading
 - Enhanced build script to copy language-specific phrase files and locales directory
 - Updated manifest.json to include all phrase files as web_accessible_resources
@@ -226,13 +248,15 @@ All notable changes to AutoChat will be documented in this file.
 - Improved i18n.js to support Spanish language
 
 ### Technical
+
 - Created `farming_phrases_en.txt`, `farming_phrases_ur.txt`, `farming_phrases_es.txt`
 - Added `_locales/es/messages.json` with full Spanish translations
 - Updated test setup to mock chrome.i18n API
-- Enhanced build script with recursive directory copying for _locales and src
+- Enhanced build script with recursive directory copying for \_locales and src
 - All 82 tests passing with new language-specific tests
 
 ### Files Added
+
 - `farming_phrases_en.txt` - English phrases (671 lines)
 - `farming_phrases_ur.txt` - Urdu phrases (300 lines)
 - `farming_phrases_es.txt` - Spanish phrases (300 lines)
@@ -243,6 +267,7 @@ All notable changes to AutoChat will be documented in this file.
 ## [4.1.0] - 2025-10-19 - Professional Edition
 
 ### Added
+
 - **Dark Mode**: Toggle between light and dark themes with smooth transitions
 - **Keyboard Shortcuts**: Ctrl+S (start), Ctrl+X (stop), Ctrl+P (pause), Escape (close modals)
 - **Pause/Resume**: Temporarily halt auto-send without stopping completely
@@ -257,6 +282,7 @@ All notable changes to AutoChat will be documented in this file.
 - **Documentation**: CONTRIBUTING.md, RELEASE_NOTES, SCREENSHOTS guide
 
 ### Changed
+
 - Auto-save now debounced (1 second delay) for better performance
 - Improved theme persistence across sessions
 - Enhanced modal scrolling and rendering
@@ -264,6 +290,7 @@ All notable changes to AutoChat will be documented in this file.
 - Optimized phrase list rendering
 
 ### Technical
+
 - Added `package.json` with comprehensive dev dependencies
 - Created `src/` directory for utility modules
 - Added `tests/` directory with unit and integration tests
@@ -274,6 +301,7 @@ All notable changes to AutoChat will be documented in this file.
 - Created rate limiter class
 
 ### Developer Experience
+
 - New commands: `npm run build`, `npm test`, `npm run lint`
 - Watch mode: `npm run watch` for auto-rebuild
 - Package command: `npm run package` for distribution
@@ -283,6 +311,7 @@ All notable changes to AutoChat will be documented in this file.
 ## [4.0.0] - 2025-10-18 - Enhanced Edition
 
 ### Added
+
 - **Typing Simulation**: Realistic character-by-character typing with variable WPM (40-80)
 - **Anti-Detection Features**:
   - Variable delays (0.5-2s thinking time)
@@ -324,6 +353,7 @@ All notable changes to AutoChat will be documented in this file.
   - Daily counter reset at midnight
 
 ### Changed
+
 - Upgraded UI from basic to modern gradient design
 - Improved file structure (content-enhanced.js, popup-enhanced.js)
 - Better code organization and documentation
@@ -331,6 +361,7 @@ All notable changes to AutoChat will be documented in this file.
 - Improved input field detection and validation
 
 ### Technical
+
 - Added `background.js` service worker
 - Created `styles.css` for modern styling
 - Implemented template variable processing
@@ -341,6 +372,7 @@ All notable changes to AutoChat will be documented in this file.
 ## [3.0.0] - 2025-10-17
 
 ### Added
+
 - Complete rewrite of extension
 - Random and sequential send modes
 - Customizable time intervals
@@ -350,6 +382,7 @@ All notable changes to AutoChat will be documented in this file.
 - Universal website compatibility
 
 ### Changed
+
 - Migrated to Manifest V3
 - Improved content script injection
 - Better UI/UX design
@@ -358,6 +391,7 @@ All notable changes to AutoChat will be documented in this file.
 ## [2.0.0] - Previous Version
 
 ### Added
+
 - Basic automation features
 - Simple popup interface
 - Message rotation
@@ -365,6 +399,7 @@ All notable changes to AutoChat will be documented in this file.
 ## [1.0.0] - Initial Release
 
 ### Added
+
 - Basic message sending
 - Simple field marking
 - Manual controls

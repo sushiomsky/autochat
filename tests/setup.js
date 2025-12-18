@@ -26,7 +26,7 @@ global.chrome = {
       clear: jest.fn((callback) => {
         if (callback) callback();
         return Promise.resolve();
-      })
+      }),
     },
     sync: {
       get: jest.fn((keys, callback) => {
@@ -36,8 +36,8 @@ global.chrome = {
       set: jest.fn((items, callback) => {
         if (callback) callback();
         return Promise.resolve();
-      })
-    }
+      }),
+    },
   },
   runtime: {
     sendMessage: jest.fn((message, callback) => {
@@ -46,12 +46,11 @@ global.chrome = {
     }),
     getURL: jest.fn((path) => `chrome-extension://test/${path}`),
     lastError: null,
-    id: 'test-extension-id'
-    ,
+    id: 'test-extension-id',
     onMessage: {
       addListener: jest.fn(),
-      removeListener: jest.fn()
-    }
+      removeListener: jest.fn(),
+    },
   },
   tabs: {
     query: jest.fn((queryInfo, callback) => {
@@ -67,14 +66,14 @@ global.chrome = {
       const tab = { id: 2, ...createProperties };
       if (callback) callback(tab);
       return Promise.resolve(tab);
-    })
+    }),
   },
   scripting: {
     executeScript: jest.fn((injection, callback) => {
       const results = [{ result: null }];
       if (callback) callback(results);
       return Promise.resolve(results);
-    })
+    }),
   },
   i18n: {
     getMessage: jest.fn((key, _substitutions) => {
@@ -85,8 +84,8 @@ global.chrome = {
       const languages = ['en'];
       if (callback) callback(languages);
       return Promise.resolve(languages);
-    })
-  }
+    }),
+  },
 };
 
 // Reset mocks before each test

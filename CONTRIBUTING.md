@@ -3,6 +3,7 @@
 Thank you for your interest in contributing! This document provides guidelines and instructions for contributing to the project.
 
 ## Table of Contents
+
 - [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
 - [Development Setup](#development-setup)
@@ -36,16 +37,19 @@ Thank you for your interest in contributing! This document provides guidelines a
 ## Development Setup
 
 ### Prerequisites
+
 - Node.js 16+ and npm
 - Google Chrome browser
 - Git
 
 ### Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### Build the Extension
+
 ```bash
 # Development build
 npm run build
@@ -58,6 +62,7 @@ npm run watch
 ```
 
 ### Load Extension in Chrome
+
 1. Open Chrome and navigate to `chrome://extensions/`
 2. Enable "Developer mode" (top-right toggle)
 3. Click "Load unpacked"
@@ -66,6 +71,7 @@ npm run watch
 ## Development Workflow
 
 ### Branch Naming
+
 - `feature/description` - New features
 - `fix/description` - Bug fixes
 - `docs/description` - Documentation updates
@@ -75,6 +81,7 @@ npm run watch
 ### Making Changes
 
 1. **Create a branch**:
+
    ```bash
    git checkout -b feature/my-new-feature
    ```
@@ -86,12 +93,14 @@ npm run watch
    - Update documentation as needed
 
 3. **Test your changes**:
+
    ```bash
    npm test
    npm run lint
    ```
 
 4. **Commit your changes**:
+
    ```bash
    git add .
    git commit -m "feat: add new feature description"
@@ -109,21 +118,25 @@ npm run watch
 ## Testing
 
 ### Run All Tests
+
 ```bash
 npm test
 ```
 
 ### Run Tests in Watch Mode
+
 ```bash
 npm run test:watch
 ```
 
 ### Run Tests with Coverage
+
 ```bash
 npm run test:coverage
 ```
 
 ### Writing Tests
+
 - Place unit tests in `tests/unit/`
 - Place integration tests in `tests/integration/`
 - Follow the existing test structure
@@ -131,6 +144,7 @@ npm run test:coverage
 - Test edge cases and error conditions
 
 ### Test Example
+
 ```javascript
 describe('MyFeature', () => {
   test('should do something', () => {
@@ -143,6 +157,7 @@ describe('MyFeature', () => {
 ## Coding Standards
 
 ### JavaScript Style
+
 - Use ES6+ features
 - Use `const` by default, `let` when reassignment needed
 - Use arrow functions for callbacks
@@ -151,7 +166,9 @@ describe('MyFeature', () => {
 - Keep functions small and focused
 
 ### Code Formatting
+
 We use Prettier and ESLint:
+
 ```bash
 # Format code
 npm run format
@@ -167,6 +184,7 @@ npm run lint:fix
 ```
 
 ### JSDoc Example
+
 ```javascript
 /**
  * Sends a message to the chat input field
@@ -180,6 +198,7 @@ async function sendMessage(text, retries = 3) {
 ```
 
 ### File Organization
+
 ```
 autochat/
 ├── src/              # Source files (future)
@@ -196,12 +215,14 @@ autochat/
 ### Pull Request Process
 
 1. **Update your fork**:
+
    ```bash
    git fetch upstream
    git rebase upstream/main
    ```
 
 2. **Push to your fork**:
+
    ```bash
    git push origin feature/my-new-feature
    ```
@@ -214,6 +235,7 @@ autochat/
    - Request review from maintainers
 
 ### PR Requirements
+
 - ✅ All tests pass
 - ✅ Code is linted and formatted
 - ✅ No merge conflicts
@@ -222,42 +244,51 @@ autochat/
 - ✅ Screenshots provided (for UI changes)
 
 ### PR Template
+
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Unit tests added/updated
 - [ ] Manual testing completed
 - [ ] All tests passing
 
 ## Screenshots (if applicable)
+
 Add screenshots here
 
 ## Related Issues
+
 Closes #123
 ```
 
 ## Reporting Bugs
 
 ### Before Submitting
+
 - Check existing issues to avoid duplicates
 - Test with the latest version
 - Gather all relevant information
 
 ### Bug Report Template
+
 ```markdown
 **Describe the bug**
 Clear description of what the bug is
 
 **To Reproduce**
 Steps to reproduce:
+
 1. Go to '...'
 2. Click on '...'
 3. See error
@@ -269,6 +300,7 @@ What you expected to happen
 If applicable, add screenshots
 
 **Environment:**
+
 - OS: [e.g., Windows 10]
 - Browser: [e.g., Chrome 120]
 - Extension Version: [e.g., 4.0.0]
@@ -280,6 +312,7 @@ Any other relevant information
 ## Feature Requests
 
 ### Feature Request Template
+
 ```markdown
 **Is your feature request related to a problem?**
 Clear description of the problem

@@ -7,17 +7,20 @@ AutoChat now supports language-specific farming phrase libraries! The extension 
 The extension now includes farming phrases in the following languages:
 
 ### 1. **English (en)** - Default
+
 - File: `farming_phrases_en.txt`
 - 671+ phrases
 - Original English phrases with casino and gaming humor
 
 ### 2. **Urdu (ur)** - اردو
+
 - File: `farming_phrases_ur.txt`
 - 300+ phrases
 - Culturally adapted phrases for Urdu-speaking users
 - Includes gaming and casino-themed humor translated to Urdu
 
 ### 3. **Spanish (es)** - Español
+
 - File: `farming_phrases_es.txt`
 - 300+ phrases
 - Spanish translations with culturally relevant humor
@@ -53,15 +56,15 @@ The phrase loading logic in `popup-enhanced.js`:
 async function loadDefaultPhrasesFromFile() {
   try {
     // Get current locale from storage or browser default
-    const storageData = await new Promise(resolve => {
+    const storageData = await new Promise((resolve) => {
       chrome.storage.local.get(['locale'], resolve);
     });
     const locale = storageData.locale || chrome.i18n.getUILanguage().split('-')[0] || 'en';
-    
+
     // Try to load language-specific phrases, fallback to English
     let phraseFile = `farming_phrases_${locale}.txt`;
     let response;
-    
+
     try {
       response = await fetch(chrome.runtime.getURL(phraseFile));
       if (!response.ok) throw new Error('File not found');
@@ -70,9 +73,12 @@ async function loadDefaultPhrasesFromFile() {
       phraseFile = 'farming_phrases_en.txt';
       response = await fetch(chrome.runtime.getURL(phraseFile));
     }
-    
+
     const text = await response.text();
-    defaultPhrases = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    defaultPhrases = text
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
     console.log(`[AutoChat] Loaded ${defaultPhrases.length} default phrases from ${phraseFile}`);
     return defaultPhrases;
   } catch (error) {
@@ -158,7 +164,7 @@ const filesToCopy = [
   'farming_phrases_en.txt',
   'farming_phrases_ur.txt',
   'farming_phrases_es.txt',
-  'farming_phrases_fr.txt',  // Add new language
+  'farming_phrases_fr.txt', // Add new language
   // ... other files
 ];
 ```
@@ -189,7 +195,7 @@ test('should load French phrases when locale is set to fr', async () => {
   global.fetch = jest.fn(() =>
     Promise.resolve({
       ok: true,
-      text: () => Promise.resolve('Phrase française 1\nPhrase française 2')
+      text: () => Promise.resolve('Phrase française 1\nPhrase française 2'),
     })
   );
 
@@ -198,7 +204,7 @@ test('should load French phrases when locale is set to fr', async () => {
   });
 
   const phrases = await loadPhrases();
-  
+
   expect(phrases).toHaveLength(2);
   expect(phrases[0]).toBe('Phrase française 1');
 });
@@ -271,6 +277,7 @@ npm test
 ```
 
 Language-specific tests verify:
+
 - Correct file loading based on locale
 - Fallback to English for unsupported languages
 - Browser locale detection with region codes
@@ -279,6 +286,7 @@ Language-specific tests verify:
 ## Browser Compatibility
 
 The multi-language phrase system works with:
+
 - Chrome Extension Manifest V3
 - Chrome i18n API
 - Standard fetch API for loading files
@@ -294,6 +302,7 @@ The multi-language phrase system works with:
 ## Future Enhancements
 
 Planned additions:
+
 - Arabic (ar) - RTL support
 - French (fr)
 - German (de)
@@ -307,6 +316,7 @@ Planned additions:
 ## Support
 
 For issues or questions about multi-language phrases:
+
 - Open an issue on GitHub with the `i18n` label
 - Include your language preference and browser locale
 - Provide console logs if phrases aren't loading

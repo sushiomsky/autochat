@@ -10,12 +10,14 @@
 ## 📦 Downloads
 
 ### For Users (Chrome Extension)
+
 - **autochat-v4.2.0.tar.gz** - Ready-to-use extension package
   - Extract and load in Chrome as unpacked extension
   - All features included
   - Size: ~41 KB
 
 ### For Developers (Full Source)
+
 - **autochat-v4.2.0-source.tar.gz** - Complete source code
   - Includes all source files and tests
   - Development tools and scripts
@@ -27,18 +29,23 @@
 ## 🆕 What's New in v4.2
 
 ### 🔔 Browser Notifications
+
 Desktop notifications for all events with customizable sounds
 
 ### 👁️ Message Preview & Dry-Run Mode
+
 Test messages safely before sending with warning detection
 
 ### 📁 Phrase Categories & Tags
+
 Organize your messages with 10 default categories and custom tags
 
 ### ⚡ Command Palette (Ctrl+K)
+
 Instant access to all features with fuzzy search and keyboard navigation
 
 ### 😊 Emoji Picker
+
 300+ emojis organized in 10 categories with smart search
 
 ---
@@ -59,7 +66,7 @@ Instant access to all features with fuzzy search and keyboard navigation
 
 1. **Download**: Get `autochat-v4.2.0.tar.gz` from releases
 2. **Extract**: `tar -xzf autochat-v4.2.0.tar.gz`
-3. **Install**: 
+3. **Install**:
    - Open Chrome → `chrome://extensions/`
    - Enable "Developer mode"
    - Click "Load unpacked"
@@ -173,18 +180,21 @@ New features are additive - everything from v4.1 works exactly the same.
 ## 🗺️ Roadmap
 
 ### v4.3 (Next)
+
 - UI integration for all v4.2 features
 - Visual improvements and animations
 - User onboarding tutorial
 - Analytics dashboard with charts
 
 ### v4.4
+
 - Firefox port
 - Multi-language support (i18n)
 - Advanced scheduling calendar
 - Webhook integration
 
 ### v5.0
+
 - Cloud sync (optional)
 - AI message generation
 - Team collaboration
@@ -194,17 +204,17 @@ New features are additive - everything from v4.1 works exactly the same.
 
 ## 📈 Version Comparison
 
-| Feature | v4.1 | v4.2 |
-|---------|------|------|
-| Browser Notifications | ❌ | ✅ |
-| Message Preview | ❌ | ✅ |
-| Dry-Run Mode | ❌ | ✅ |
-| Phrase Categories | ❌ | ✅ |
-| Tags System | ❌ | ✅ |
-| Command Palette | ❌ | ✅ |
-| Emoji Picker | ❌ | ✅ |
-| Tests | 28 | 75 |
-| Features | 22 | 72+ |
+| Feature               | v4.1 | v4.2 |
+| --------------------- | ---- | ---- |
+| Browser Notifications | ❌   | ✅   |
+| Message Preview       | ❌   | ✅   |
+| Dry-Run Mode          | ❌   | ✅   |
+| Phrase Categories     | ❌   | ✅   |
+| Tags System           | ❌   | ✅   |
+| Command Palette       | ❌   | ✅   |
+| Emoji Picker          | ❌   | ✅   |
+| Tests                 | 28   | 75   |
+| Features              | 22   | 72+  |
 
 ---
 
@@ -248,7 +258,7 @@ See [LICENSE](LICENSE) file for details.
 ✅ **75 Tests** - 100% passing  
 ✅ **Complete API** - Fully documented  
 ✅ **Modular Code** - Clean architecture  
-✅ **Zero Errors** - Professional quality  
+✅ **Zero Errors** - Professional quality
 
 ---
 

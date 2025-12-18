@@ -18,7 +18,7 @@ describe('CategoryManager', () => {
       getDefaultCategories() {
         return [
           { id: 'greetings', name: 'Greetings', icon: '👋', color: '#667eea' },
-          { id: 'questions', name: 'Questions', icon: '❓', color: '#f093fb' }
+          { id: 'questions', name: 'Questions', icon: '❓', color: '#f093fb' },
         ];
       }
 
@@ -33,7 +33,7 @@ describe('CategoryManager', () => {
           name: category.name,
           icon: category.icon || '📁',
           color: category.color || '#667eea',
-          created: new Date().toISOString()
+          created: new Date().toISOString(),
         };
         this.categories.push(newCategory);
         return id;
@@ -49,11 +49,11 @@ describe('CategoryManager', () => {
           created: new Date().toISOString(),
           usageCount: 0,
           lastUsed: null,
-          favorite: false
+          favorite: false,
         };
-        
+
         this.phrases.set(id, phrase);
-        tags.forEach(tag => this.tags.add(tag));
+        tags.forEach((tag) => this.tags.add(tag));
         return id;
       }
 
@@ -62,7 +62,7 @@ describe('CategoryManager', () => {
         if (phrase) {
           this.phrases.set(phraseId, { ...phrase, ...updates });
           if (updates.tags) {
-            updates.tags.forEach(tag => this.tags.add(tag));
+            updates.tags.forEach((tag) => this.tags.add(tag));
           }
         }
       }
@@ -72,22 +72,20 @@ describe('CategoryManager', () => {
       }
 
       getPhrasesByCategory(categoryId) {
-        return Array.from(this.phrases.values())
-          .filter(p => p.category === categoryId);
+        return Array.from(this.phrases.values()).filter((p) => p.category === categoryId);
       }
 
       getPhrasesByTag(tag) {
-        return Array.from(this.phrases.values())
-          .filter(p => p.tags.includes(tag));
+        return Array.from(this.phrases.values()).filter((p) => p.tags.includes(tag));
       }
 
       searchPhrases(query) {
         const lowerQuery = query.toLowerCase();
-        return Array.from(this.phrases.values())
-          .filter(p => 
+        return Array.from(this.phrases.values()).filter(
+          (p) =>
             p.text.toLowerCase().includes(lowerQuery) ||
-            p.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
-          );
+            p.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))
+        );
       }
 
       toggleFavorite(phraseId) {
@@ -134,27 +132,23 @@ describe('CategoryManager', () => {
     const id = manager.addCategory({
       name: 'Custom',
       icon: '🎯',
-      color: '#ff0000'
+      color: '#ff0000',
     });
-    
+
     expect(id).toBeDefined();
     const categories = manager.getCategories();
     expect(categories).toHaveLength(3);
-    
-    const newCategory = categories.find(c => c.id === id);
+
+    const newCategory = categories.find((c) => c.id === id);
     expect(newCategory.name).toBe('Custom');
     expect(newCategory.icon).toBe('🎯');
   });
 
   test('should add a phrase with category and tags', () => {
-    const phraseId = manager.addPhrase(
-      'Hello, how are you?',
-      'greetings',
-      ['friendly', 'casual']
-    );
-    
+    const phraseId = manager.addPhrase('Hello, how are you?', 'greetings', ['friendly', 'casual']);
+
     expect(phraseId).toBeDefined();
-    
+
     const phrases = manager.getPhrasesByCategory('greetings');
     expect(phrases).toHaveLength(1);
     expect(phrases[0].text).toBe('Hello, how are you?');
@@ -163,14 +157,14 @@ describe('CategoryManager', () => {
 
   test('should update a phrase', () => {
     const id = manager.addPhrase('Original text', 'greetings', ['old']);
-    
+
     manager.updatePhrase(id, {
       text: 'Updated text',
-      tags: ['new']
+      tags: ['new'],
     });
-    
+
     const phrases = Array.from(manager.phrases.values());
-    const updated = phrases.find(p => p.id === id);
+    const updated = phrases.find((p) => p.id === id);
     expect(updated.text).toBe('Updated text');
     expect(updated.tags).toEqual(['new']);
   });
@@ -178,7 +172,7 @@ describe('CategoryManager', () => {
   test('should delete a phrase', () => {
     const id = manager.addPhrase('Test', 'greetings', []);
     expect(manager.phrases.size).toBe(1);
-    
+
     manager.deletePhrase(id);
     expect(manager.phrases.size).toBe(0);
   });
@@ -187,10 +181,10 @@ describe('CategoryManager', () => {
     manager.addPhrase('Hi', 'greetings', []);
     manager.addPhrase('Hello', 'greetings', []);
     manager.addPhrase('Why?', 'questions', []);
-    
+
     const greetings = manager.getPhrasesByCategory('greetings');
     const questions = manager.getPhrasesByCategory('questions');
-    
+
     expect(greetings).toHaveLength(2);
     expect(questions).toHaveLength(1);
   });
@@ -199,7 +193,7 @@ describe('CategoryManager', () => {
     manager.addPhrase('Phrase 1', 'greetings', ['friendly']);
     manager.addPhrase('Phrase 2', 'greetings', ['friendly', 'casual']);
     manager.addPhrase('Phrase 3', 'questions', ['formal']);
-    
+
     const friendly = manager.getPhrasesByTag('friendly');
     expect(friendly).toHaveLength(2);
   });
@@ -208,7 +202,7 @@ describe('CategoryManager', () => {
     manager.addPhrase('Hello world', 'greetings', []);
     manager.addPhrase('Goodbye world', 'greetings', []);
     manager.addPhrase('Hi there', 'greetings', []);
-    
+
     const results = manager.searchPhrases('world');
     expect(results).toHaveLength(2);
   });
@@ -216,7 +210,7 @@ describe('CategoryManager', () => {
   test('should search phrases by tag', () => {
     manager.addPhrase('Message 1', 'greetings', ['friendly']);
     manager.addPhrase('Message 2', 'greetings', ['formal']);
-    
+
     const results = manager.searchPhrases('friendly');
     expect(results).toHaveLength(1);
     expect(results[0].text).toBe('Message 1');
@@ -224,27 +218,27 @@ describe('CategoryManager', () => {
 
   test('should toggle favorite status', () => {
     const id = manager.addPhrase('Test', 'greetings', []);
-    
+
     const phrase = manager.phrases.get(id);
     expect(phrase.favorite).toBe(false);
-    
+
     manager.toggleFavorite(id);
     expect(phrase.favorite).toBe(true);
-    
+
     manager.toggleFavorite(id);
     expect(phrase.favorite).toBe(false);
   });
 
   test('should track usage count', () => {
     const id = manager.addPhrase('Test', 'greetings', []);
-    
+
     const phrase = manager.phrases.get(id);
     expect(phrase.usageCount).toBe(0);
-    
+
     manager.markUsed(id);
     expect(phrase.usageCount).toBe(1);
     expect(phrase.lastUsed).toBeDefined();
-    
+
     manager.markUsed(id);
     expect(phrase.usageCount).toBe(2);
   });
@@ -253,14 +247,14 @@ describe('CategoryManager', () => {
     const id1 = manager.addPhrase('Phrase 1', 'greetings', []);
     const id2 = manager.addPhrase('Phrase 2', 'greetings', []);
     const id3 = manager.addPhrase('Phrase 3', 'greetings', []);
-    
+
     manager.markUsed(id1);
     manager.markUsed(id2);
     manager.markUsed(id2);
     manager.markUsed(id3);
     manager.markUsed(id3);
     manager.markUsed(id3);
-    
+
     const mostUsed = manager.getMostUsed(3);
     expect(mostUsed).toHaveLength(3);
     expect(mostUsed[0].text).toBe('Phrase 3'); // 3 uses
@@ -271,7 +265,7 @@ describe('CategoryManager', () => {
   test('should track all tags', () => {
     manager.addPhrase('P1', 'greetings', ['tag1', 'tag2']);
     manager.addPhrase('P2', 'greetings', ['tag2', 'tag3']);
-    
+
     const tags = manager.getTags();
     expect(tags).toEqual(['tag1', 'tag2', 'tag3']);
   });

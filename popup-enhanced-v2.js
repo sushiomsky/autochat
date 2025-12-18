@@ -50,7 +50,7 @@ async function ensureContentScript(tabId) {
   try {
     await chrome.scripting.executeScript({
       target: { tabId },
-      files: ['content-enhanced.js']
+      files: ['content-enhanced.js'],
     });
     console.log('[Popup] content-enhanced.js injected');
   } catch (err) {
@@ -64,14 +64,14 @@ async function sendMessageToContent(msg) {
     showNotification('No active tab found!', false);
     return null;
   }
-  
+
   try {
     return await chrome.tabs.sendMessage(tab.id, msg);
   } catch (err) {
     console.log('[Popup] Reinjecting content script...');
     await ensureContentScript(tab.id);
-    await new Promise(r => setTimeout(r, 500));
-    
+    await new Promise((r) => setTimeout(r, 500));
+
     try {
       return await chrome.tabs.sendMessage(tab.id, msg);
     } catch (err2) {
@@ -91,10 +91,10 @@ const elements = {
   sendMode: document.getElementById('sendMode'),
   minInterval: document.getElementById('minInterval'),
   maxInterval: document.getElementById('maxInterval'),
-  
+
   // Theme toggle
   themeToggle: document.getElementById('themeToggle'),
-  
+
   // Advanced Settings
   dailyLimit: document.getElementById('dailyLimit'),
   typingSimulation: document.getElementById('typingSimulation'),
@@ -104,29 +104,29 @@ const elements = {
   activeHours: document.getElementById('activeHours'),
   activeHoursStart: document.getElementById('activeHoursStart'),
   activeHoursEnd: document.getElementById('activeHoursEnd'),
-  
+
   // Buttons
   pauseButton: document.getElementById('pauseAutoSend'),
-  
+
   // Analytics
   messagesSentToday: document.getElementById('messagesSentToday'),
   totalMessages: document.getElementById('totalMessages'),
   autoSendStatus: document.getElementById('autoSendStatus'),
-  
+
   // Modals
   settingsModal: document.getElementById('settingsModal'),
   phraseModal: document.getElementById('phraseModal'),
   analyticsModal: document.getElementById('analyticsModal'),
-  
+
   // Phrase management
   customPhrasesList: document.getElementById('customPhrasesList'),
   defaultPhrasesList: document.getElementById('defaultPhrasesList'),
   customPhrasesCount: document.getElementById('customPhrasesCount'),
   defaultPhrasesCount: document.getElementById('defaultPhrasesCount'),
   newPhraseInput: document.getElementById('newPhraseInput'),
-  
+
   // Notifications
-  notification: document.getElementById('notification')
+  notification: document.getElementById('notification'),
 };
 
 // ===== STATE =====
@@ -188,22 +188,22 @@ function handleKeyboardShortcuts(e) {
     e.preventDefault();
     document.getElementById('startAutoSend')?.click();
   }
-  
+
   // Ctrl+X: Stop
   if (e.ctrlKey && e.key === 'x') {
     e.preventDefault();
     document.getElementById('stopAutoSend')?.click();
   }
-  
+
   // Ctrl+P: Pause/Resume
   if (e.ctrlKey && e.key === 'p') {
     e.preventDefault();
     togglePause();
   }
-  
+
   // Escape: Close modals
   if (e.key === 'Escape') {
-    document.querySelectorAll('.modal.show').forEach(modal => {
+    document.querySelectorAll('.modal.show').forEach((modal) => {
       modal.classList.remove('show');
     });
   }
@@ -218,11 +218,11 @@ document.addEventListener('keydown', handleKeyboardShortcuts);
  */
 async function togglePause() {
   isPaused = !isPaused;
-  
-  const response = await sendMessageToContent({ 
-    action: isPaused ? 'pauseAutoSend' : 'resumeAutoSend'
+
+  const response = await sendMessageToContent({
+    action: isPaused ? 'pauseAutoSend' : 'resumeAutoSend',
   });
-  
+
   if (response && response.ok) {
     if (isPaused) {
       elements.pauseButton.textContent = '▶️ Resume';
@@ -247,7 +247,7 @@ function showNotification(message, isSuccess = true) {
   const notification = elements.notification;
   notification.textContent = sanitizeInput(message);
   notification.className = 'notification ' + (isSuccess ? 'success' : 'error') + ' show';
-  
+
   setTimeout(() => {
     notification.classList.remove('show');
   }, 3000);
@@ -263,22 +263,22 @@ async function exportAnalytics() {
     const stats = await new Promise((resolve) => {
       chrome.runtime.sendMessage({ action: 'getStats' }, resolve);
     });
-    
+
     const analyticsData = {
       exportDate: new Date().toISOString(),
       version: '4.0',
       statistics: {
         messagesSentToday: stats?.messagesSentToday || 0,
         totalMessagesSent: stats?.totalMessagesSent || 0,
-        isActive: stats?.isAutoSendActive || false
+        isActive: stats?.isAutoSendActive || false,
       },
       settings: await new Promise((resolve) => {
         chrome.storage.local.get(null, resolve);
-      })
+      }),
     };
-    
-    const blob = new Blob([JSON.stringify(analyticsData, null, 2)], { 
-      type: 'application/json' 
+
+    const blob = new Blob([JSON.stringify(analyticsData, null, 2)], {
+      type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -286,7 +286,7 @@ async function exportAnalytics() {
     a.download = `autochat-analytics-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    
+
     showNotification('Analytics exported successfully!', true);
   } catch (error) {
     console.error('[Popup] Export failed:', error);
@@ -301,7 +301,7 @@ document.getElementById('exportAnalytics')?.addEventListener('click', exportAnal
 async function updateInputStatus() {
   const tab = await getActiveTab();
   if (!tab?.id) return;
-  
+
   try {
     const response = await chrome.tabs.sendMessage(tab.id, { action: 'getChatInputSelector' });
     if (response && response.selector) {
@@ -322,13 +322,13 @@ async function updateStats() {
     const stats = await new Promise((resolve) => {
       chrome.runtime.sendMessage({ action: 'getStats' }, resolve);
     });
-    
+
     if (stats) {
       elements.messagesSentToday.textContent = stats.messagesSentToday || 0;
       elements.totalMessages.textContent = stats.totalMessagesSent || 0;
       elements.autoSendStatus.textContent = stats.isAutoSendActive ? '🟢 Active' : '⚪ Inactive';
       elements.autoSendStatus.className = 'status ' + (stats.isAutoSendActive ? 'success' : '');
-      
+
       // Show/hide pause button
       if (stats.isAutoSendActive) {
         elements.pauseButton.style.display = 'block';
@@ -336,13 +336,15 @@ async function updateStats() {
         elements.pauseButton.style.display = 'none';
         isPaused = false;
       }
-      
+
       // Update analytics modal if open
       const analyticsModal = document.getElementById('analyticsModal');
       if (analyticsModal?.classList.contains('show')) {
         document.getElementById('analyticsToday').textContent = stats.messagesSentToday || 0;
         document.getElementById('analyticsTotal').textContent = stats.totalMessagesSent || 0;
-        document.getElementById('analyticsStatus').textContent = stats.isAutoSendActive ? 'Active' : 'Inactive';
+        document.getElementById('analyticsStatus').textContent = stats.isAutoSendActive
+          ? 'Active'
+          : 'Inactive';
       }
     }
   } catch (e) {
@@ -355,14 +357,20 @@ async function updateStats() {
 function getMessages() {
   const text = elements.messageList.value.trim();
   if (!text) return [];
-  return text.split('\n').map(m => m.trim()).filter(m => m.length > 0);
+  return text
+    .split('\n')
+    .map((m) => m.trim())
+    .filter((m) => m.length > 0);
 }
 
 async function loadDefaultPhrasesFromFile() {
   try {
     const response = await fetch(chrome.runtime.getURL('farming_phrases.txt'));
     const text = await response.text();
-    defaultPhrases = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    defaultPhrases = text
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
     console.log(`[AutoChat] Loaded ${defaultPhrases.length} default phrases`);
     return defaultPhrases;
   } catch (error) {
@@ -406,9 +414,10 @@ function renderPhrasesList() {
   // Custom phrases
   elements.customPhrasesCount.textContent = customPhrases.length;
   elements.customPhrasesList.innerHTML = '';
-  
+
   if (customPhrases.length === 0) {
-    elements.customPhrasesList.innerHTML = '<div class="help" style="text-align: center; padding: 20px;">No custom phrases yet. Add one above!</div>';
+    elements.customPhrasesList.innerHTML =
+      '<div class="help" style="text-align: center; padding: 20px;">No custom phrases yet. Add one above!</div>';
   } else {
     customPhrases.forEach((phrase, index) => {
       const item = document.createElement('div');
@@ -422,13 +431,14 @@ function renderPhrasesList() {
       elements.customPhrasesList.appendChild(item);
     });
   }
-  
+
   // Default phrases
   elements.defaultPhrasesCount.textContent = defaultPhrases.length;
   elements.defaultPhrasesList.innerHTML = '';
-  
+
   if (defaultPhrases.length === 0) {
-    elements.defaultPhrasesList.innerHTML = '<div class="help" style="text-align: center; padding: 20px;">No default phrases loaded</div>';
+    elements.defaultPhrasesList.innerHTML =
+      '<div class="help" style="text-align: center; padding: 20px;">No default phrases loaded</div>';
   } else {
     defaultPhrases.slice(0, 50).forEach((phrase) => {
       const item = document.createElement('div');
@@ -438,7 +448,7 @@ function renderPhrasesList() {
       `;
       elements.defaultPhrasesList.appendChild(item);
     });
-    
+
     if (defaultPhrases.length > 50) {
       const more = document.createElement('div');
       more.className = 'help';
@@ -448,9 +458,9 @@ function renderPhrasesList() {
       elements.defaultPhrasesList.appendChild(more);
     }
   }
-  
+
   // Delete button handlers
-  elements.customPhrasesList.querySelectorAll('.btn-small.delete').forEach(btn => {
+  elements.customPhrasesList.querySelectorAll('.btn-small.delete').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       const index = parseInt(e.target.dataset.index);
       if (confirm('Delete this phrase?')) {
@@ -485,49 +495,52 @@ const debouncedSave = debounce(() => {
     templateVariables: elements.templateVariables.checked,
     activeHours: elements.activeHours.checked,
     activeHoursStart: elements.activeHoursStart.value,
-    activeHoursEnd: elements.activeHoursEnd.value
+    activeHoursEnd: elements.activeHoursEnd.value,
   };
-  
+
   chrome.storage.local.set(settings);
   console.log('[AutoChat] Settings auto-saved');
 }, AUTOSAVE_DELAY);
 
 function loadSettings() {
-  chrome.storage.local.get([
-    'messageList',
-    'sendMode',
-    'minInterval',
-    'maxInterval',
-    'dailyLimit',
-    'typingSimulation',
-    'variableDelays',
-    'antiRepetition',
-    'templateVariables',
-    'activeHours',
-    'activeHoursStart',
-    'activeHoursEnd'
-  ], (data) => {
-    if (data.messageList) elements.messageList.value = data.messageList;
-    if (data.sendMode) elements.sendMode.value = data.sendMode;
-    if (data.minInterval) elements.minInterval.value = data.minInterval;
-    if (data.maxInterval) elements.maxInterval.value = data.maxInterval;
-    if (data.dailyLimit) elements.dailyLimit.value = data.dailyLimit;
-    
-    elements.typingSimulation.checked = data.typingSimulation !== false;
-    elements.variableDelays.checked = data.variableDelays !== false;
-    elements.antiRepetition.checked = data.antiRepetition !== false;
-    elements.templateVariables.checked = data.templateVariables !== false;
-    elements.activeHours.checked = data.activeHours || false;
-    
-    if (data.activeHoursStart) elements.activeHoursStart.value = data.activeHoursStart;
-    if (data.activeHoursEnd) elements.activeHoursEnd.value = data.activeHoursEnd;
-    
-    // Show/hide active hours inputs
-    const hoursInputs = document.getElementById('activeHoursInputs');
-    if (hoursInputs) {
-      hoursInputs.style.display = elements.activeHours.checked ? 'flex' : 'none';
+  chrome.storage.local.get(
+    [
+      'messageList',
+      'sendMode',
+      'minInterval',
+      'maxInterval',
+      'dailyLimit',
+      'typingSimulation',
+      'variableDelays',
+      'antiRepetition',
+      'templateVariables',
+      'activeHours',
+      'activeHoursStart',
+      'activeHoursEnd',
+    ],
+    (data) => {
+      if (data.messageList) elements.messageList.value = data.messageList;
+      if (data.sendMode) elements.sendMode.value = data.sendMode;
+      if (data.minInterval) elements.minInterval.value = data.minInterval;
+      if (data.maxInterval) elements.maxInterval.value = data.maxInterval;
+      if (data.dailyLimit) elements.dailyLimit.value = data.dailyLimit;
+
+      elements.typingSimulation.checked = data.typingSimulation !== false;
+      elements.variableDelays.checked = data.variableDelays !== false;
+      elements.antiRepetition.checked = data.antiRepetition !== false;
+      elements.templateVariables.checked = data.templateVariables !== false;
+      elements.activeHours.checked = data.activeHours || false;
+
+      if (data.activeHoursStart) elements.activeHoursStart.value = data.activeHoursStart;
+      if (data.activeHoursEnd) elements.activeHoursEnd.value = data.activeHoursEnd;
+
+      // Show/hide active hours inputs
+      const hoursInputs = document.getElementById('activeHoursInputs');
+      if (hoursInputs) {
+        hoursInputs.style.display = elements.activeHours.checked ? 'flex' : 'none';
+      }
     }
-  });
+  );
 }
 
 // Auto-save with debouncing
@@ -553,10 +566,10 @@ elements.activeHoursEnd?.addEventListener('change', debouncedSave);
   loadSettings();
   await loadDefaultPhrasesFromFile();
   await loadCustomPhrases();
-  
+
   // Update stats every 5 seconds
   setInterval(updateStats, 5000);
-  
+
   console.log('[AutoChat] Enhanced popup initialized');
 })();
 

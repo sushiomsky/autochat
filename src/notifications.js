@@ -18,7 +18,12 @@ export class NotificationManager {
    * Load notification settings from storage
    */
   async loadSettings() {
-    const data = await chrome.storage.local.get(['notificationsEnabled', 'notificationSound', 'notificationHistory', 'unreadCount']);
+    const data = await chrome.storage.local.get([
+      'notificationsEnabled',
+      'notificationSound',
+      'notificationHistory',
+      'unreadCount',
+    ]);
     this.enabled = data.notificationsEnabled !== false;
     this.soundEnabled = data.notificationSound !== false;
     this.notificationHistory = data.notificationHistory || [];
@@ -29,9 +34,9 @@ export class NotificationManager {
    * Save notification history to storage
    */
   async saveHistory() {
-    await chrome.storage.local.set({ 
+    await chrome.storage.local.set({
       notificationHistory: this.notificationHistory,
-      unreadCount: this.unreadCount
+      unreadCount: this.unreadCount,
     });
   }
 
@@ -74,7 +79,7 @@ export class NotificationManager {
     const notification = new Notification(title, {
       icon: chrome.runtime.getURL('icon48.png'),
       badge: chrome.runtime.getURL('icon16.png'),
-      ...options
+      ...options,
     });
 
     // Auto-close after 5 seconds
@@ -110,11 +115,11 @@ export class NotificationManager {
       type: options.type || 'info',
       timestamp: new Date().toISOString(),
       read: false,
-      tag: options.tag || null
+      tag: options.tag || null,
     };
 
     this.notificationHistory.unshift(historyItem);
-    
+
     // Keep only maxHistory items
     if (this.notificationHistory.length > this.maxHistory) {
       this.notificationHistory = this.notificationHistory.slice(0, this.maxHistory);
@@ -130,7 +135,7 @@ export class NotificationManager {
    * @param {number} id - Notification ID
    */
   markAsRead(id) {
-    const notification = this.notificationHistory.find(n => n.id === id);
+    const notification = this.notificationHistory.find((n) => n.id === id);
     if (notification && !notification.read) {
       notification.read = true;
       this.unreadCount = Math.max(0, this.unreadCount - 1);
@@ -142,7 +147,7 @@ export class NotificationManager {
    * Mark all notifications as read
    */
   markAllAsRead() {
-    this.notificationHistory.forEach(n => n.read = true);
+    this.notificationHistory.forEach((n) => (n.read = true));
     this.unreadCount = 0;
     this.saveHistory();
   }
@@ -178,7 +183,7 @@ export class NotificationManager {
    * @param {number} id - Notification ID
    */
   deleteNotification(id) {
-    const index = this.notificationHistory.findIndex(n => n.id === id);
+    const index = this.notificationHistory.findIndex((n) => n.id === id);
     if (index !== -1) {
       if (!this.notificationHistory[index].read) {
         this.unreadCount = Math.max(0, this.unreadCount - 1);
@@ -196,7 +201,7 @@ export class NotificationManager {
     await this.show('AutoChat', {
       body: `Message${count > 1 ? 's' : ''} sent successfully! (Total: ${count})`,
       tag: 'message-sent',
-      icon: chrome.runtime.getURL('icon48.png')
+      icon: chrome.runtime.getURL('icon48.png'),
     });
   }
 
@@ -208,7 +213,7 @@ export class NotificationManager {
     await this.show('AutoChat - Daily Limit Reached', {
       body: `You've reached your daily limit of ${limit} messages. Auto-send stopped.`,
       tag: 'daily-limit',
-      requireInteraction: true
+      requireInteraction: true,
     });
   }
 
@@ -220,7 +225,7 @@ export class NotificationManager {
     await this.show('AutoChat Error', {
       body: message,
       tag: 'error',
-      requireInteraction: true
+      requireInteraction: true,
     });
   }
 
@@ -230,7 +235,7 @@ export class NotificationManager {
   async notifyAutoSendStarted() {
     await this.show('AutoChat Started', {
       body: 'Auto-send is now active',
-      tag: 'auto-send-started'
+      tag: 'auto-send-started',
     });
   }
 
@@ -240,7 +245,7 @@ export class NotificationManager {
   async notifyAutoSendStopped() {
     await this.show('AutoChat Stopped', {
       body: 'Auto-send has been stopped',
-      tag: 'auto-send-stopped'
+      tag: 'auto-send-stopped',
     });
   }
 
@@ -253,7 +258,7 @@ export class NotificationManager {
     await this.show(`🏆 Achievement Unlocked!`, {
       body: `${achievement}\n${description}`,
       tag: 'achievement',
-      requireInteraction: true
+      requireInteraction: true,
     });
   }
 
@@ -265,8 +270,9 @@ export class NotificationManager {
       const audio = new Audio();
       audio.volume = 0.3;
       // Use a data URL for a simple beep sound
-      audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYHGWi77eifTRAMUKfi8LdjHAU4ktjyzHksBSN2yPDekTwKFF+z6uyoVRQLRp/h8r5sIQYtgMzy2Ik2Bxlou+3on00QDVG34vC3YhwFOJLY8s15KwUldsrw3ZE8ChRfs+rsp1UUDUZ/4fK/bSEHLYDM8tmJNgcZaLzs6J9NEA1Rt+Lxt2IcBziS2PLNeSsFJXbK8N2RPAoUX7Pq7KhVFA1Gf+HyvmwhBy2AzPLZiTYHGWi77OifTRAMUbfi8LdjHAU4ktfyzHksBSh1y/DdkTwKFF+z6+ynVRQNRp/g8r9sIQcqf8zy2Ik2Bxlou+3on0wQDVG24vC3YhwFOJPY8sx5LAYqdsrw3ZA8ChRfs+rsp1QUDUaf4PK+bCEHLX/L8tiJNgcZaLvt6J9NEAxStuLwtmIcBTiT2PLMeSwGKnbK8N2QPAoUX7Tp7KdUFA1Gn+DyvmshBy+Ay/LYiTYHGWi77eifTRAMUzfh8bZiHAU4lNjyzHksBit2yvDdkDwKFF+06eymVBQNRp/g8r5sIQYvgMry2Ik2Bxlou+3on00QDFI34fG2YhwFOJPY8sx5LAUsdsvw3JA8ChRftOnsp1QUDUaf4PK+bCEHL4DL8tiJNggZaLrt6J9NEAxTN+HxtmIcBTiU2PLMeSwGK3bL8NyQPAoUYLTp7KdUFAxGn+DyvmwhBy+Ay/LYiTYHGWi77eifTRAMUzfh8bZiHAU4lNjyzHksBSt2y/DckDwKFF+06eynVBQMR5/g8r5sIQcvgMvy2Ik2Bxlou+3on00QDFI34fG2YhwFOJTY8sx5LAUrdsvw3JA8ChRftOnsp1QUDEef4PK+bCEHL4DL8tiJNgcZaLrt6J9NEAxTN+HxtmIcBTiU2PLMeSwGK3bL8NyQPAoUX7Tq7KdUFAxHn+DyvmwhBy+Ay/LYiTYHGWi77eifTRAMUzfh8bZiHAU4lNjyzHksBit2y/DckDwKFF+06eynVBQMR5/g8r5sIQcvgMvy2Ik2Bxlou+3on00QDFI34fG2YhwFOJTY8sx5LAYrdsvw3JA8ChRftOnsp1QUDEef4PK+bCEHL4DL8tiJNgcZaLvt6J9NEAxTN+HxtmIcBTiU2PLMeSwGK3bL8NyQPAoUX7Tq7KdUFAxHn+DyvmwhBy+Ay/LYiTYHGWi77eifTRANU3fh8bZiHAQ4lNjyzHksBit2y/DckDwKFF+06eynVBQMR5/g8r5sIQcvgMvy2Ik2Bxlou+3on00QDVI34fG2YhwFOJTY8sx5LAYrdsvw3JA8ChRftOnsp1QUDEef4PK+bCEHL4DL8tiJNgcZaLvt6J9NEA1Td+HxtmIcBDiU2PLMeSwGK3bL8NyQPAoUX7Tq7KdUFA';
-      audio.play().catch(e => console.warn('Sound play failed:', e));
+      audio.src =
+        'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYHGWi77eifTRAMUKfi8LdjHAU4ktjyzHksBSN2yPDekTwKFF+z6uyoVRQLRp/h8r5sIQYtgMzy2Ik2Bxlou+3on00QDVG34vC3YhwFOJLY8s15KwUldsrw3ZE8ChRfs+rsp1UUDUZ/4fK/bSEHLYDM8tmJNgcZaLzs6J9NEA1Rt+Lxt2IcBziS2PLNeSsFJXbK8N2RPAoUX7Pq7KhVFA1Gf+HyvmwhBy2AzPLZiTYHGWi77OifTRAMUbfi8LdjHAU4ktfyzHksBSh1y/DdkTwKFF+z6+ynVRQNRp/g8r9sIQcqf8zy2Ik2Bxlou+3on0wQDVG24vC3YhwFOJPY8sx5LAYqdsrw3ZA8ChRfs+rsp1QUDUaf4PK+bCEHLX/L8tiJNgcZaLvt6J9NEAxStuLwtmIcBTiT2PLMeSwGKnbK8N2QPAoUX7Tp7KdUFA1Gn+DyvmshBy+Ay/LYiTYHGWi77eifTRAMUzfh8bZiHAU4lNjyzHksBit2yvDdkDwKFF+06eymVBQNRp/g8r5sIQYvgMry2Ik2Bxlou+3on00QDFI34fG2YhwFOJPY8sx5LAUsdsvw3JA8ChRftOnsp1QUDUaf4PK+bCEHL4DL8tiJNggZaLrt6J9NEAxTN+HxtmIcBTiU2PLMeSwGK3bL8NyQPAoUYLTp7KdUFAxGn+DyvmwhBy+Ay/LYiTYHGWi77eifTRAMUzfh8bZiHAU4lNjyzHksBSt2y/DckDwKFF+06eynVBQMR5/g8r5sIQcvgMvy2Ik2Bxlou+3on00QDFI34fG2YhwFOJTY8sx5LAUrdsvw3JA8ChRftOnsp1QUDEef4PK+bCEHL4DL8tiJNgcZaLrt6J9NEAxTN+HxtmIcBTiU2PLMeSwGK3bL8NyQPAoUX7Tq7KdUFAxHn+DyvmwhBy+Ay/LYiTYHGWi77eifTRAMUzfh8bZiHAU4lNjyzHksBit2y/DckDwKFF+06eynVBQMR5/g8r5sIQcvgMvy2Ik2Bxlou+3on00QDFI34fG2YhwFOJTY8sx5LAYrdsvw3JA8ChRftOnsp1QUDEef4PK+bCEHL4DL8tiJNgcZaLvt6J9NEAxTN+HxtmIcBTiU2PLMeSwGK3bL8NyQPAoUX7Tq7KdUFAxHn+DyvmwhBy+Ay/LYiTYHGWi77eifTRANU3fh8bZiHAQ4lNjyzHksBit2y/DckDwKFF+06eynVBQMR5/g8r5sIQcvgMvy2Ik2Bxlou+3on00QDVI34fG2YhwFOJTY8sx5LAYrdsvw3JA8ChRftOnsp1QUDEef4PK+bCEHL4DL8tiJNgcZaLvt6J9NEA1Td+HxtmIcBDiU2PLMeSwGK3bL8NyQPAoUX7Tq7KdUFA';
+      audio.play().catch((e) => console.warn('Sound play failed:', e));
     } catch (e) {
       console.warn('Could not play notification sound:', e);
     }

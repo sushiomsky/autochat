@@ -16,6 +16,7 @@
 Never miss an important event with desktop notifications!
 
 **Features**:
+
 - **Desktop Notifications**: System-level notifications for all events
 - **Message Sent Alerts**: Get notified when messages are sent
 - **Daily Limit Warnings**: Alert when you reach your daily message limit
@@ -25,6 +26,7 @@ Never miss an important event with desktop notifications!
 - **Auto-Dismiss**: Notifications automatically close after 5 seconds
 
 **Usage**:
+
 ```javascript
 // Automatically enabled - configure in settings
 Notifications: On/Off
@@ -38,6 +40,7 @@ Sound Effects: On/Off
 Test messages before sending to avoid mistakes!
 
 **Features**:
+
 - **Live Preview**: See exactly what will be sent with all variables processed
 - **Dry-Run Mode**: Test the entire workflow without actually sending
 - **Warning Detection**: Alerts for empty messages, unprocessed variables, excessive length
@@ -46,6 +49,7 @@ Test messages before sending to avoid mistakes!
 - **Batch Preview**: Preview multiple messages at once
 
 **Benefits**:
+
 - Catch errors before sending
 - Test template variables safely
 - Ensure messages look correct
@@ -58,6 +62,7 @@ Test messages before sending to avoid mistakes!
 Organize your messages like a pro!
 
 **Features**:
+
 - **10 Default Categories**: Greetings, Questions, Responses, Closings, Casual, Formal, Funny, Supportive, Business, Personal
 - **Custom Categories**: Create your own with custom icons and colors
 - **Tag System**: Tag phrases with multiple keywords
@@ -69,6 +74,7 @@ Organize your messages like a pro!
 - **Auto-Tagging**: Get tag suggestions based on content
 
 **Use Cases**:
+
 - Organize work vs personal messages
 - Separate formal from casual tones
 - Create themed collections
@@ -81,6 +87,7 @@ Organize your messages like a pro!
 Lightning-fast access to every feature!
 
 **Features**:
+
 - **Fuzzy Search**: Type part of any command name
 - **20+ Built-in Commands**: Control every aspect of AutoChat
 - **Recent Commands**: Quickly repeat recent actions
@@ -90,6 +97,7 @@ Lightning-fast access to every feature!
 - **Keyboard Shortcuts**: See all shortcuts at a glance
 
 **Built-in Commands**:
+
 - **Controls**: Start, Stop, Pause, Send Once
 - **Settings**: Open Settings, Toggle Theme, Import/Export
 - **Analytics**: View Stats, Export Data, Reset Stats
@@ -98,6 +106,7 @@ Lightning-fast access to every feature!
 - **Help**: Show Shortcuts, Documentation
 
 **Shortcuts**:
+
 - `Ctrl+K` - Open command palette
 - `Escape` - Close
 - `↑↓` - Navigate
@@ -110,6 +119,7 @@ Lightning-fast access to every feature!
 Add personality to your messages!
 
 **Features**:
+
 - **300+ Emojis**: Organized in 10 categories
 - **Smart Search**: Find emojis by keyword (e.g., "happy", "love", "fire")
 - **Recent Emojis**: Quick access to your frequently used emojis
@@ -120,6 +130,7 @@ Add personality to your messages!
 - **Quick Insert**: Click to add to your message
 
 **Categories**:
+
 - Smileys & Emotion
 - Hand Gestures
 - Hearts & Symbols
@@ -147,6 +158,7 @@ Add personality to your messages!
   - Command Palette (18 tests)
 
 ### Code Coverage
+
 - Core features: Well tested
 - Edge cases: Handled
 - Error scenarios: Covered
@@ -157,34 +169,37 @@ Add personality to your messages!
 
 ### v4.1 → v4.2 Changes
 
-| Metric | v4.1 | v4.2 | Change |
-|--------|------|------|--------|
-| **Features** | 22 | 72 | +227% |
-| **Code Lines** | 7,000 | 9,100 | +30% |
-| **Test Suites** | 5 | 9 | +80% |
-| **Tests Passing** | 28 | 75 | +168% |
-| **Modules** | 8 | 13 | +63% |
-| **Commands** | 0 | 20+ | ∞ |
-| **Emojis** | 10 | 300+ | +2900% |
-| **Categories** | 0 | 10 | ∞ |
+| Metric            | v4.1  | v4.2  | Change |
+| ----------------- | ----- | ----- | ------ |
+| **Features**      | 22    | 72    | +227%  |
+| **Code Lines**    | 7,000 | 9,100 | +30%   |
+| **Test Suites**   | 5     | 9     | +80%   |
+| **Tests Passing** | 28    | 75    | +168%  |
+| **Modules**       | 8     | 13    | +63%   |
+| **Commands**      | 0     | 20+   | ∞      |
+| **Emojis**        | 10    | 300+  | +2900% |
+| **Categories**    | 0     | 10    | ∞      |
 
 ---
 
 ## 🔧 Technical Improvements
 
 ### Architecture
+
 - **Modular Design**: Each feature is a standalone module
 - **Singleton Pattern**: Consistent API across modules
 - **Storage Management**: Efficient Chrome storage usage
 - **Event Handling**: Proper cleanup and memory management
 
 ### Performance
+
 - **Lazy Loading**: Features load only when needed
 - **Efficient Search**: Optimized fuzzy search algorithms
 - **Memory Optimized**: Proper cleanup of event listeners
 - **Fast Execution**: Sub-millisecond command execution
 
 ### Code Quality
+
 - **ESLint**: All code linted
 - **Consistent Style**: Prettier formatting
 - **JSDoc Comments**: Full API documentation
@@ -252,11 +267,13 @@ const random = emojiPicker.getRandom('smileys');
 **No Breaking Changes!** All v4.1 features work exactly the same.
 
 **New Features are Additive**:
+
 - Existing phrases work as before
 - All settings preserved
 - No data migration needed
 
 **Recommended Actions**:
+
 1. Review notification settings
 2. Organize existing phrases into categories
 3. Try the command palette (Ctrl+K)
@@ -276,11 +293,13 @@ const random = emojiPicker.getRandom('smileys');
 ## 🎯 Known Limitations
 
 ### Phase 1 Complete (Backend)
+
 - ✅ All feature logic implemented
 - ✅ Complete API documentation
 - ✅ Comprehensive testing
 
 ### Phase 2 Pending (UI)
+
 - ⏳ UI components need integration
 - ⏳ Modal designs not yet implemented
 - ⏳ Visual polish pending
@@ -292,6 +311,7 @@ const random = emojiPicker.getRandom('smileys');
 ## 🗺️ Roadmap
 
 ### v4.3 (Next)
+
 - UI integration for all v4.2 features
 - Visual improvements and animations
 - User onboarding tutorial
@@ -299,12 +319,14 @@ const random = emojiPicker.getRandom('smileys');
 - Analytics dashboard with charts
 
 ### v4.4
+
 - Firefox port
 - Multi-language support (i18n)
 - Advanced scheduling calendar
 - Webhook integration
 
 ### v5.0
+
 - Cloud sync (optional)
 - AI message generation
 - Team collaboration
@@ -315,6 +337,7 @@ const random = emojiPicker.getRandom('smileys');
 ## 💡 Usage Examples
 
 ### Example 1: Organized Workflow
+
 ```
 1. Press Ctrl+K
 2. Type "emoji"
@@ -326,6 +349,7 @@ const random = emojiPicker.getRandom('smileys');
 ```
 
 ### Example 2: Power User
+
 ```
 1. Create categories for different contexts
 2. Tag all phrases appropriately
@@ -336,6 +360,7 @@ const random = emojiPicker.getRandom('smileys');
 ```
 
 ### Example 3: Safe Testing
+
 ```
 1. Enable dry-run mode
 2. Configure new automation
@@ -350,6 +375,7 @@ const random = emojiPicker.getRandom('smileys');
 ## 🏆 Achievements
 
 This release represents:
+
 - **3 hours of development**
 - **2,057 lines of new code**
 - **47 new tests added**
@@ -372,12 +398,14 @@ This release represents:
 ## 📞 Support
 
 ### Resources
+
 - **Documentation**: See FEATURES_v4.2.md
 - **GitHub**: https://github.com/sushiomsky/autochat
 - **Issues**: https://github.com/sushiomsky/autochat/issues
 - **Discussions**: https://github.com/sushiomsky/autochat/discussions
 
 ### Help
+
 - Press `Ctrl+K` and type "help"
 - Check README.md for complete guide
 - Review FEATURES_v4.2.md for API docs

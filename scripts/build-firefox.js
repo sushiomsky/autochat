@@ -27,17 +27,13 @@ const filesToCopy = [
 ];
 
 // Source JS files (will be minified in production)
-const jsFiles = [
-  'background.js',
-  'content-enhanced.js',
-  'popup-enhanced.js',
-];
+const jsFiles = ['background.js', 'content-enhanced.js', 'popup-enhanced.js'];
 
 // Copy static files
 filesToCopy.forEach((file) => {
   const src = path.join(__dirname, '..', file);
   const dest = path.join(distDir, file);
-  
+
   if (fs.existsSync(src)) {
     fs.copyFileSync(src, dest);
     console.log(`✓ Copied ${file}`);
@@ -50,19 +46,18 @@ filesToCopy.forEach((file) => {
 jsFiles.forEach((file) => {
   const src = path.join(__dirname, '..', file);
   const dest = path.join(distDir, file);
-  
+
   if (fs.existsSync(src)) {
     let content = fs.readFileSync(src, 'utf8');
-    
+
     // Replace Chrome-specific APIs with browser namespace (Firefox compatible)
     content = content.replace(/chrome\./g, 'browser.');
-    
+
     if (isProd) {
       // Simple minification: remove block comments only (preserve code structure)
-      content = content
-        .replace(/\/\*[\s\S]*?\*\//g, ''); // Remove block comments only
+      content = content.replace(/\/\*[\s\S]*?\*\//g, ''); // Remove block comments only
     }
-    
+
     fs.writeFileSync(dest, content);
     console.log(`✓ Processed ${file} (Firefox compatible)`);
   }
@@ -73,7 +68,7 @@ function copyRecursive(src, dest) {
   const exists = fs.existsSync(src);
   const stats = exists && fs.statSync(src);
   const isDirectory = exists && stats.isDirectory();
-  
+
   if (isDirectory) {
     if (!fs.existsSync(dest)) {
       fs.mkdirSync(dest, { recursive: true });
@@ -107,7 +102,7 @@ const manifestDest = path.join(distDir, 'manifest.json');
 if (fs.existsSync(firefoxManifestSrc)) {
   fs.copyFileSync(firefoxManifestSrc, manifestDest);
   console.log('✓ Copied Firefox manifest');
-  
+
   // Update manifest version
   const manifest = JSON.parse(fs.readFileSync(manifestDest, 'utf8'));
   manifest.version_name = isProd ? `${manifest.version}` : `${manifest.version}-dev`;

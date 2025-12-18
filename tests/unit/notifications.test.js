@@ -10,7 +10,7 @@ describe('NotificationManager', () => {
     // Mock Notification API
     global.Notification = {
       permission: 'granted',
-      requestPermission: jest.fn(() => Promise.resolve('granted'))
+      requestPermission: jest.fn(() => Promise.resolve('granted')),
     };
 
     // Mock Notification constructor
@@ -18,7 +18,7 @@ describe('NotificationManager', () => {
       return {
         title,
         options,
-        close: jest.fn()
+        close: jest.fn(),
       };
     });
     global.Notification.permission = 'granted';
@@ -29,7 +29,7 @@ describe('NotificationManager', () => {
       return {
         play: jest.fn().mockResolvedValue(undefined),
         volume: 0.3,
-        src: ''
+        src: '',
       };
     });
 
@@ -63,7 +63,7 @@ describe('NotificationManager', () => {
         if (!this.enabled) return;
         const hasPermission = await this.requestPermission();
         if (!hasPermission) return;
-        
+
         const notification = new global.Notification(title, options);
         if (this.soundEnabled && options.sound !== false) {
           this.playSound();
@@ -79,11 +79,11 @@ describe('NotificationManager', () => {
           type: options.type || 'info',
           timestamp: new Date().toISOString(),
           read: false,
-          tag: options.tag || null
+          tag: options.tag || null,
         };
 
         this.notificationHistory.unshift(historyItem);
-        
+
         if (this.notificationHistory.length > this.maxHistory) {
           this.notificationHistory = this.notificationHistory.slice(0, this.maxHistory);
         }
@@ -93,7 +93,7 @@ describe('NotificationManager', () => {
       }
 
       markAsRead(id) {
-        const notification = this.notificationHistory.find(n => n.id === id);
+        const notification = this.notificationHistory.find((n) => n.id === id);
         if (notification && !notification.read) {
           notification.read = true;
           this.unreadCount = Math.max(0, this.unreadCount - 1);
@@ -101,7 +101,7 @@ describe('NotificationManager', () => {
       }
 
       markAllAsRead() {
-        this.notificationHistory.forEach(n => n.read = true);
+        this.notificationHistory.forEach((n) => (n.read = true));
         this.unreadCount = 0;
       }
 
@@ -119,7 +119,7 @@ describe('NotificationManager', () => {
       }
 
       deleteNotification(id) {
-        const index = this.notificationHistory.findIndex(n => n.id === id);
+        const index = this.notificationHistory.findIndex((n) => n.id === id);
         if (index !== -1) {
           if (!this.notificationHistory[index].read) {
             this.unreadCount = Math.max(0, this.unreadCount - 1);
@@ -159,9 +159,12 @@ describe('NotificationManager', () => {
   test('should show notification when enabled', async () => {
     const notification = await manager.show('Test', { body: 'Test message' });
     expect(notification).toBeDefined();
-    expect(global.Notification).toHaveBeenCalledWith('Test', expect.objectContaining({
-      body: 'Test message'
-    }));
+    expect(global.Notification).toHaveBeenCalledWith(
+      'Test',
+      expect.objectContaining({
+        body: 'Test message',
+      })
+    );
   });
 
   test('should not show notification when disabled', async () => {
@@ -209,12 +212,12 @@ describe('NotificationManager', () => {
     test('should mark notification as read', async () => {
       await manager.show('Test', { body: 'Test' });
       const id = manager.notificationHistory[0].id;
-      
+
       expect(manager.notificationHistory[0].read).toBe(false);
       expect(manager.unreadCount).toBe(1);
-      
+
       manager.markAsRead(id);
-      
+
       expect(manager.notificationHistory[0].read).toBe(true);
       expect(manager.unreadCount).toBe(0);
     });
@@ -223,13 +226,13 @@ describe('NotificationManager', () => {
       await manager.show('Test 1', { body: 'Test 1' });
       await manager.show('Test 2', { body: 'Test 2' });
       await manager.show('Test 3', { body: 'Test 3' });
-      
+
       expect(manager.unreadCount).toBe(3);
-      
+
       manager.markAllAsRead();
-      
+
       expect(manager.unreadCount).toBe(0);
-      manager.notificationHistory.forEach(n => {
+      manager.notificationHistory.forEach((n) => {
         expect(n.read).toBe(true);
       });
     });
@@ -237,11 +240,11 @@ describe('NotificationManager', () => {
     test('should clear notification history', async () => {
       await manager.show('Test 1', { body: 'Test 1' });
       await manager.show('Test 2', { body: 'Test 2' });
-      
+
       expect(manager.notificationHistory.length).toBe(2);
-      
+
       manager.clearHistory();
-      
+
       expect(manager.notificationHistory.length).toBe(0);
       expect(manager.unreadCount).toBe(0);
     });
@@ -250,7 +253,7 @@ describe('NotificationManager', () => {
       for (let i = 0; i < 10; i++) {
         await manager.show(`Test ${i}`, { body: `Body ${i}` });
       }
-      
+
       const history = manager.getHistory(5);
       expect(history.length).toBe(5);
     });
@@ -258,14 +261,14 @@ describe('NotificationManager', () => {
     test('should delete notification from history', async () => {
       await manager.show('Test 1', { body: 'Test 1' });
       await manager.show('Test 2', { body: 'Test 2' });
-      
+
       const id = manager.notificationHistory[0].id;
-      
+
       expect(manager.notificationHistory.length).toBe(2);
       expect(manager.unreadCount).toBe(2);
-      
+
       manager.deleteNotification(id);
-      
+
       expect(manager.notificationHistory.length).toBe(1);
       expect(manager.unreadCount).toBe(1);
     });
@@ -274,7 +277,7 @@ describe('NotificationManager', () => {
       for (let i = 0; i < 60; i++) {
         manager.addToHistory(`Test ${i}`, { body: `Body ${i}` });
       }
-      
+
       expect(manager.notificationHistory.length).toBe(50);
     });
 

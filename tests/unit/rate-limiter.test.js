@@ -13,9 +13,7 @@ class RateLimiter {
   isAllowed(key) {
     const now = Date.now();
     const userAttempts = this.attempts.get(key) || [];
-    const recentAttempts = userAttempts.filter(
-      timestamp => now - timestamp < this.windowMs
-    );
+    const recentAttempts = userAttempts.filter((timestamp) => now - timestamp < this.windowMs);
 
     if (recentAttempts.length >= this.maxAttempts) {
       return false;
@@ -33,9 +31,7 @@ class RateLimiter {
   getRemainingAttempts(key) {
     const now = Date.now();
     const userAttempts = this.attempts.get(key) || [];
-    const recentAttempts = userAttempts.filter(
-      timestamp => now - timestamp < this.windowMs
-    );
+    const recentAttempts = userAttempts.filter((timestamp) => now - timestamp < this.windowMs);
     return Math.max(0, this.maxAttempts - recentAttempts.length);
   }
 
@@ -43,7 +39,7 @@ class RateLimiter {
     const now = Date.now();
     const userAttempts = this.attempts.get(key) || [];
     if (userAttempts.length === 0) return 0;
-    
+
     const oldestAttempt = Math.min(...userAttempts);
     return Math.max(0, this.windowMs - (now - oldestAttempt));
   }
@@ -74,7 +70,7 @@ describe('RateLimiter', () => {
     limiter.isAllowed('user1');
     limiter.isAllowed('user1');
     limiter.isAllowed('user1');
-    
+
     // user2 should still have attempts
     expect(limiter.isAllowed('user2')).toBe(true);
     expect(limiter.isAllowed('user2')).toBe(true);
@@ -84,22 +80,22 @@ describe('RateLimiter', () => {
     limiter.isAllowed('user3');
     limiter.isAllowed('user3');
     limiter.isAllowed('user3');
-    
+
     expect(limiter.isAllowed('user3')).toBe(false);
-    
+
     limiter.reset('user3');
     expect(limiter.isAllowed('user3')).toBe(true);
   });
 
   test('should return correct remaining attempts', () => {
     expect(limiter.getRemainingAttempts('user4')).toBe(3);
-    
+
     limiter.isAllowed('user4');
     expect(limiter.getRemainingAttempts('user4')).toBe(2);
-    
+
     limiter.isAllowed('user4');
     expect(limiter.getRemainingAttempts('user4')).toBe(1);
-    
+
     limiter.isAllowed('user4');
     expect(limiter.getRemainingAttempts('user4')).toBe(0);
   });
@@ -107,21 +103,21 @@ describe('RateLimiter', () => {
   test('should allow attempts after window expires', async () => {
     // Use a very short window for testing
     const shortLimiter = new RateLimiter(2, 100);
-    
+
     shortLimiter.isAllowed('user5');
     shortLimiter.isAllowed('user5');
     expect(shortLimiter.isAllowed('user5')).toBe(false);
-    
+
     // Wait for window to expire
-    await new Promise(resolve => setTimeout(resolve, 150));
-    
+    await new Promise((resolve) => setTimeout(resolve, 150));
+
     expect(shortLimiter.isAllowed('user5')).toBe(true);
   });
 
   test('should return time until reset', () => {
     limiter.isAllowed('user6');
     const timeUntilReset = limiter.getTimeUntilReset('user6');
-    
+
     expect(timeUntilReset).toBeGreaterThan(0);
     expect(timeUntilReset).toBeLessThanOrEqual(1000);
   });
@@ -135,7 +131,7 @@ describe('RateLimiter', () => {
     for (let i = 0; i < 5; i++) {
       results.push(limiter.isAllowed('concurrent'));
     }
-    
+
     // First 3 should succeed, next 2 should fail
     expect(results).toEqual([true, true, true, false, false]);
   });

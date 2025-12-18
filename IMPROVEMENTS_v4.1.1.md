@@ -1,6 +1,7 @@
 # AutoChat Enhanced - v4.1.1 Improvements
 
 ## Summary
+
 This document outlines all improvements made to bring the repository to production-ready standards.
 
 **Date**: 2025-10-20  
@@ -12,15 +13,18 @@ This document outlines all improvements made to bring the repository to producti
 ## ✅ Completed Improvements
 
 ### 1. Version Consistency
+
 - ✅ **package.json**: Updated from 4.0.0 to 4.1.0
-- ✅ **manifest.json**: Updated from "4.1" to "4.1.0"  
+- ✅ **manifest.json**: Updated from "4.1" to "4.1.0"
 - ✅ All documentation now references consistent version
 
 ### 2. License
+
 - ✅ **MIT LICENSE file added**: Formal license file with 2025 copyright
 - ✅ Referenced in README.md and package.json
 
 ### 3. Repository URLs
+
 - ✅ **Updated all placeholder URLs**: Changed `yourusername` to `sushiomsky`
 - ✅ Files updated:
   - package.json
@@ -30,6 +34,7 @@ This document outlines all improvements made to bring the repository to producti
   - RELEASE_NOTES_v4.1.md
 
 ### 4. Security Enhancements
+
 - ✅ **Content Security Policy**: Added CSP to manifest.json
   ```json
   "content_security_policy": {
@@ -42,6 +47,7 @@ This document outlines all improvements made to bring the repository to producti
   - Methods: isAllowed(), reset(), getRemainingAttempts(), getTimeUntilReset()
 
 ### 5. Testing Improvements
+
 - ✅ **Fixed test setup**: Updated tests/setup.js with proper Chrome API mocks
 - ✅ **Fixed failing tests**: Updated template-variables.test.js regex patterns
 - ✅ **Added new test suite**: rate-limiter.test.js with 9 comprehensive tests
@@ -49,6 +55,7 @@ This document outlines all improvements made to bring the repository to producti
 - ✅ **Dependencies installed**: Fixed peer dependency conflicts with --legacy-peer-deps
 
 ### 6. Development Environment
+
 - ✅ **.nvmrc added**: Specifies Node.js version 18.17.0
 - ✅ **GitHub templates**:
   - Bug report template (.github/ISSUE_TEMPLATE/bug_report.md)
@@ -56,6 +63,7 @@ This document outlines all improvements made to bring the repository to producti
   - Pull request template (.github/pull_request_template.md)
 
 ### 7. Code Quality
+
 - ✅ **Rate limiter utility**: Production-ready implementation with JSDoc
 - ✅ **Test coverage improved**: From 0% baseline to meaningful coverage
 - ✅ **Documentation**: Added this improvements document
@@ -65,12 +73,14 @@ This document outlines all improvements made to bring the repository to producti
 ## 📊 Test Results
 
 ### Before
+
 ```
 Test Suites: 4 failed, 0 passed
 Tests: 0 total (setup errors)
 ```
 
 ### After
+
 ```
 Test Suites: 5 passed, 5 total
 Tests: 28 passed, 28 total
@@ -78,6 +88,7 @@ Time: 1.169s
 ```
 
 ### Coverage by File
+
 - ✅ tests/unit/template-variables.test.js: 6 tests passing
 - ✅ tests/unit/active-hours.test.js: 6 tests passing
 - ✅ tests/unit/anti-repetition.test.js: 4 tests passing
@@ -89,6 +100,7 @@ Time: 1.169s
 ## 🔧 Technical Changes
 
 ### Files Added
+
 ```
 LICENSE
 .nvmrc
@@ -100,6 +112,7 @@ IMPROVEMENTS_v4.1.1.md (this file)
 ```
 
 ### Files Modified
+
 ```
 package.json (version + repo URL)
 manifest.json (version + CSP)
@@ -117,6 +130,7 @@ src/utils.js (RateLimiter class)
 ## 🚀 How to Use New Features
 
 ### Rate Limiter
+
 ```javascript
 import { RateLimiter } from './src/utils.js';
 
@@ -141,6 +155,7 @@ limiter.reset('user-action');
 ```
 
 ### Running Tests
+
 ```bash
 # Install dependencies
 npm install --legacy-peer-deps
@@ -160,6 +175,7 @@ npm run test:watch
 ## 📋 Remaining TODOs
 
 ### High Priority
+
 - [ ] Increase test coverage to 80%+
 - [ ] Add E2E tests with Puppeteer
 - [ ] Implement source maps in build system
@@ -167,6 +183,7 @@ npm run test:watch
 - [ ] Create actual screenshots for SCREENSHOTS.md
 
 ### Medium Priority
+
 - [ ] Firefox port (WebExtensions)
 - [ ] Multi-language support (i18n)
 - [ ] Webpack implementation (mentioned but not completed)
@@ -174,6 +191,7 @@ npm run test:watch
 - [ ] Performance monitoring dashboard
 
 ### Low Priority
+
 - [ ] TypeScript migration
 - [ ] Cloud sync (optional)
 - [ ] AI message generation
@@ -184,6 +202,7 @@ npm run test:watch
 ## 🎯 Next Release (v4.2) Planning
 
 ### Target Features
+
 1. **Firefox Support**: Port to WebExtensions API
 2. **Internationalization**: Add i18n for major languages
 3. **Webhook Integration**: Notify external services
@@ -191,6 +210,7 @@ npm run test:watch
 5. **Error Logging UI**: Better visibility into errors
 
 ### Technical Improvements
+
 1. **Source Maps**: Debug minified production builds
 2. **Webpack**: Replace custom build scripts
 3. **E2E Tests**: Full user flow testing
@@ -202,6 +222,7 @@ npm run test:watch
 ## 📝 Developer Notes
 
 ### Setting Up Development Environment
+
 ```bash
 # Clone repo
 git clone https://github.com/sushiomsky/autochat.git
@@ -221,6 +242,7 @@ npm run watch
 ```
 
 ### Before Committing
+
 ```bash
 # Format code
 npm run format
@@ -236,12 +258,14 @@ npm run build
 ```
 
 ### Creating Issues
+
 - Use bug report template for bugs
 - Use feature request template for features
 - Include all requested information
 - Check for duplicates first
 
 ### Submitting PRs
+
 - Use PR template
 - Link related issues
 - Include tests for changes
@@ -253,21 +277,27 @@ npm run build
 ## 🔒 Security Notes
 
 ### Content Security Policy
+
 The extension now enforces strict CSP:
+
 - No inline scripts allowed
 - Only self-hosted resources
 - No eval() or similar functions
 - All scripts must be in separate .js files
 
 ### Rate Limiting
+
 Implemented to prevent:
+
 - Rapid-fire abuse
 - Accidental infinite loops
 - Resource exhaustion
 - API spam
 
 ### Input Validation
+
 All user inputs are:
+
 - Sanitized before display
 - Validated before storage
 - Checked for suspicious patterns
@@ -278,6 +308,7 @@ All user inputs are:
 ## 📈 Metrics
 
 ### Code Statistics
+
 - **Total Files**: 45+ (including tests and docs)
 - **Test Suites**: 5
 - **Total Tests**: 28
@@ -285,12 +316,14 @@ All user inputs are:
 - **Documentation**: ~4,000+ lines
 
 ### Build Performance
+
 - **Build Time**: ~2 seconds
 - **Package Size**: ~45KB (optimized)
 - **Test Time**: ~1.2 seconds
 - **Install Time**: ~27 seconds
 
 ### Quality Indicators
+
 - ✅ All tests passing
 - ✅ No security vulnerabilities (npm audit)
 - ✅ ESLint configuration ready
@@ -308,6 +341,7 @@ Generated with assistance from [Continue](https://continue.dev)
 ## 📞 Support
 
 For questions or issues:
+
 - **GitHub Issues**: https://github.com/sushiomsky/autochat/issues
 - **GitHub Discussions**: https://github.com/sushiomsky/autochat/discussions
 - **Documentation**: See README.md, CONTRIBUTING.md, QUICKSTART.md

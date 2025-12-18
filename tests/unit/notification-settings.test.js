@@ -8,10 +8,10 @@ describe('Notification Settings Integration', () => {
     global.chrome.storage.local.get = jest.fn((keys, callback) => {
       callback({
         notificationsEnabled: true,
-        notificationSound: true
+        notificationSound: true,
       });
     });
-    
+
     global.chrome.storage.local.set = jest.fn((data, callback) => {
       if (callback) callback();
     });
@@ -28,11 +28,11 @@ describe('Notification Settings Integration', () => {
   test('should save notification settings to storage', () => {
     const settings = {
       notificationsEnabled: false,
-      notificationSound: false
+      notificationSound: false,
     };
-    
+
     global.chrome.storage.local.set(settings);
-    
+
     expect(global.chrome.storage.local.set).toHaveBeenCalledWith(settings);
   });
 
@@ -40,7 +40,7 @@ describe('Notification Settings Integration', () => {
     global.chrome.storage.local.get = jest.fn((keys, callback) => {
       callback({});
     });
-    
+
     global.chrome.storage.local.get(['notificationsEnabled', 'notificationSound'], (data) => {
       // In the actual implementation, notificationsEnabled !== false means true
       const enabled = data.notificationsEnabled !== false;
@@ -53,7 +53,7 @@ describe('Notification Settings Integration', () => {
     global.chrome.storage.local.get = jest.fn((keys, callback) => {
       callback({});
     });
-    
+
     global.chrome.storage.local.get(['notificationsEnabled', 'notificationSound'], (data) => {
       // In the actual implementation, notificationSound !== false means true
       const soundEnabled = data.notificationSound !== false;
@@ -68,10 +68,10 @@ describe('Notification Settings Integration', () => {
         messageList: 'Hello\nWorld',
         sendMode: 'random',
         notificationsEnabled: false,
-        notificationSound: true
+        notificationSound: true,
       });
     });
-    
+
     global.chrome.storage.local.get(
       ['messageList', 'sendMode', 'notificationsEnabled', 'notificationSound'],
       (data) => {
@@ -92,11 +92,11 @@ describe('Notification Settings Integration', () => {
       maxInterval: 3,
       typingSimulation: true,
       notificationsEnabled: true,
-      notificationSound: false
+      notificationSound: false,
     };
-    
+
     global.chrome.storage.local.set(completeSettings);
-    
+
     expect(global.chrome.storage.local.set).toHaveBeenCalledWith(completeSettings);
   });
 });

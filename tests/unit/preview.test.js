@@ -47,20 +47,20 @@ describe('PreviewManager', () => {
 
       checkWarnings(text) {
         const warnings = [];
-        
+
         if (text.length === 0) {
           warnings.push({
             type: 'empty',
             severity: 'error',
-            message: 'Message is empty'
+            message: 'Message is empty',
           });
         }
-        
+
         if (text.length > 2000) {
           warnings.push({
             type: 'length',
             severity: 'warning',
-            message: `Message is very long (${text.length} characters)`
+            message: `Message is very long (${text.length} characters)`,
           });
         }
 
@@ -69,7 +69,7 @@ describe('PreviewManager', () => {
           warnings.push({
             type: 'variables',
             severity: 'warning',
-            message: `Unprocessed variables: ${unprocessed.join(', ')}`
+            message: `Unprocessed variables: ${unprocessed.join(', ')}`,
           });
         }
 
@@ -87,7 +87,7 @@ describe('PreviewManager', () => {
           length: processed.length,
           timestamp: new Date().toISOString(),
           variables,
-          warnings
+          warnings,
         };
 
         this.previewHistory.unshift(preview);
@@ -140,20 +140,20 @@ describe('PreviewManager', () => {
   test('should detect long message warning', () => {
     const longMessage = 'a'.repeat(2500);
     const warnings = preview.checkWarnings(longMessage);
-    const lengthWarning = warnings.find(w => w.type === 'length');
+    const lengthWarning = warnings.find((w) => w.type === 'length');
     expect(lengthWarning).toBeDefined();
     expect(lengthWarning.severity).toBe('warning');
   });
 
   test('should detect unprocessed variables', () => {
     const warnings = preview.checkWarnings('Hello {unknown_var}');
-    const varWarning = warnings.find(w => w.type === 'variables');
+    const varWarning = warnings.find((w) => w.type === 'variables');
     expect(varWarning).toBeDefined();
   });
 
   test('should create preview with all information', () => {
     const result = preview.previewMessage('Test {time}');
-    
+
     expect(result).toHaveProperty('original');
     expect(result).toHaveProperty('processed');
     expect(result).toHaveProperty('length');
@@ -175,7 +175,7 @@ describe('PreviewManager', () => {
 
   test('should limit history size', () => {
     preview.maxHistory = 3;
-    
+
     preview.previewMessage('Message 1');
     preview.previewMessage('Message 2');
     preview.previewMessage('Message 3');
@@ -188,7 +188,7 @@ describe('PreviewManager', () => {
   test('should clear history', () => {
     preview.previewMessage('Test');
     expect(preview.getHistory()).toHaveLength(1);
-    
+
     preview.clearHistory();
     expect(preview.getHistory()).toHaveLength(0);
   });

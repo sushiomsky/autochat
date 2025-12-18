@@ -10,7 +10,7 @@
 export function sanitizeHTML(html) {
   const div = document.createElement('div');
   div.textContent = html;
-  
+
   // Remove any existing HTML tags except allowed ones
   return div.innerHTML;
 }
@@ -22,37 +22,33 @@ export function sanitizeHTML(html) {
  */
 export function validateMessage(message) {
   const errors = [];
-  
+
   if (typeof message !== 'string') {
     errors.push('Message must be a string');
   }
-  
+
   if (message.length === 0) {
     errors.push('Message cannot be empty');
   }
-  
+
   if (message.length > 5000) {
     errors.push('Message too long (max 5000 characters)');
   }
-  
+
   // Check for suspicious patterns
-  const suspiciousPatterns = [
-    /<script/i,
-    /javascript:/i,
-    /on\w+\s*=/i,
-  ];
-  
+  const suspiciousPatterns = [/<script/i, /javascript:/i, /on\w+\s*=/i];
+
   for (const pattern of suspiciousPatterns) {
     if (pattern.test(message)) {
       errors.push('Message contains suspicious content');
       break;
     }
   }
-  
+
   return {
     valid: errors.length === 0,
     errors,
-    sanitized: sanitizeHTML(message)
+    sanitized: sanitizeHTML(message),
   };
 }
 
@@ -64,7 +60,7 @@ export function validateMessage(message) {
 export function validateSettings(settings) {
   const errors = [];
   const validSettings = {};
-  
+
   // Validate message list
   if ('messageList' in settings) {
     if (typeof settings.messageList !== 'string') {
@@ -73,7 +69,7 @@ export function validateSettings(settings) {
       validSettings.messageList = settings.messageList;
     }
   }
-  
+
   // Validate send mode
   if ('sendMode' in settings) {
     if (!['random', 'sequential'].includes(settings.sendMode)) {
@@ -82,7 +78,7 @@ export function validateSettings(settings) {
       validSettings.sendMode = settings.sendMode;
     }
   }
-  
+
   // Validate intervals
   if ('minInterval' in settings) {
     const val = parseInt(settings.minInterval);
@@ -92,7 +88,7 @@ export function validateSettings(settings) {
       validSettings.minInterval = val;
     }
   }
-  
+
   if ('maxInterval' in settings) {
     const val = parseInt(settings.maxInterval);
     if (isNaN(val) || val < 1 || val > 3600) {
@@ -101,7 +97,7 @@ export function validateSettings(settings) {
       validSettings.maxInterval = val;
     }
   }
-  
+
   // Validate daily limit
   if ('dailyLimit' in settings) {
     const val = parseInt(settings.dailyLimit);
@@ -111,16 +107,16 @@ export function validateSettings(settings) {
       validSettings.dailyLimit = val;
     }
   }
-  
+
   // Validate boolean settings
   const booleanSettings = [
     'typingSimulation',
     'variableDelays',
     'antiRepetition',
     'templateVariables',
-    'activeHours'
+    'activeHours',
   ];
-  
+
   for (const key of booleanSettings) {
     if (key in settings) {
       if (typeof settings[key] !== 'boolean') {
@@ -130,7 +126,7 @@ export function validateSettings(settings) {
       }
     }
   }
-  
+
   // Validate active hours
   if ('activeHoursStart' in settings) {
     const val = parseInt(settings.activeHoursStart);
@@ -140,7 +136,7 @@ export function validateSettings(settings) {
       validSettings.activeHoursStart = val;
     }
   }
-  
+
   if ('activeHoursEnd' in settings) {
     const val = parseInt(settings.activeHoursEnd);
     if (isNaN(val) || val < 0 || val > 23) {
@@ -149,11 +145,11 @@ export function validateSettings(settings) {
       validSettings.activeHoursEnd = val;
     }
   }
-  
+
   return {
     valid: errors.length === 0,
     errors,
-    validated: validSettings
+    validated: validSettings,
   };
 }
 
@@ -166,33 +162,33 @@ export class RateLimiter {
     this.timeWindow = timeWindow;
     this.requests = [];
   }
-  
+
   /**
    * Check if action is allowed
    * @returns {boolean} - True if allowed
    */
   isAllowed() {
     const now = Date.now();
-    this.requests = this.requests.filter(time => now - time < this.timeWindow);
-    
+    this.requests = this.requests.filter((time) => now - time < this.timeWindow);
+
     if (this.requests.length < this.maxRequests) {
       this.requests.push(now);
       return true;
     }
-    
+
     return false;
   }
-  
+
   /**
    * Get remaining requests
    * @returns {number} - Number of remaining requests
    */
   getRemaining() {
     const now = Date.now();
-    this.requests = this.requests.filter(time => now - time < this.timeWindow);
+    this.requests = this.requests.filter((time) => now - time < this.timeWindow);
     return Math.max(0, this.maxRequests - this.requests.length);
   }
-  
+
   /**
    * Reset the rate limiter
    */
@@ -214,12 +210,12 @@ export function validateCSP(content) {
     /javascript:/gi,
     /data:text\/html/gi,
   ];
-  
+
   for (const pattern of dangerousPatterns) {
     if (pattern.test(content)) {
       return false;
     }
   }
-  
+
   return true;
 }

@@ -21,12 +21,12 @@ export class StateManager {
       // Messages
       messageList: data.messageList || '',
       customPhrases: data.customPhrases || [],
-      
+
       // Basic settings
       sendMode: data.sendMode || 'random',
       minInterval: data.minInterval || 60,
       maxInterval: data.maxInterval || 120,
-      
+
       // Advanced settings
       dailyLimit: data.dailyLimit || 0,
       typingSimulation: data.typingSimulation !== false,
@@ -36,32 +36,32 @@ export class StateManager {
       activeHours: data.activeHours || false,
       activeHoursStart: data.activeHoursStart || 9,
       activeHoursEnd: data.activeHoursEnd || 22,
-      
+
       // Statistics
       messagesSentToday: data.messagesSentToday || 0,
       totalMessagesSent: data.totalMessagesSent || 0,
       lastResetDate: data.lastResetDate || new Date().toDateString(),
-      
+
       // UI state
       theme: data.theme || 'light',
       isAutoSendActive: false,
       isPaused: false,
-      
+
       // New features
       notificationsEnabled: data.notificationsEnabled !== false,
       notificationSound: data.notificationSound !== false,
       dryRunMode: data.dryRunMode || false,
       analyticsEnabled: data.analyticsEnabled !== false,
-      
+
       // Categories
       categories: data.categories || null,
       categorizedPhrases: data.categorizedPhrases || [],
       phraseTags: data.phraseTags || [],
-      
+
       // Recents
       recentCommands: data.recentCommands || [],
       recentEmojis: data.recentEmojis || [],
-      favoriteEmojis: data.favoriteEmojis || []
+      favoriteEmojis: data.favoriteEmojis || [],
     };
 
     this.initialized = true;
@@ -102,7 +102,7 @@ export class StateManager {
    */
   async setMultiple(updates, save = true) {
     const changes = [];
-    
+
     Object.entries(updates).forEach(([key, value]) => {
       const oldValue = this.state[key];
       this.state[key] = value;
@@ -142,7 +142,7 @@ export class StateManager {
     if (!this.listeners.has(key)) {
       this.listeners.set(key, new Set());
     }
-    
+
     this.listeners.get(key).add(callback);
 
     // Return unsubscribe function
@@ -160,7 +160,7 @@ export class StateManager {
   notify(key, value, oldValue) {
     const listeners = this.listeners.get(key);
     if (listeners) {
-      listeners.forEach(callback => {
+      listeners.forEach((callback) => {
         try {
           callback(value, oldValue);
         } catch (error) {
@@ -172,7 +172,7 @@ export class StateManager {
     // Notify wildcard listeners (listening to all changes)
     const wildcardListeners = this.listeners.get('*');
     if (wildcardListeners) {
-      wildcardListeners.forEach(callback => {
+      wildcardListeners.forEach((callback) => {
         try {
           callback(key, value, oldValue);
         } catch (error) {
@@ -189,7 +189,7 @@ export class StateManager {
     await this.setMultiple({
       messagesSentToday: 0,
       totalMessagesSent: 0,
-      lastResetDate: new Date().toDateString()
+      lastResetDate: new Date().toDateString(),
     });
   }
 
@@ -198,11 +198,15 @@ export class StateManager {
    * @returns {string} JSON string
    */
   export() {
-    return JSON.stringify({
-      version: '4.3',
-      exported: new Date().toISOString(),
-      state: this.state
-    }, null, 2);
+    return JSON.stringify(
+      {
+        version: '4.3',
+        exported: new Date().toISOString(),
+        state: this.state,
+      },
+      null,
+      2
+    );
   }
 
   /**

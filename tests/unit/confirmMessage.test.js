@@ -13,7 +13,9 @@ test('confirmMessageSent resolves when input is cleared', async () => {
   const { confirmMessageSent } = helpers;
 
   // Clear input after 100ms
-  setTimeout(() => { input.value = ''; }, 100);
+  setTimeout(() => {
+    input.value = '';
+  }, 100);
 
   const result = await confirmMessageSent(input, 'hello world', 1000);
   expect(result).toBe(true);

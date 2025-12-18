@@ -48,10 +48,10 @@ describe('Anti-Repetition Logic', () => {
   test('should avoid recently used messages when enabled', () => {
     // Fill recent messages
     recentMessages = ['msg1', 'msg2'];
-    
+
     // Get next 10 messages
     const messages = Array.from({ length: 10 }, () => getNextMessage());
-    
+
     // Not guaranteed but highly unlikely to always pick recent ones
     expect(messages.length).toBe(10);
   });
@@ -60,7 +60,7 @@ describe('Anti-Repetition Logic', () => {
     for (let i = 0; i < 10; i++) {
       getNextMessage();
     }
-    
+
     const maxLength = Math.min(5, Math.floor(messageList.length / 2));
     expect(recentMessages.length).toBeLessThanOrEqual(maxLength);
   });
@@ -74,7 +74,7 @@ describe('Anti-Repetition Logic', () => {
   test('should work when anti-repetition is disabled', () => {
     enableAntiRepetition = false;
     recentMessages = ['msg1', 'msg2'];
-    
+
     const msg = getNextMessage();
     expect(messageList).toContain(msg);
     expect(recentMessages.length).toBe(2); // Shouldn't change

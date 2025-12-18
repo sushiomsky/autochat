@@ -20,7 +20,7 @@ async function ensureContentScript(tabId) {
   try {
     await chrome.scripting.executeScript({
       target: { tabId },
-      files: ['content-enhanced.js']
+      files: ['content-enhanced.js'],
     });
     console.log('[Popup] content-enhanced.js injected');
   } catch (err) {
@@ -40,7 +40,7 @@ async function sendMessageToContent(msg) {
   } catch (err) {
     console.log('[Popup] Reinjecting content script...');
     await ensureContentScript(tab.id);
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 500));
 
     try {
       return await chrome.tabs.sendMessage(tab.id, msg);
@@ -127,7 +127,7 @@ const elements = {
   newPhraseInput: document.getElementById('newPhraseInput'),
 
   // Notifications
-  notification: document.getElementById('notification')
+  notification: document.getElementById('notification'),
 };
 
 // ===== STATE =====
@@ -138,8 +138,8 @@ let currentAccount = 'default';
 let accounts = {
   default: {
     name: 'Default Account',
-    settings: {}
-  }
+    settings: {},
+  },
 };
 
 // ===== NOTIFICATIONS =====
@@ -196,7 +196,9 @@ async function updateInputStatus() {
     }
     if (elements.sendButtonStatus) {
       if (method === 'click') {
-        elements.sendButtonStatus.textContent = data.sendButtonSelector ? '✅ Send button marked' : 'If you choose "Click a Send button", please mark the button.';
+        elements.sendButtonStatus.textContent = data.sendButtonSelector
+          ? '✅ Send button marked'
+          : 'If you choose "Click a Send button", please mark the button.';
       } else {
         elements.sendButtonStatus.textContent = '';
       }
@@ -225,19 +227,23 @@ async function updateStats() {
       // Use animated stat updates
       updateStatWithAnimation('messagesSentToday', stats.messagesSentToday || 0);
       updateStatWithAnimation('totalMessages', stats.totalMessagesSent || 0);
-      
+
       // Update analytics modal stats
       updateStatWithAnimation('analyticsToday', stats.messagesSentToday || 0);
       updateStatWithAnimation('analyticsTotal', stats.totalMessagesSent || 0);
-      
+
       // Use localized status if available
-      const statusText = stats.isAutoSendActive ? 
-        (typeof t === 'function' ? t('statusActive') : 'Active') : 
-        (typeof t === 'function' ? t('statusInactive') : 'Inactive');
+      const statusText = stats.isAutoSendActive
+        ? typeof t === 'function'
+          ? t('statusActive')
+          : 'Active'
+        : typeof t === 'function'
+          ? t('statusInactive')
+          : 'Inactive';
       const statusIcon = stats.isAutoSendActive ? '🟢' : '⚪';
       elements.autoSendStatus.textContent = `${statusIcon} ${statusText}`;
       elements.autoSendStatus.className = 'status ' + (stats.isAutoSendActive ? 'success' : '');
-      
+
       // Update analytics modal if visible
       const analyticsStatus = document.getElementById('analyticsStatus');
       if (analyticsStatus) {
@@ -254,21 +260,24 @@ async function updateStats() {
 function getMessages() {
   const text = elements.messageList.value.trim();
   if (!text) return [];
-  return text.split('\n').map(m => m.trim()).filter(m => m.length > 0);
+  return text
+    .split('\n')
+    .map((m) => m.trim())
+    .filter((m) => m.length > 0);
 }
 
 async function loadDefaultPhrasesFromFile() {
   try {
     // Get current locale from storage or use browser default
-    const storageData = await new Promise(resolve => {
+    const storageData = await new Promise((resolve) => {
       chrome.storage.local.get(['locale'], resolve);
     });
     const locale = storageData.locale || chrome.i18n.getUILanguage().split('-')[0] || 'en';
-    
+
     // Try to load language-specific phrases, fallback to English
     let phraseFile = `farming_phrases_${locale}.txt`;
     let response;
-    
+
     try {
       response = await fetch(chrome.runtime.getURL(phraseFile));
       if (!response.ok) throw new Error('File not found');
@@ -277,9 +286,12 @@ async function loadDefaultPhrasesFromFile() {
       phraseFile = 'farming_phrases_en.txt';
       response = await fetch(chrome.runtime.getURL(phraseFile));
     }
-    
+
     const text = await response.text();
-    defaultPhrases = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    defaultPhrases = text
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
     console.log(`[AutoChat] Loaded ${defaultPhrases.length} default phrases from ${phraseFile}`);
     return defaultPhrases;
   } catch (error) {
@@ -325,7 +337,8 @@ function renderPhrasesList() {
   elements.customPhrasesList.innerHTML = '';
 
   if (customPhrases.length === 0) {
-    elements.customPhrasesList.innerHTML = '<div class="help" style="text-align: center; padding: 20px;">No custom phrases yet. Add one above!</div>';
+    elements.customPhrasesList.innerHTML =
+      '<div class="help" style="text-align: center; padding: 20px;">No custom phrases yet. Add one above!</div>';
   } else {
     customPhrases.forEach((phrase, index) => {
       const item = document.createElement('div');
@@ -345,7 +358,8 @@ function renderPhrasesList() {
   elements.defaultPhrasesList.innerHTML = '';
 
   if (defaultPhrases.length === 0) {
-    elements.defaultPhrasesList.innerHTML = '<div class="help" style="text-align: center; padding: 20px;">No default phrases loaded</div>';
+    elements.defaultPhrasesList.innerHTML =
+      '<div class="help" style="text-align: center; padding: 20px;">No default phrases loaded</div>';
   } else {
     defaultPhrases.slice(0, 50).forEach((phrase) => {
       const item = document.createElement('div');
@@ -367,7 +381,7 @@ function renderPhrasesList() {
   }
 
   // Delete button handlers
-  elements.customPhrasesList.querySelectorAll('.btn-small.delete').forEach(btn => {
+  elements.customPhrasesList.querySelectorAll('.btn-small.delete').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       const index = parseInt(e.target.dataset.index);
       if (confirm('Delete this phrase?')) {
@@ -401,7 +415,8 @@ elements.sendMethod?.addEventListener('change', (e) => {
       elements.markSendButton.style.display = method === 'click' ? 'inline-block' : 'none';
     }
     if (elements.sendButtonStatus) {
-      elements.sendButtonStatus.textContent = method === 'click' ? 'If you choose "Click a Send button", please mark the button.' : '';
+      elements.sendButtonStatus.textContent =
+        method === 'click' ? 'If you choose "Click a Send button", please mark the button.' : '';
     }
   });
 });
@@ -420,7 +435,7 @@ document.getElementById('sendOnce')?.addEventListener('click', async () => {
     return;
   }
 
-  const { sendMethod, sendButtonSelector } = await new Promise(resolve => {
+  const { sendMethod, sendButtonSelector } = await new Promise((resolve) => {
     chrome.storage.local.get(['sendMethod', 'sendButtonSelector'], resolve);
   });
   if ((sendMethod || 'enter') === 'click' && !sendButtonSelector) {
@@ -431,7 +446,7 @@ document.getElementById('sendOnce')?.addEventListener('click', async () => {
   const randomMsg = messages[Math.floor(Math.random() * messages.length)];
   const response = await sendMessageToContent({
     action: 'sendMessage',
-    text: randomMsg
+    text: randomMsg,
   });
 
   if (response && response.ok) {
@@ -460,7 +475,7 @@ document.getElementById('startAutoSend')?.addEventListener('click', async () => 
   }
 
   // Validate send method if needed
-  const { sendMethod, sendButtonSelector } = await new Promise(resolve => {
+  const { sendMethod, sendButtonSelector } = await new Promise((resolve) => {
     chrome.storage.local.get(['sendMethod', 'sendButtonSelector'], resolve);
   });
   if ((sendMethod || 'enter') === 'click' && !sendButtonSelector) {
@@ -481,13 +496,13 @@ document.getElementById('startAutoSend')?.addEventListener('click', async () => 
     activeHoursEnabled: elements.activeHours.checked,
     activeHoursStart: parseInt(elements.activeHoursStart.value) || 9,
     activeHoursEnd: parseInt(elements.activeHoursEnd.value) || 22,
-    sendMethod: (sendMethod || 'enter')
+    sendMethod: sendMethod || 'enter',
   };
 
   const response = await sendMessageToContent({
     action: 'startAutoSend',
     messages,
-    config
+    config,
   });
 
   if (response && response.ok) {
@@ -518,7 +533,10 @@ document.getElementById('loadDefaultPhrases')?.addEventListener('click', async (
 
   elements.messageList.value = allPhrases.join('\n');
   chrome.storage.local.set({ messageList: elements.messageList.value });
-  showNotification(`Loaded ${allPhrases.length} phrases (${customPhrases.length} custom + ${defaultPhrases.length} default)`, true);
+  showNotification(
+    `Loaded ${allPhrases.length} phrases (${customPhrases.length} custom + ${defaultPhrases.length} default)`,
+    true
+  );
 });
 
 // Manage phrases
@@ -546,18 +564,21 @@ async function initializeWebhookManager() {
       webhooks: [],
       enabled: true,
       async load() {
-        const data = await new Promise(resolve => {
+        const data = await new Promise((resolve) => {
           chrome.storage.local.get(['webhooks', 'webhooksEnabled'], resolve);
         });
         this.webhooks = data.webhooks || [];
         this.enabled = data.webhooksEnabled !== false;
       },
       async save() {
-        await new Promise(resolve => {
-          chrome.storage.local.set({ 
-            webhooks: this.webhooks,
-            webhooksEnabled: this.enabled
-          }, resolve);
+        await new Promise((resolve) => {
+          chrome.storage.local.set(
+            {
+              webhooks: this.webhooks,
+              webhooksEnabled: this.enabled,
+            },
+            resolve
+          );
         });
       },
       generateId() {
@@ -575,20 +596,20 @@ async function initializeWebhookManager() {
           createdAt: new Date().toISOString(),
           triggerCount: 0,
           failureCount: 0,
-          lastTriggered: null
+          lastTriggered: null,
         };
         this.webhooks.push(newWebhook);
         return newWebhook;
       },
       update(id, updates) {
-        const webhook = this.webhooks.find(w => w.id === id);
+        const webhook = this.webhooks.find((w) => w.id === id);
         if (webhook) {
           Object.assign(webhook, updates);
         }
         return webhook;
       },
       delete(id) {
-        const index = this.webhooks.findIndex(w => w.id === id);
+        const index = this.webhooks.findIndex((w) => w.id === id);
         if (index !== -1) {
           this.webhooks.splice(index, 1);
         }
@@ -599,13 +620,13 @@ async function initializeWebhookManager() {
       getStats() {
         return {
           total: this.webhooks.length,
-          enabled: this.webhooks.filter(w => w.enabled).length,
+          enabled: this.webhooks.filter((w) => w.enabled).length,
           totalTriggers: this.webhooks.reduce((sum, w) => sum + w.triggerCount, 0),
-          totalFailures: this.webhooks.reduce((sum, w) => sum + w.failureCount, 0)
+          totalFailures: this.webhooks.reduce((sum, w) => sum + w.failureCount, 0),
         };
       },
       async test(id) {
-        const webhook = this.webhooks.find(w => w.id === id);
+        const webhook = this.webhooks.find((w) => w.id === id);
         if (!webhook) {
           throw new Error('Webhook not found');
         }
@@ -615,15 +636,15 @@ async function initializeWebhookManager() {
             method: webhook.method,
             headers: {
               'Content-Type': 'application/json',
-              ...webhook.headers
+              ...webhook.headers,
             },
             body: JSON.stringify({
               event: 'test',
               timestamp: new Date().toISOString(),
               data: { test: true, message: 'Test webhook from AutoChat' },
               source: 'AutoChat',
-              version: chrome.runtime.getManifest().version
-            })
+              version: chrome.runtime.getManifest().version,
+            }),
           });
 
           if (!response.ok) {
@@ -636,7 +657,7 @@ async function initializeWebhookManager() {
           showNotification(`❌ Webhook test failed: ${error.message}`, false);
           return false;
         }
-      }
+      },
     };
     await webhookManager.load();
   }
@@ -648,7 +669,7 @@ async function renderWebhookList() {
   await initializeWebhookManager();
   const webhookList = document.getElementById('webhookList');
   const webhookCount = document.getElementById('webhookCount');
-  
+
   if (!webhookList) return;
 
   const webhooks = webhookManager.getAll();
@@ -664,7 +685,9 @@ async function renderWebhookList() {
     return;
   }
 
-  webhookList.innerHTML = webhooks.map(webhook => `
+  webhookList.innerHTML = webhooks
+    .map(
+      (webhook) => `
     <div class="webhook-item ${webhook.enabled ? '' : 'disabled'}">
       <div class="webhook-header">
         <span class="webhook-name">${sanitizeHTML(webhook.name)}</span>
@@ -688,7 +711,7 @@ async function renderWebhookList() {
         <div class="webhook-detail-row">
           <span class="webhook-detail-label">Events:</span>
           <div class="webhook-events">
-            ${webhook.events.map(e => `<span class="webhook-event-tag">${e.replace('_', ' ')}</span>`).join('')}
+            ${webhook.events.map((e) => `<span class="webhook-event-tag">${e.replace('_', ' ')}</span>`).join('')}
           </div>
         </div>
       </div>
@@ -707,13 +730,15 @@ async function renderWebhookList() {
         </div>
       </div>
     </div>
-  `).join('');
+  `
+    )
+    .join('');
 
   // Attach event listeners
-  webhookList.querySelectorAll('.btn-toggle').forEach(btn => {
+  webhookList.querySelectorAll('.btn-toggle').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const id = btn.getAttribute('data-id');
-      const webhook = webhookManager.getAll().find(w => w.id === id);
+      const webhook = webhookManager.getAll().find((w) => w.id === id);
       if (webhook) {
         webhookManager.update(id, { enabled: !webhook.enabled });
         await webhookManager.save();
@@ -723,17 +748,17 @@ async function renderWebhookList() {
     });
   });
 
-  webhookList.querySelectorAll('.btn-test').forEach(btn => {
+  webhookList.querySelectorAll('.btn-test').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const id = btn.getAttribute('data-id');
       await webhookManager.test(id);
     });
   });
 
-  webhookList.querySelectorAll('.btn-delete').forEach(btn => {
+  webhookList.querySelectorAll('.btn-delete').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const id = btn.getAttribute('data-id');
-      const webhook = webhookManager.getAll().find(w => w.id === id);
+      const webhook = webhookManager.getAll().find((w) => w.id === id);
       if (webhook && confirm(`Are you sure you want to delete webhook "${webhook.name}"?`)) {
         webhookManager.delete(id);
         await webhookManager.save();
@@ -769,10 +794,11 @@ document.getElementById('webhookForm')?.addEventListener('submit', async (e) => 
   const url = document.getElementById('webhookUrl').value.trim();
   const method = document.getElementById('webhookMethod').value;
   const headersText = document.getElementById('webhookHeaders').value.trim();
-  
+
   // Get selected events
-  const events = Array.from(document.querySelectorAll('#webhookEvents input[type="checkbox"]:checked'))
-    .map(cb => cb.value);
+  const events = Array.from(
+    document.querySelectorAll('#webhookEvents input[type="checkbox"]:checked')
+  ).map((cb) => cb.value);
 
   // Validation
   if (!name) {
@@ -801,20 +827,20 @@ document.getElementById('webhookForm')?.addEventListener('submit', async (e) => 
   }
 
   await initializeWebhookManager();
-  
+
   try {
     webhookManager.add({
       name,
       url,
       method,
       events,
-      headers
+      headers,
     });
-    
+
     await webhookManager.save();
     await renderWebhookList();
     await updateWebhookStats();
-    
+
     // Reset form
     document.getElementById('webhookForm').reset();
     showNotification(`✅ Webhook "${name}" added successfully!`, true);
@@ -855,27 +881,27 @@ document.getElementById('openDonation')?.addEventListener('click', () => {
 });
 
 // Copy crypto address functionality
-document.querySelectorAll('.btn-copy').forEach(btn => {
+document.querySelectorAll('.btn-copy').forEach((btn) => {
   btn.addEventListener('click', async (e) => {
     const addressId = e.target.getAttribute('data-address');
     const addressElement = document.getElementById(addressId);
     if (!addressElement) return;
 
     const address = addressElement.textContent;
-    
+
     try {
       await navigator.clipboard.writeText(address);
-      
+
       // Show feedback
       const originalText = e.target.textContent;
       e.target.textContent = '✓';
       e.target.style.background = '#2ecc71';
-      
+
       setTimeout(() => {
         e.target.textContent = originalText;
         e.target.style.background = '';
       }, 2000);
-      
+
       showNotification('Address copied to clipboard!', true);
     } catch (err) {
       console.error('Failed to copy:', err);
@@ -896,104 +922,132 @@ async function initPerformanceMonitor() {
         messagesSent: [],
         typingSpeed: [],
         errors: [],
-        memoryUsage: []
+        memoryUsage: [],
       },
       startTime: Date.now(),
-      
+
       recordMessageSend(duration, success) {
         this.metrics.messagesSent.push({ timestamp: Date.now(), duration, success });
         if (this.metrics.messagesSent.length > 100) this.metrics.messagesSent.shift();
       },
-      
+
       recordTypingSpeed(wpm) {
         this.metrics.typingSpeed.push({ timestamp: Date.now(), wpm });
         if (this.metrics.typingSpeed.length > 50) this.metrics.typingSpeed.shift();
       },
-      
+
       recordError(type, message) {
         this.metrics.errors.push({ timestamp: Date.now(), type, message });
         if (this.metrics.errors.length > 50) this.metrics.errors.shift();
       },
-      
+
       getStats() {
         const now = Date.now();
         const uptime = now - this.startTime;
-        
-        const successfulSends = this.metrics.messagesSent.filter(m => m.success);
-        const failedSends = this.metrics.messagesSent.filter(m => !m.success);
-        const avgSendDuration = successfulSends.length > 0
-          ? successfulSends.reduce((sum, m) => sum + m.duration, 0) / successfulSends.length
-          : 0;
-        
-        const avgTypingSpeed = this.metrics.typingSpeed.length > 0
-          ? this.metrics.typingSpeed.reduce((sum, t) => sum + t.wpm, 0) / this.metrics.typingSpeed.length
-          : 0;
-        
-        const recentErrors = this.metrics.errors.filter(e => now - e.timestamp < 3600000);
-        
+
+        const successfulSends = this.metrics.messagesSent.filter((m) => m.success);
+        const failedSends = this.metrics.messagesSent.filter((m) => !m.success);
+        const avgSendDuration =
+          successfulSends.length > 0
+            ? successfulSends.reduce((sum, m) => sum + m.duration, 0) / successfulSends.length
+            : 0;
+
+        const avgTypingSpeed =
+          this.metrics.typingSpeed.length > 0
+            ? this.metrics.typingSpeed.reduce((sum, t) => sum + t.wpm, 0) /
+              this.metrics.typingSpeed.length
+            : 0;
+
+        const recentErrors = this.metrics.errors.filter((e) => now - e.timestamp < 3600000);
+
         return {
           uptime,
           messages: {
             total: this.metrics.messagesSent.length,
             successful: successfulSends.length,
             failed: failedSends.length,
-            successRate: this.metrics.messagesSent.length > 0
-              ? ((successfulSends.length / this.metrics.messagesSent.length) * 100).toFixed(1)
-              : 0,
-            avgDuration: avgSendDuration.toFixed(0)
+            successRate:
+              this.metrics.messagesSent.length > 0
+                ? ((successfulSends.length / this.metrics.messagesSent.length) * 100).toFixed(1)
+                : 0,
+            avgDuration: avgSendDuration.toFixed(0),
           },
           typing: {
             avgSpeed: avgTypingSpeed.toFixed(1),
-            samples: this.metrics.typingSpeed.length
+            samples: this.metrics.typingSpeed.length,
           },
           errors: {
             total: this.metrics.errors.length,
-            recentCount: recentErrors.length
+            recentCount: recentErrors.length,
           },
-          memory: performance.memory ? {
-            usedMB: (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2),
-            usagePercent: ((performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit) * 100).toFixed(1)
-          } : null
+          memory: performance.memory
+            ? {
+                usedMB: (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2),
+                usagePercent: (
+                  (performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit) *
+                  100
+                ).toFixed(1),
+              }
+            : null,
         };
       },
-      
+
       getRecommendations() {
         const stats = this.getStats();
         const recommendations = [];
-        
+
         if (stats.messages.successRate < 90 && stats.messages.total > 10) {
-          recommendations.push({ type: 'warning', text: '⚠️ Message success rate is below 90%. Check input field configuration.' });
+          recommendations.push({
+            type: 'warning',
+            text: '⚠️ Message success rate is below 90%. Check input field configuration.',
+          });
         }
-        
+
         if (parseFloat(stats.typing.avgSpeed) < 30 && stats.typing.samples > 5) {
-          recommendations.push({ type: 'info', text: '💡 Typing speed is slow. Consider increasing typing simulation speed.' });
+          recommendations.push({
+            type: 'info',
+            text: '💡 Typing speed is slow. Consider increasing typing simulation speed.',
+          });
         } else if (parseFloat(stats.typing.avgSpeed) > 100 && stats.typing.samples > 5) {
-          recommendations.push({ type: 'warning', text: '⚠️ Typing speed is very fast. May appear robotic.' });
+          recommendations.push({
+            type: 'warning',
+            text: '⚠️ Typing speed is very fast. May appear robotic.',
+          });
         }
-        
+
         if (stats.errors.recentCount > 10) {
-          recommendations.push({ type: 'warning', text: '⚠️ High error rate detected. Review recent errors.' });
+          recommendations.push({
+            type: 'warning',
+            text: '⚠️ High error rate detected. Review recent errors.',
+          });
         }
-        
+
         if (stats.memory && parseFloat(stats.memory.usagePercent) > 80) {
-          recommendations.push({ type: 'warning', text: '⚠️ High memory usage. Consider restarting extension.' });
+          recommendations.push({
+            type: 'warning',
+            text: '⚠️ High memory usage. Consider restarting extension.',
+          });
         }
-        
+
         if (recommendations.length === 0) {
-          recommendations.push({ type: 'success', text: '✅ Performance is optimal! No issues detected.' });
+          recommendations.push({
+            type: 'success',
+            text: '✅ Performance is optimal! No issues detected.',
+          });
         }
-        
+
         return recommendations;
-      }
+      },
     };
-    
+
     // Load saved metrics
-    const data = await new Promise(resolve => {
+    const data = await new Promise((resolve) => {
       chrome.storage.local.get(['performanceMetrics'], resolve);
     });
     if (data.performanceMetrics) {
       performanceMonitor.metrics = data.performanceMetrics.metrics || performanceMonitor.metrics;
-      performanceMonitor.startTime = data.performanceMetrics.startTime || performanceMonitor.startTime;
+      performanceMonitor.startTime =
+        data.performanceMetrics.startTime || performanceMonitor.startTime;
     }
   }
   return performanceMonitor;
@@ -1003,17 +1057,17 @@ async function initPerformanceMonitor() {
 async function updatePerformanceDisplay() {
   await initPerformanceMonitor();
   const stats = performanceMonitor.getStats();
-  
+
   // Update message stats
   document.getElementById('perfTotalMessages').textContent = stats.messages.total;
   document.getElementById('perfSuccessRate').textContent = stats.messages.successRate + '%';
   document.getElementById('perfAvgDuration').textContent = stats.messages.avgDuration + 'ms';
   document.getElementById('perfFailed').textContent = stats.messages.failed;
-  
+
   // Update typing stats
   document.getElementById('perfTypingSpeed').textContent = stats.typing.avgSpeed + ' WPM';
   document.getElementById('perfTypingSamples').textContent = stats.typing.samples;
-  
+
   // Update system stats
   if (stats.memory) {
     document.getElementById('perfMemoryUsed').textContent = stats.memory.usedMB + ' MB';
@@ -1022,20 +1076,21 @@ async function updatePerformanceDisplay() {
     document.getElementById('perfMemoryUsed').textContent = 'N/A';
     document.getElementById('perfMemoryPercent').textContent = 'N/A';
   }
-  
+
   const uptimeSeconds = Math.floor(stats.uptime / 1000);
-  const uptimeStr = uptimeSeconds < 60 
-    ? uptimeSeconds + 's'
-    : Math.floor(uptimeSeconds / 60) + 'm ' + (uptimeSeconds % 60) + 's';
+  const uptimeStr =
+    uptimeSeconds < 60
+      ? uptimeSeconds + 's'
+      : Math.floor(uptimeSeconds / 60) + 'm ' + (uptimeSeconds % 60) + 's';
   document.getElementById('perfUptime').textContent = uptimeStr;
   document.getElementById('perfErrors').textContent = stats.errors.total;
-  
+
   // Update recommendations
   const recommendations = performanceMonitor.getRecommendations();
   const recContainer = document.getElementById('perfRecommendations');
-  recContainer.innerHTML = recommendations.map(rec => 
-    `<div class="perf-recommendation ${rec.type}">${rec.text}</div>`
-  ).join('');
+  recContainer.innerHTML = recommendations
+    .map((rec) => `<div class="perf-recommendation ${rec.type}">${rec.text}</div>`)
+    .join('');
 }
 
 // Performance modal
@@ -1057,9 +1112,9 @@ document.getElementById('exportPerformance')?.addEventListener('click', async ()
   const data = {
     exportTime: new Date().toISOString(),
     stats,
-    recommendations: performanceMonitor.getRecommendations()
+    recommendations: performanceMonitor.getRecommendations(),
   };
-  
+
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1067,7 +1122,7 @@ document.getElementById('exportPerformance')?.addEventListener('click', async ()
   a.download = `autochat-performance-${Date.now()}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  
+
   showNotification('Performance data exported', true);
 });
 
@@ -1079,10 +1134,10 @@ document.getElementById('clearPerformance')?.addEventListener('click', async () 
       messagesSent: [],
       typingSpeed: [],
       errors: [],
-      memoryUsage: []
+      memoryUsage: [],
     };
     performanceMonitor.startTime = Date.now();
-    
+
     await chrome.storage.local.remove(['performanceMetrics']);
     await updatePerformanceDisplay();
     showNotification('Performance metrics cleared', true);
@@ -1090,14 +1145,14 @@ document.getElementById('clearPerformance')?.addEventListener('click', async () 
 });
 
 // Close modals
-document.querySelectorAll('.close-modal').forEach(btn => {
+document.querySelectorAll('.close-modal').forEach((btn) => {
   btn.addEventListener('click', (e) => {
     e.target.closest('.modal').classList.remove('show');
   });
 });
 
 // Close modal on background click
-document.querySelectorAll('.modal').forEach(modal => {
+document.querySelectorAll('.modal').forEach((modal) => {
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       modal.classList.remove('show');
@@ -1136,7 +1191,7 @@ document.getElementById('exportSettings')?.addEventListener('click', () => {
     const settings = {
       version: '4.0',
       settings: data,
-      exportDate: new Date().toISOString()
+      exportDate: new Date().toISOString(),
     };
 
     const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
@@ -1184,14 +1239,17 @@ document.getElementById('importSettings')?.addEventListener('click', () => {
 // Reset stats
 document.getElementById('resetStats')?.addEventListener('click', () => {
   if (confirm('Reset all statistics? This cannot be undone.')) {
-    chrome.storage.local.set({
-      messagesSentToday: 0,
-      totalMessagesSent: 0,
-      lastResetDate: new Date().toDateString()
-    }, () => {
-      showNotification('Statistics reset', true);
-      updateStats();
-    });
+    chrome.storage.local.set(
+      {
+        messagesSentToday: 0,
+        totalMessagesSent: 0,
+        lastResetDate: new Date().toDateString(),
+      },
+      () => {
+        showNotification('Statistics reset', true);
+        updateStats();
+      }
+    );
   }
 });
 
@@ -1217,8 +1275,8 @@ function saveAccounts() {
 
 function updateAccountSelect() {
   elements.accountSelect.innerHTML = '';
-  
-  Object.keys(accounts).forEach(accountId => {
+
+  Object.keys(accounts).forEach((accountId) => {
     const account = accounts[accountId];
     const option = document.createElement('option');
     option.value = accountId;
@@ -1232,40 +1290,40 @@ function updateAccountSelect() {
 
 function updateAccountList() {
   elements.accountList.innerHTML = '';
-  
-  Object.keys(accounts).forEach(accountId => {
+
+  Object.keys(accounts).forEach((accountId) => {
     const account = accounts[accountId];
     const isActive = accountId === currentAccount;
-    
+
     const item = document.createElement('div');
     item.className = 'account-item' + (isActive ? ' active' : '');
-    
+
     const nameSpan = document.createElement('span');
     nameSpan.className = 'account-item-name';
     nameSpan.textContent = account.name;
-    
+
     if (isActive) {
       const badge = document.createElement('span');
       badge.className = 'account-item-badge';
       badge.textContent = 'ACTIVE';
       nameSpan.appendChild(badge);
     }
-    
+
     const actions = document.createElement('div');
     actions.className = 'account-item-actions';
-    
+
     if (!isActive) {
       const switchBtn = document.createElement('button');
       switchBtn.textContent = '🔄 Switch';
       switchBtn.onclick = () => switchAccount(accountId);
       actions.appendChild(switchBtn);
     }
-    
+
     const exportBtn = document.createElement('button');
     exportBtn.textContent = '📥 Export';
     exportBtn.onclick = () => exportAccount(accountId);
     actions.appendChild(exportBtn);
-    
+
     if (accountId !== 'default') {
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'btn-danger-small';
@@ -1273,7 +1331,7 @@ function updateAccountList() {
       deleteBtn.onclick = () => deleteAccount(accountId);
       actions.appendChild(deleteBtn);
     }
-    
+
     item.appendChild(nameSpan);
     item.appendChild(actions);
     elements.accountList.appendChild(item);
@@ -1285,15 +1343,15 @@ function switchAccount(accountId) {
     showNotification('❌ Account not found', false);
     return;
   }
-  
+
   // Save current account settings before switching
   const currentSettings = getCurrentSettings();
   accounts[currentAccount].settings = currentSettings;
-  
+
   // Switch to new account
   currentAccount = accountId;
   saveAccounts();
-  
+
   // Load new account settings
   if (accounts[accountId].settings && Object.keys(accounts[accountId].settings).length > 0) {
     chrome.storage.local.set(accounts[accountId].settings, () => {
@@ -1313,14 +1371,14 @@ function switchAccount(accountId) {
 function getCurrentSettings() {
   const mentionKeywords = elements.mentionKeywords.value
     .split('\n')
-    .map(k => k.trim())
-    .filter(k => k.length > 0);
-  
+    .map((k) => k.trim())
+    .filter((k) => k.length > 0);
+
   const mentionReplyMessages = elements.mentionReplyMessages.value
     .split('\n')
-    .map(m => m.trim())
-    .filter(m => m.length > 0);
-  
+    .map((m) => m.trim())
+    .filter((m) => m.length > 0);
+
   return {
     messageList: elements.messageList.value,
     sendMode: elements.sendMode.value,
@@ -1341,25 +1399,29 @@ function getCurrentSettings() {
     chatLoggingEnabled: elements.chatLoggingEnabled?.checked || false,
     manualDetectionEnabled: elements.manualDetectionEnabled?.checked || false,
     notificationsEnabled: elements.notificationsEnabled.checked,
-    notificationSound: elements.notificationSound.checked
+    notificationSound: elements.notificationSound.checked,
   };
 }
 
 function exportAccount(accountId) {
   const account = accounts[accountId];
   if (!account) return;
-  
+
   // Get current settings if this is the active account
   if (accountId === currentAccount) {
     account.settings = getCurrentSettings();
   }
-  
-  const dataStr = JSON.stringify({
-    name: account.name,
-    settings: account.settings,
-    exportDate: new Date().toISOString()
-  }, null, 2);
-  
+
+  const dataStr = JSON.stringify(
+    {
+      name: account.name,
+      settings: account.settings,
+      exportDate: new Date().toISOString(),
+    },
+    null,
+    2
+  );
+
   const dataBlob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(dataBlob);
   const link = document.createElement('a');
@@ -1367,7 +1429,7 @@ function exportAccount(accountId) {
   link.download = `autochat-${account.name.toLowerCase().replace(/\s+/g, '-')}.json`;
   link.click();
   URL.revokeObjectURL(url);
-  
+
   showNotification(`📥 Exported: ${account.name}`, true);
 }
 
@@ -1376,12 +1438,12 @@ function deleteAccount(accountId) {
     showNotification('❌ Cannot delete default account', false);
     return;
   }
-  
+
   if (accountId === currentAccount) {
     showNotification('❌ Cannot delete active account', false);
     return;
   }
-  
+
   const account = accounts[accountId];
   if (confirm(`Delete account "${account.name}"? This cannot be undone.`)) {
     delete accounts[accountId];
@@ -1404,25 +1466,25 @@ elements.createAccount?.addEventListener('click', () => {
     showNotification('❌ Please enter an account name', false);
     return;
   }
-  
+
   if (name.length > 50) {
     showNotification('❌ Name too long (max 50 characters)', false);
     return;
   }
-  
+
   // Generate unique ID
   const accountId = 'account_' + Date.now();
-  
+
   accounts[accountId] = {
     name: name,
-    settings: {}
+    settings: {},
   };
-  
+
   saveAccounts();
   updateAccountSelect();
   updateAccountList();
   elements.newAccountName.value = '';
-  
+
   showNotification(`✅ Created: ${name}`, true);
 });
 
@@ -1436,82 +1498,85 @@ elements.accountSelect?.addEventListener('change', (e) => {
 // ===== LOAD/SAVE SETTINGS =====
 
 function loadSettings() {
-  chrome.storage.local.get([
-    'messageList',
-    'sendMode',
-    'minInterval',
-    'maxInterval',
-    'dailyLimit',
-    'typingSimulation',
-    'variableDelays',
-    'antiRepetition',
-    'templateVariables',
-    'activeHours',
-    'activeHoursStart',
-    'activeHoursEnd',
-    'sendConfirmTimeout',
-    'mentionDetectionEnabled',
-    'mentionKeywords',
-    'mentionReplyMessages',
-    'chatLoggingEnabled',
-    'manualDetectionEnabled',
-    'notificationsEnabled',
-    'notificationSound'
-  ], (data) => {
-    if (data.messageList) elements.messageList.value = data.messageList;
-    if (data.sendMode) elements.sendMode.value = data.sendMode;
-    if (data.minInterval) elements.minInterval.value = data.minInterval;
-    if (data.maxInterval) elements.maxInterval.value = data.maxInterval;
-    if (data.dailyLimit) elements.dailyLimit.value = data.dailyLimit;
+  chrome.storage.local.get(
+    [
+      'messageList',
+      'sendMode',
+      'minInterval',
+      'maxInterval',
+      'dailyLimit',
+      'typingSimulation',
+      'variableDelays',
+      'antiRepetition',
+      'templateVariables',
+      'activeHours',
+      'activeHoursStart',
+      'activeHoursEnd',
+      'sendConfirmTimeout',
+      'mentionDetectionEnabled',
+      'mentionKeywords',
+      'mentionReplyMessages',
+      'chatLoggingEnabled',
+      'manualDetectionEnabled',
+      'notificationsEnabled',
+      'notificationSound',
+    ],
+    (data) => {
+      if (data.messageList) elements.messageList.value = data.messageList;
+      if (data.sendMode) elements.sendMode.value = data.sendMode;
+      if (data.minInterval) elements.minInterval.value = data.minInterval;
+      if (data.maxInterval) elements.maxInterval.value = data.maxInterval;
+      if (data.dailyLimit) elements.dailyLimit.value = data.dailyLimit;
 
-    elements.typingSimulation.checked = data.typingSimulation !== false;
-    elements.variableDelays.checked = data.variableDelays !== false;
-    elements.antiRepetition.checked = data.antiRepetition !== false;
-    elements.templateVariables.checked = data.templateVariables !== false;
-    elements.activeHours.checked = data.activeHours || false;
+      elements.typingSimulation.checked = data.typingSimulation !== false;
+      elements.variableDelays.checked = data.variableDelays !== false;
+      elements.antiRepetition.checked = data.antiRepetition !== false;
+      elements.templateVariables.checked = data.templateVariables !== false;
+      elements.activeHours.checked = data.activeHours || false;
 
-    if (data.activeHoursStart) elements.activeHoursStart.value = data.activeHoursStart;
-    if (data.activeHoursEnd) elements.activeHoursEnd.value = data.activeHoursEnd;
-    if (data.sendConfirmTimeout) elements.sendConfirmTimeout.value = data.sendConfirmTimeout;
+      if (data.activeHoursStart) elements.activeHoursStart.value = data.activeHoursStart;
+      if (data.activeHoursEnd) elements.activeHoursEnd.value = data.activeHoursEnd;
+      if (data.sendConfirmTimeout) elements.sendConfirmTimeout.value = data.sendConfirmTimeout;
 
-    // Mention detection settings
-    elements.mentionDetectionEnabled.checked = data.mentionDetectionEnabled || false;
-    if (data.mentionKeywords && Array.isArray(data.mentionKeywords)) {
-      elements.mentionKeywords.value = data.mentionKeywords.join('\n');
+      // Mention detection settings
+      elements.mentionDetectionEnabled.checked = data.mentionDetectionEnabled || false;
+      if (data.mentionKeywords && Array.isArray(data.mentionKeywords)) {
+        elements.mentionKeywords.value = data.mentionKeywords.join('\n');
+      }
+      if (data.mentionReplyMessages && Array.isArray(data.mentionReplyMessages)) {
+        elements.mentionReplyMessages.value = data.mentionReplyMessages.join('\n');
+      }
+
+      // Chat logging settings
+      if (elements.chatLoggingEnabled) {
+        elements.chatLoggingEnabled.checked = data.chatLoggingEnabled || false;
+      }
+
+      // Manual detection settings
+      if (elements.manualDetectionEnabled) {
+        elements.manualDetectionEnabled.checked = data.manualDetectionEnabled || false;
+      }
+
+      // Notification settings
+      elements.notificationsEnabled.checked = data.notificationsEnabled !== false;
+      elements.notificationSound.checked = data.notificationSound !== false;
+
+      // Show/hide active hours inputs
+      const hoursInputs = document.getElementById('activeHoursInputs');
+      if (hoursInputs) {
+        hoursInputs.style.display = elements.activeHours.checked ? 'flex' : 'none';
+      }
     }
-    if (data.mentionReplyMessages && Array.isArray(data.mentionReplyMessages)) {
-      elements.mentionReplyMessages.value = data.mentionReplyMessages.join('\n');
-    }
-
-    // Chat logging settings
-    if (elements.chatLoggingEnabled) {
-      elements.chatLoggingEnabled.checked = data.chatLoggingEnabled || false;
-    }
-
-    // Manual detection settings
-    if (elements.manualDetectionEnabled) {
-      elements.manualDetectionEnabled.checked = data.manualDetectionEnabled || false;
-    }
-
-    // Notification settings
-    elements.notificationsEnabled.checked = data.notificationsEnabled !== false;
-    elements.notificationSound.checked = data.notificationSound !== false;
-
-    // Show/hide active hours inputs
-    const hoursInputs = document.getElementById('activeHoursInputs');
-    if (hoursInputs) {
-      hoursInputs.style.display = elements.activeHours.checked ? 'flex' : 'none';
-    }
-  });
+  );
 }
 
 function saveSettings() {
   const settings = getCurrentSettings();
-  
+
   // Save to current account
   accounts[currentAccount].settings = settings;
   saveAccounts();
-  
+
   // Also save to storage for immediate use
   chrome.storage.local.set(settings);
 }
@@ -1538,17 +1603,17 @@ elements.notificationSound?.addEventListener('change', saveSettings);
 // Mention detection settings
 elements.mentionDetectionEnabled?.addEventListener('change', async () => {
   saveSettings();
-  
+
   // Notify content script to start/stop mention detection
   const keywords = elements.mentionKeywords.value
     .split('\n')
-    .map(k => k.trim())
-    .filter(k => k.length > 0);
-  
+    .map((k) => k.trim())
+    .filter((k) => k.length > 0);
+
   const replyMessages = elements.mentionReplyMessages.value
     .split('\n')
-    .map(m => m.trim())
-    .filter(m => m.length > 0);
+    .map((m) => m.trim())
+    .filter((m) => m.length > 0);
 
   if (elements.mentionDetectionEnabled.checked) {
     if (keywords.length === 0) {
@@ -1567,9 +1632,9 @@ elements.mentionDetectionEnabled?.addEventListener('change', async () => {
     const response = await sendMessageToContent({
       action: 'startMentionDetection',
       keywords: keywords,
-      replyMessages: replyMessages
+      replyMessages: replyMessages,
     });
-    
+
     if (response && response.ok) {
       showNotification('✅ Mention detection enabled', true);
     } else {
@@ -1624,34 +1689,120 @@ const commandSearch = document.getElementById('commandSearch');
 const commandResults = document.getElementById('commandResults');
 
 const commands = [
-  { name: 'Start Auto-Send', icon: '▶️', desc: 'Begin sending messages', shortcut: 'Ctrl+S', action: () => document.getElementById('startAutoSend')?.click() },
-  { name: 'Stop Auto-Send', icon: '⏹️', desc: 'Stop sending messages', shortcut: 'Ctrl+X', action: () => document.getElementById('stopAutoSend')?.click() },
-  { name: 'Pause/Resume', icon: '⏸️', desc: 'Pause or resume', shortcut: 'Ctrl+P', action: () => document.getElementById('pauseAutoSend')?.click() },
-  { name: 'Send Once', icon: '📤', desc: 'Send one message now', shortcut: '', action: () => document.getElementById('sendOnce')?.click() },
-  { name: 'Mark Input Field', icon: '🎯', desc: 'Mark chat input', shortcut: '', action: () => document.getElementById('markInput')?.click() },
-  { name: 'Preview Messages', icon: '👁️', desc: 'Preview messages', shortcut: '', action: () => document.getElementById('previewMessage')?.click() },
-  { name: 'Open Settings', icon: '⚙️', desc: 'Advanced settings', shortcut: '', action: () => document.getElementById('openSettings')?.click() },
-  { name: 'Open Analytics', icon: '📊', desc: 'View statistics', shortcut: '', action: () => document.getElementById('openAnalytics')?.click() },
-  { name: 'Manage Phrases', icon: '✏️', desc: 'Edit phrases', shortcut: '', action: () => document.getElementById('managePhrases')?.click() },
-  { name: 'Load Phrases', icon: '📚', desc: 'Load default phrases', shortcut: '', action: () => document.getElementById('loadDefaultPhrases')?.click() },
-  { name: 'Categories', icon: '📁', desc: 'Browse categories', shortcut: '', action: () => document.getElementById('openCategories')?.click() },
-  { name: 'Emoji Picker', icon: '😊', desc: 'Insert emoji', shortcut: '', action: () => document.getElementById('openEmoji')?.click() },
-  { name: 'Export Settings', icon: '💾', desc: 'Backup settings', shortcut: '', action: () => document.getElementById('exportSettings')?.click() },
-  { name: 'Toggle Theme', icon: '🌙', desc: 'Dark/Light mode', shortcut: '', action: () => document.getElementById('themeToggle')?.click() }
+  {
+    name: 'Start Auto-Send',
+    icon: '▶️',
+    desc: 'Begin sending messages',
+    shortcut: 'Ctrl+S',
+    action: () => document.getElementById('startAutoSend')?.click(),
+  },
+  {
+    name: 'Stop Auto-Send',
+    icon: '⏹️',
+    desc: 'Stop sending messages',
+    shortcut: 'Ctrl+X',
+    action: () => document.getElementById('stopAutoSend')?.click(),
+  },
+  {
+    name: 'Pause/Resume',
+    icon: '⏸️',
+    desc: 'Pause or resume',
+    shortcut: 'Ctrl+P',
+    action: () => document.getElementById('pauseAutoSend')?.click(),
+  },
+  {
+    name: 'Send Once',
+    icon: '📤',
+    desc: 'Send one message now',
+    shortcut: '',
+    action: () => document.getElementById('sendOnce')?.click(),
+  },
+  {
+    name: 'Mark Input Field',
+    icon: '🎯',
+    desc: 'Mark chat input',
+    shortcut: '',
+    action: () => document.getElementById('markInput')?.click(),
+  },
+  {
+    name: 'Preview Messages',
+    icon: '👁️',
+    desc: 'Preview messages',
+    shortcut: '',
+    action: () => document.getElementById('previewMessage')?.click(),
+  },
+  {
+    name: 'Open Settings',
+    icon: '⚙️',
+    desc: 'Advanced settings',
+    shortcut: '',
+    action: () => document.getElementById('openSettings')?.click(),
+  },
+  {
+    name: 'Open Analytics',
+    icon: '📊',
+    desc: 'View statistics',
+    shortcut: '',
+    action: () => document.getElementById('openAnalytics')?.click(),
+  },
+  {
+    name: 'Manage Phrases',
+    icon: '✏️',
+    desc: 'Edit phrases',
+    shortcut: '',
+    action: () => document.getElementById('managePhrases')?.click(),
+  },
+  {
+    name: 'Load Phrases',
+    icon: '📚',
+    desc: 'Load default phrases',
+    shortcut: '',
+    action: () => document.getElementById('loadDefaultPhrases')?.click(),
+  },
+  {
+    name: 'Categories',
+    icon: '📁',
+    desc: 'Browse categories',
+    shortcut: '',
+    action: () => document.getElementById('openCategories')?.click(),
+  },
+  {
+    name: 'Emoji Picker',
+    icon: '😊',
+    desc: 'Insert emoji',
+    shortcut: '',
+    action: () => document.getElementById('openEmoji')?.click(),
+  },
+  {
+    name: 'Export Settings',
+    icon: '💾',
+    desc: 'Backup settings',
+    shortcut: '',
+    action: () => document.getElementById('exportSettings')?.click(),
+  },
+  {
+    name: 'Toggle Theme',
+    icon: '🌙',
+    desc: 'Dark/Light mode',
+    shortcut: '',
+    action: () => document.getElementById('themeToggle')?.click(),
+  },
 ];
 
 let selectedCommandIndex = 0;
 
 function renderCommands(filter = '') {
-  const filtered = commands.filter(cmd => 
-    cmd.name.toLowerCase().includes(filter.toLowerCase()) ||
-    cmd.desc.toLowerCase().includes(filter.toLowerCase())
+  const filtered = commands.filter(
+    (cmd) =>
+      cmd.name.toLowerCase().includes(filter.toLowerCase()) ||
+      cmd.desc.toLowerCase().includes(filter.toLowerCase())
   );
 
   commandResults.innerHTML = '';
-  
+
   if (filtered.length === 0) {
-    commandResults.innerHTML = '<div class="help" style="padding: 20px; text-align: center;">No commands found</div>';
+    commandResults.innerHTML =
+      '<div class="help" style="padding: 20px; text-align: center;">No commands found</div>';
     return;
   }
 
@@ -1693,7 +1844,7 @@ commandSearch?.addEventListener('input', (e) => {
 
 commandSearch?.addEventListener('keydown', (e) => {
   const items = commandResults.querySelectorAll('.command-item');
-  
+
   if (e.key === 'ArrowDown') {
     e.preventDefault();
     selectedCommandIndex = Math.min(selectedCommandIndex + 1, items.length - 1);
@@ -1726,21 +1877,259 @@ const emojiTabs = document.getElementById('emojiTabs');
 const emojiContent = document.getElementById('emojiContent');
 
 const emojiCategories = {
-  'Smileys': ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳'],
-  'Gestures': ['👍', '👎', '👊', '✊', '🤛', '🤜', '🤞', '✌️', '🤟', '🤘', '👌', '🤏', '👈', '👉', '👆', '👇', '☝️', '👋', '🤚', '🖐️', '✋', '🖖', '👏', '🙌', '👐', '🤲', '🤝', '🙏'],
-  'Hearts': ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❤️‍🔥', '❤️‍🩹', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '♥️'],
-  'Animals': ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋'],
-  'Food': ['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🌽', '🥕', '🧄', '🧅', '🥔', '🍠', '🥐', '🍞', '🥖'],
-  'Sports': ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛼', '🛷'],
-  'Objects': ['⌚', '📱', '💻', '⌨️', '🖥️', '🖨️', '🖱️', '💾', '💿', '📀', '🎥', '📷', '📹', '📞', '☎️', '📟', '📠', '📺', '📻', '🎙️', '🎚️', '🎛️', '🧭', '⏱️', '⏲️', '⏰', '🕰️', '⌛', '⏳', '📡'],
-  'Symbols': ['💯', '🔥', '✨', '🌟', '⭐', '💫', '💥', '💢', '💦', '💨', '🕳️', '💬', '👁️‍🗨️', '🗨️', '🗯️', '💭', '💤', '✅', '✔️', '☑️', '❌', '❎', '➕', '➖', '✖️', '➗', '♾️', '‼️', '⁉️', '❓']
+  Smileys: [
+    '😀',
+    '😃',
+    '😄',
+    '😁',
+    '😆',
+    '😅',
+    '😂',
+    '🤣',
+    '😊',
+    '😇',
+    '🙂',
+    '🙃',
+    '😉',
+    '😌',
+    '😍',
+    '🥰',
+    '😘',
+    '😗',
+    '😙',
+    '😚',
+    '😋',
+    '😛',
+    '😝',
+    '😜',
+    '🤪',
+    '🤨',
+    '🧐',
+    '🤓',
+    '😎',
+    '🤩',
+    '🥳',
+  ],
+  Gestures: [
+    '👍',
+    '👎',
+    '👊',
+    '✊',
+    '🤛',
+    '🤜',
+    '🤞',
+    '✌️',
+    '🤟',
+    '🤘',
+    '👌',
+    '🤏',
+    '👈',
+    '👉',
+    '👆',
+    '👇',
+    '☝️',
+    '👋',
+    '🤚',
+    '🖐️',
+    '✋',
+    '🖖',
+    '👏',
+    '🙌',
+    '👐',
+    '🤲',
+    '🤝',
+    '🙏',
+  ],
+  Hearts: [
+    '❤️',
+    '🧡',
+    '💛',
+    '💚',
+    '💙',
+    '💜',
+    '🖤',
+    '🤍',
+    '🤎',
+    '💔',
+    '❤️‍🔥',
+    '❤️‍🩹',
+    '💕',
+    '💞',
+    '💓',
+    '💗',
+    '💖',
+    '💘',
+    '💝',
+    '💟',
+    '♥️',
+  ],
+  Animals: [
+    '🐶',
+    '🐱',
+    '🐭',
+    '🐹',
+    '🐰',
+    '🦊',
+    '🐻',
+    '🐼',
+    '🐨',
+    '🐯',
+    '🦁',
+    '🐮',
+    '🐷',
+    '🐸',
+    '🐵',
+    '🐔',
+    '🐧',
+    '🐦',
+    '🐤',
+    '🦆',
+    '🦅',
+    '🦉',
+    '🦇',
+    '🐺',
+    '🐗',
+    '🐴',
+    '🦄',
+    '🐝',
+    '🐛',
+    '🦋',
+  ],
+  Food: [
+    '🍎',
+    '🍊',
+    '🍋',
+    '🍌',
+    '🍉',
+    '🍇',
+    '🍓',
+    '🍈',
+    '🍒',
+    '🍑',
+    '🥭',
+    '🍍',
+    '🥥',
+    '🥝',
+    '🍅',
+    '🍆',
+    '🥑',
+    '🥦',
+    '🥬',
+    '🥒',
+    '🌶️',
+    '🌽',
+    '🥕',
+    '🧄',
+    '🧅',
+    '🥔',
+    '🍠',
+    '🥐',
+    '🍞',
+    '🥖',
+  ],
+  Sports: [
+    '⚽',
+    '🏀',
+    '🏈',
+    '⚾',
+    '🥎',
+    '🎾',
+    '🏐',
+    '🏉',
+    '🥏',
+    '🎱',
+    '🪀',
+    '🏓',
+    '🏸',
+    '🏒',
+    '🏑',
+    '🥍',
+    '🏏',
+    '🪃',
+    '🥅',
+    '⛳',
+    '🪁',
+    '🏹',
+    '🎣',
+    '🤿',
+    '🥊',
+    '🥋',
+    '🎽',
+    '🛹',
+    '🛼',
+    '🛷',
+  ],
+  Objects: [
+    '⌚',
+    '📱',
+    '💻',
+    '⌨️',
+    '🖥️',
+    '🖨️',
+    '🖱️',
+    '💾',
+    '💿',
+    '📀',
+    '🎥',
+    '📷',
+    '📹',
+    '📞',
+    '☎️',
+    '📟',
+    '📠',
+    '📺',
+    '📻',
+    '🎙️',
+    '🎚️',
+    '🎛️',
+    '🧭',
+    '⏱️',
+    '⏲️',
+    '⏰',
+    '🕰️',
+    '⌛',
+    '⏳',
+    '📡',
+  ],
+  Symbols: [
+    '💯',
+    '🔥',
+    '✨',
+    '🌟',
+    '⭐',
+    '💫',
+    '💥',
+    '💢',
+    '💦',
+    '💨',
+    '🕳️',
+    '💬',
+    '👁️‍🗨️',
+    '🗨️',
+    '🗯️',
+    '💭',
+    '💤',
+    '✅',
+    '✔️',
+    '☑️',
+    '❌',
+    '❎',
+    '➕',
+    '➖',
+    '✖️',
+    '➗',
+    '♾️',
+    '‼️',
+    '⁉️',
+    '❓',
+  ],
 };
 
 let currentEmojiCategory = 'Smileys';
 
 function renderEmojiTabs() {
   emojiTabs.innerHTML = '';
-  Object.keys(emojiCategories).forEach(category => {
+  Object.keys(emojiCategories).forEach((category) => {
     const tab = document.createElement('button');
     tab.className = 'emoji-tab' + (category === currentEmojiCategory ? ' active' : '');
     tab.textContent = emojiCategories[category][0];
@@ -1756,14 +2145,14 @@ function renderEmojiTabs() {
 
 function renderEmojis(filter = '') {
   emojiContent.innerHTML = '';
-  
+
   let emojis = emojiCategories[currentEmojiCategory] || [];
-  
+
   if (filter) {
     emojis = Object.values(emojiCategories).flat();
   }
-  
-  emojis.forEach(emoji => {
+
+  emojis.forEach((emoji) => {
     const item = document.createElement('button');
     item.className = 'emoji-item';
     item.textContent = emoji;
@@ -1815,19 +2204,20 @@ const previewModal = document.getElementById('previewModal');
 const previewContent = document.getElementById('previewContent');
 
 function renderPreview() {
-  const messages = elements.messageList.value.split('\n').filter(m => m.trim());
+  const messages = elements.messageList.value.split('\n').filter((m) => m.trim());
   previewContent.innerHTML = '';
-  
+
   if (messages.length === 0) {
-    previewContent.innerHTML = '<div class="preview-empty">No messages to preview. Add some messages first!</div>';
+    previewContent.innerHTML =
+      '<div class="preview-empty">No messages to preview. Add some messages first!</div>';
     return;
   }
-  
+
   // Show first 10 messages with variables processed
-  messages.slice(0, 10).forEach(message => {
+  messages.slice(0, 10).forEach((message) => {
     const item = document.createElement('div');
     item.className = 'preview-item';
-    
+
     // Process template variables for preview
     const processed = message
       .replace(/{time}/g, '<span class="preview-variable">12:34 PM</span>')
@@ -1835,11 +2225,11 @@ function renderPreview() {
       .replace(/{random_emoji}/g, '<span class="preview-variable">😊</span>')
       .replace(/{random_number}/g, '<span class="preview-variable">42</span>')
       .replace(/{timestamp}/g, '<span class="preview-variable">1732298400</span>');
-    
+
     item.innerHTML = processed;
     previewContent.appendChild(item);
   });
-  
+
   if (messages.length > 10) {
     const more = document.createElement('div');
     more.className = 'help';
@@ -1870,13 +2260,13 @@ const categoryDisplayItems = [
   { name: 'Emojis', icon: '🎨', count: 0 },
   { name: 'Time', icon: '⏰', count: 0 },
   { name: 'Random', icon: '🎲', count: 0 },
-  { name: 'Custom', icon: '✨', count: customPhrases.length }
+  { name: 'Custom', icon: '✨', count: customPhrases.length },
 ];
 
 function renderCategoriesDisplay() {
   categoriesContent.innerHTML = '';
-  
-  categoryDisplayItems.forEach(category => {
+
+  categoryDisplayItems.forEach((category) => {
     const card = document.createElement('div');
     card.className = 'category-card';
     card.innerHTML = `
@@ -1905,13 +2295,13 @@ let currentOnboardingStep = 1;
 const totalOnboardingSteps = 5;
 
 function showOnboardingStep(step) {
-  document.querySelectorAll('.onboarding-step').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.onboarding-step').forEach((el) => el.classList.remove('active'));
   document.querySelector(`.onboarding-step[data-step="${step}"]`)?.classList.add('active');
   document.getElementById('onboardingStep').textContent = `${step} / ${totalOnboardingSteps}`;
-  
+
   const prevBtn = document.getElementById('onboardingPrev');
   const nextBtn = document.getElementById('onboardingNext');
-  
+
   if (prevBtn) prevBtn.disabled = step === 1;
   if (nextBtn) nextBtn.textContent = step === totalOnboardingSteps ? 'Finish' : 'Next →';
 }
@@ -1956,26 +2346,26 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     openCommandPalette();
   }
-  
+
   // Escape to close modals/overlays
   if (e.key === 'Escape') {
     closeCommandPalette();
     closeEmojiPicker();
-    document.querySelectorAll('.modal.show').forEach(modal => modal.classList.remove('show'));
+    document.querySelectorAll('.modal.show').forEach((modal) => modal.classList.remove('show'));
   }
-  
+
   // Ctrl+S to start
   if (e.ctrlKey && e.key === 's') {
     e.preventDefault();
     document.getElementById('startAutoSend')?.click();
   }
-  
+
   // Ctrl+X to stop
   if (e.ctrlKey && e.key === 'x') {
     e.preventDefault();
     document.getElementById('stopAutoSend')?.click();
   }
-  
+
   // Ctrl+P to pause
   if (e.ctrlKey && e.key === 'p') {
     e.preventDefault();
@@ -2043,20 +2433,21 @@ function updateNotificationBadge() {
 
 function renderNotificationList() {
   if (!notificationList) return;
-  
+
   if (notificationHistory.length === 0) {
-    notificationList.innerHTML = '<div class="help" style="text-align: center; padding: 20px;">No notifications yet</div>';
+    notificationList.innerHTML =
+      '<div class="help" style="text-align: center; padding: 20px;">No notifications yet</div>';
     return;
   }
 
   notificationList.innerHTML = '';
-  notificationHistory.forEach(notification => {
+  notificationHistory.forEach((notification) => {
     const item = document.createElement('div');
     item.className = 'notification-item' + (notification.read ? '' : ' unread');
-    
+
     const icon = getNotificationIcon(notification.type);
     const timeAgo = getTimeAgo(notification.timestamp);
-    
+
     item.innerHTML = `
       <div class="notification-icon">${icon}</div>
       <div class="notification-content">
@@ -2073,7 +2464,7 @@ function renderNotificationList() {
   });
 
   // Add event listeners for mark read buttons
-  notificationList.querySelectorAll('[data-mark-read]').forEach(btn => {
+  notificationList.querySelectorAll('[data-mark-read]').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       const id = e.target.dataset.markRead;
       markNotificationAsRead(id);
@@ -2081,7 +2472,7 @@ function renderNotificationList() {
   });
 
   // Add event listeners for delete buttons
-  notificationList.querySelectorAll('[data-delete-notification]').forEach(btn => {
+  notificationList.querySelectorAll('[data-delete-notification]').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       const id = e.target.dataset.deleteNotification;
       deleteNotification(id);
@@ -2091,12 +2482,18 @@ function renderNotificationList() {
 
 function getNotificationIcon(type) {
   switch (type) {
-    case 'success': return '✅';
-    case 'error': return '❌';
-    case 'warning': return '⚠️';
-    case 'achievement': return '🏆';
-    case 'message-sent': return '📤';
-    default: return '🔔';
+    case 'success':
+      return '✅';
+    case 'error':
+      return '❌';
+    case 'warning':
+      return '⚠️';
+    case 'achievement':
+      return '🏆';
+    case 'message-sent':
+      return '📤';
+    default:
+      return '🔔';
   }
 }
 
@@ -2104,7 +2501,7 @@ function getTimeAgo(timestamp) {
   const now = new Date();
   const then = new Date(timestamp);
   const seconds = Math.floor((now - then) / 1000);
-  
+
   if (seconds < 60) return 'Just now';
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
   if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
@@ -2112,7 +2509,7 @@ function getTimeAgo(timestamp) {
 }
 
 function markNotificationAsRead(id) {
-  const notification = notificationHistory.find(n => n.id === id);
+  const notification = notificationHistory.find((n) => n.id === id);
   if (notification && !notification.read) {
     notification.read = true;
     unreadCount = Math.max(0, unreadCount - 1);
@@ -2123,7 +2520,7 @@ function markNotificationAsRead(id) {
 }
 
 function markAllNotificationsAsRead() {
-  notificationHistory.forEach(n => n.read = true);
+  notificationHistory.forEach((n) => (n.read = true));
   unreadCount = 0;
   saveNotificationHistory();
   updateNotificationBadge();
@@ -2132,7 +2529,7 @@ function markAllNotificationsAsRead() {
 }
 
 function deleteNotification(id) {
-  const index = notificationHistory.findIndex(n => n.id === id);
+  const index = notificationHistory.findIndex((n) => n.id === id);
   if (index !== -1) {
     if (!notificationHistory[index].read) {
       unreadCount = Math.max(0, unreadCount - 1);
@@ -2156,9 +2553,9 @@ function clearAllNotifications() {
 }
 
 function saveNotificationHistory() {
-  chrome.storage.local.set({ 
-    notificationHistory, 
-    unreadCount 
+  chrome.storage.local.set({
+    notificationHistory,
+    unreadCount,
   });
 }
 
@@ -2189,7 +2586,7 @@ const defaultCategories = [
   { id: 'funny', name: 'Funny', icon: '😄', color: '#feca57' },
   { id: 'supportive', name: 'Supportive', icon: '💪', color: '#48dbfb' },
   { id: 'business', name: 'Business', icon: '💼', color: '#341f97' },
-  { id: 'personal', name: 'Personal', icon: '❤️', color: '#ee5a6f' }
+  { id: 'personal', name: 'Personal', icon: '❤️', color: '#ee5a6f' },
 ];
 
 async function loadCategories() {
@@ -2228,14 +2625,14 @@ function renderCategoryList() {
   });
 
   // Add event listeners
-  categoryList.querySelectorAll('[data-edit-category]').forEach(btn => {
+  categoryList.querySelectorAll('[data-edit-category]').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       const index = parseInt(e.target.dataset.editCategory);
       editCategory(index);
     });
   });
 
-  categoryList.querySelectorAll('[data-delete-category]').forEach(btn => {
+  categoryList.querySelectorAll('[data-delete-category]').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       const index = parseInt(e.target.dataset.deleteCategory);
       deleteCategory(index);
@@ -2276,9 +2673,12 @@ function createCategory() {
     return;
   }
 
-  const id = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  
-  if (categories.some(c => c.id === id)) {
+  const id = name
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+
+  if (categories.some((c) => c.id === id)) {
     showNotification('Category already exists', false);
     return;
   }
@@ -2349,51 +2749,52 @@ document.getElementById('openHelp')?.addEventListener('click', () => {
   loadSettings();
   await loadDefaultPhrasesFromFile();
   await loadCustomPhrases();
-// Chat logging event handlers
-elements.chatLoggingEnabled?.addEventListener('change', async () => {
-  const enabled = elements.chatLoggingEnabled.checked;
-  await chrome.storage.local.set({ chatLoggingEnabled: enabled });
-  
-  const action = enabled ? 'startChatLogging' : 'stopChatLogging';
-  const response = await sendMessageToContent({ action });
-  
-  if (response?.ok) {
-    showNotification(enabled ? 'Chat logging enabled' : 'Chat logging disabled', true);
-  } else {
-    showNotification('Make sure to mark a message container first', false);
-    elements.chatLoggingEnabled.checked = false;
-  }
-});
+  // Chat logging event handlers
+  elements.chatLoggingEnabled?.addEventListener('change', async () => {
+    const enabled = elements.chatLoggingEnabled.checked;
+    await chrome.storage.local.set({ chatLoggingEnabled: enabled });
 
-elements.viewChatLogs?.addEventListener('click', () => {
-  chrome.tabs.create({ url: chrome.runtime.getURL('chat-log-viewer.html') });
-});
+    const action = enabled ? 'startChatLogging' : 'stopChatLogging';
+    const response = await sendMessageToContent({ action });
 
-elements.openChatLogs?.addEventListener('click', () => {
-  chrome.tabs.create({ url: chrome.runtime.getURL('chat-log-viewer.html') });
-});
-
-// Manual detection event handlers
-elements.manualDetectionEnabled?.addEventListener('change', async () => {
-  const enabled = elements.manualDetectionEnabled.checked;
-  await chrome.storage.local.set({ manualDetectionEnabled: enabled });
-  
-  const action = enabled ? 'startManualDetection' : 'stopManualDetection';
-  const response = await sendMessageToContent({ action });
-  
-  if (response?.ok) {
-    showNotification(enabled ? 'Manual detection enabled' : 'Manual detection disabled', true);
-    
-    if (elements.manualDetectionStatus) {
-      elements.manualDetectionStatus.textContent = enabled ? 
-        '✅ Timer will reset when you manually send messages' : '';
-      elements.manualDetectionStatus.style.display = enabled ? 'block' : 'none';
+    if (response?.ok) {
+      showNotification(enabled ? 'Chat logging enabled' : 'Chat logging disabled', true);
+    } else {
+      showNotification('Make sure to mark a message container first', false);
+      elements.chatLoggingEnabled.checked = false;
     }
-  } else {
-    showNotification('Make sure to mark an input field first', false);
-    elements.manualDetectionEnabled.checked = false;
-  }
-});
+  });
+
+  elements.viewChatLogs?.addEventListener('click', () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('chat-log-viewer.html') });
+  });
+
+  elements.openChatLogs?.addEventListener('click', () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('chat-log-viewer.html') });
+  });
+
+  // Manual detection event handlers
+  elements.manualDetectionEnabled?.addEventListener('change', async () => {
+    const enabled = elements.manualDetectionEnabled.checked;
+    await chrome.storage.local.set({ manualDetectionEnabled: enabled });
+
+    const action = enabled ? 'startManualDetection' : 'stopManualDetection';
+    const response = await sendMessageToContent({ action });
+
+    if (response?.ok) {
+      showNotification(enabled ? 'Manual detection enabled' : 'Manual detection disabled', true);
+
+      if (elements.manualDetectionStatus) {
+        elements.manualDetectionStatus.textContent = enabled
+          ? '✅ Timer will reset when you manually send messages'
+          : '';
+        elements.manualDetectionStatus.style.display = enabled ? 'block' : 'none';
+      }
+    } else {
+      showNotification('Make sure to mark an input field first', false);
+      elements.manualDetectionEnabled.checked = false;
+    }
+  });
 
   await loadNotificationHistory();
   await loadCategories();
@@ -2416,12 +2817,12 @@ elements.manualDetectionEnabled?.addEventListener('change', async () => {
 // Profile overlay close handler
 const profileClose = document.getElementById('profile-close');
 if (profileClose) {
-    profileClose.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const overlay = document.getElementById('profile-overlay');
-        if (overlay) {
-            overlay.classList.remove('active');
-        }
-    });
+  profileClose.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const overlay = document.getElementById('profile-overlay');
+    if (overlay) {
+      overlay.classList.remove('active');
+    }
+  });
 }

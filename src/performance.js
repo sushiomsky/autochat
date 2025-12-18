@@ -10,7 +10,7 @@ class PerformanceMonitor {
       typingSpeed: [],
       sendDuration: [],
       memoryUsage: [],
-      errors: []
+      errors: [],
     };
     this.startTime = Date.now();
   }
@@ -24,7 +24,7 @@ class PerformanceMonitor {
     this.metrics.messagesSent.push({
       timestamp: Date.now(),
       duration,
-      success
+      success,
     });
 
     // Keep only last 100 entries
@@ -40,7 +40,7 @@ class PerformanceMonitor {
   recordTypingSpeed(wpm) {
     this.metrics.typingSpeed.push({
       timestamp: Date.now(),
-      wpm
+      wpm,
     });
 
     if (this.metrics.typingSpeed.length > 50) {
@@ -57,7 +57,7 @@ class PerformanceMonitor {
     this.metrics.errors.push({
       timestamp: Date.now(),
       type: errorType,
-      message
+      message,
     });
 
     if (this.metrics.errors.length > 50) {
@@ -74,7 +74,7 @@ class PerformanceMonitor {
         timestamp: Date.now(),
         usedJSHeapSize: performance.memory.usedJSHeapSize,
         totalJSHeapSize: performance.memory.totalJSHeapSize,
-        jsHeapSizeLimit: performance.memory.jsHeapSizeLimit
+        jsHeapSizeLimit: performance.memory.jsHeapSizeLimit,
       });
 
       if (this.metrics.memoryUsage.length > 20) {
@@ -92,24 +92,28 @@ class PerformanceMonitor {
     const uptime = now - this.startTime;
 
     // Calculate message send stats
-    const successfulSends = this.metrics.messagesSent.filter(m => m.success);
-    const failedSends = this.metrics.messagesSent.filter(m => !m.success);
-    const avgSendDuration = successfulSends.length > 0
-      ? successfulSends.reduce((sum, m) => sum + m.duration, 0) / successfulSends.length
-      : 0;
+    const successfulSends = this.metrics.messagesSent.filter((m) => m.success);
+    const failedSends = this.metrics.messagesSent.filter((m) => !m.success);
+    const avgSendDuration =
+      successfulSends.length > 0
+        ? successfulSends.reduce((sum, m) => sum + m.duration, 0) / successfulSends.length
+        : 0;
 
     // Calculate typing speed stats
-    const avgTypingSpeed = this.metrics.typingSpeed.length > 0
-      ? this.metrics.typingSpeed.reduce((sum, t) => sum + t.wpm, 0) / this.metrics.typingSpeed.length
-      : 0;
+    const avgTypingSpeed =
+      this.metrics.typingSpeed.length > 0
+        ? this.metrics.typingSpeed.reduce((sum, t) => sum + t.wpm, 0) /
+          this.metrics.typingSpeed.length
+        : 0;
 
     // Calculate error rate
-    const recentErrors = this.metrics.errors.filter(e => now - e.timestamp < 3600000); // Last hour
+    const recentErrors = this.metrics.errors.filter((e) => now - e.timestamp < 3600000); // Last hour
 
     // Memory stats
-    const latestMemory = this.metrics.memoryUsage.length > 0
-      ? this.metrics.memoryUsage[this.metrics.memoryUsage.length - 1]
-      : null;
+    const latestMemory =
+      this.metrics.memoryUsage.length > 0
+        ? this.metrics.memoryUsage[this.metrics.memoryUsage.length - 1]
+        : null;
 
     return {
       uptime,
@@ -117,26 +121,32 @@ class PerformanceMonitor {
         total: this.metrics.messagesSent.length,
         successful: successfulSends.length,
         failed: failedSends.length,
-        successRate: this.metrics.messagesSent.length > 0
-          ? (successfulSends.length / this.metrics.messagesSent.length) * 100
-          : 0,
-        avgDuration: avgSendDuration
+        successRate:
+          this.metrics.messagesSent.length > 0
+            ? (successfulSends.length / this.metrics.messagesSent.length) * 100
+            : 0,
+        avgDuration: avgSendDuration,
       },
       typing: {
         avgSpeed: avgTypingSpeed,
-        samples: this.metrics.typingSpeed.length
+        samples: this.metrics.typingSpeed.length,
       },
       errors: {
         total: this.metrics.errors.length,
         recentCount: recentErrors.length,
-        byType: this.getErrorsByType()
+        byType: this.getErrorsByType(),
       },
-      memory: latestMemory ? {
-        usedMB: (latestMemory.usedJSHeapSize / 1024 / 1024).toFixed(2),
-        totalMB: (latestMemory.totalJSHeapSize / 1024 / 1024).toFixed(2),
-        limitMB: (latestMemory.jsHeapSizeLimit / 1024 / 1024).toFixed(2),
-        usagePercent: ((latestMemory.usedJSHeapSize / latestMemory.jsHeapSizeLimit) * 100).toFixed(2)
-      } : null
+      memory: latestMemory
+        ? {
+            usedMB: (latestMemory.usedJSHeapSize / 1024 / 1024).toFixed(2),
+            totalMB: (latestMemory.totalJSHeapSize / 1024 / 1024).toFixed(2),
+            limitMB: (latestMemory.jsHeapSizeLimit / 1024 / 1024).toFixed(2),
+            usagePercent: (
+              (latestMemory.usedJSHeapSize / latestMemory.jsHeapSizeLimit) *
+              100
+            ).toFixed(2),
+          }
+        : null,
     };
   }
 
@@ -146,7 +156,7 @@ class PerformanceMonitor {
    */
   getErrorsByType() {
     const byType = {};
-    this.metrics.errors.forEach(error => {
+    this.metrics.errors.forEach((error) => {
       byType[error.type] = (byType[error.type] || 0) + 1;
     });
     return byType;
@@ -162,29 +172,39 @@ class PerformanceMonitor {
 
     // Check success rate
     if (stats.messages.successRate < 90 && stats.messages.total > 10) {
-      recommendations.push('⚠️ Message success rate is below 90%. Check input field configuration.');
+      recommendations.push(
+        '⚠️ Message success rate is below 90%. Check input field configuration.'
+      );
     }
 
     // Check typing speed
     if (stats.typing.avgSpeed < 30) {
       recommendations.push('💡 Typing speed is slow. Consider increasing typing simulation speed.');
     } else if (stats.typing.avgSpeed > 100) {
-      recommendations.push('⚠️ Typing speed is very fast. May appear robotic. Consider slowing down.');
+      recommendations.push(
+        '⚠️ Typing speed is very fast. May appear robotic. Consider slowing down.'
+      );
     }
 
     // Check error frequency
     if (stats.errors.recentCount > 10) {
-      recommendations.push('⚠️ High error rate detected. Review recent errors and adjust settings.');
+      recommendations.push(
+        '⚠️ High error rate detected. Review recent errors and adjust settings.'
+      );
     }
 
     // Check memory usage
     if (stats.memory && parseFloat(stats.memory.usagePercent) > 80) {
-      recommendations.push('⚠️ High memory usage detected. Consider reducing message history or restarting extension.');
+      recommendations.push(
+        '⚠️ High memory usage detected. Consider reducing message history or restarting extension.'
+      );
     }
 
     // Check send duration
     if (stats.messages.avgDuration > 5000) {
-      recommendations.push('💡 Average send time is high. Check typing simulation settings or network latency.');
+      recommendations.push(
+        '💡 Average send time is high. Check typing simulation settings or network latency.'
+      );
     }
 
     if (recommendations.length === 0) {
@@ -204,7 +224,7 @@ class PerformanceMonitor {
       exportTime: Date.now(),
       metrics: this.metrics,
       stats: this.getStats(),
-      recommendations: this.getRecommendations()
+      recommendations: this.getRecommendations(),
     };
   }
 
@@ -217,7 +237,7 @@ class PerformanceMonitor {
       typingSpeed: [],
       sendDuration: [],
       memoryUsage: [],
-      errors: []
+      errors: [],
     };
     this.startTime = Date.now();
   }
@@ -228,7 +248,7 @@ class PerformanceMonitor {
   async saveToStorage() {
     try {
       await chrome.storage.local.set({
-        performanceMetrics: this.exportMetrics()
+        performanceMetrics: this.exportMetrics(),
       });
     } catch (error) {
       console.error('[Performance] Failed to save metrics:', error);

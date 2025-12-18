@@ -39,11 +39,13 @@ This creates a `build/` directory with all necessary files.
 ### Step 3: Create ZIP File
 
 **Option A: Using command line (if zip is installed):**
+
 ```bash
 cd build && zip -r ../autochat-v4.0.zip . && cd ..
 ```
 
 **Option B: Using file manager (Linux):**
+
 ```bash
 # Open file manager
 nautilus build/
@@ -51,11 +53,13 @@ nautilus build/
 ```
 
 **Option C: Using Python:**
+
 ```bash
 python3 -c "import shutil; shutil.make_archive('autochat-v4.0', 'zip', 'build')"
 ```
 
 ### Files Included in Package:
+
 - ✅ manifest.json
 - ✅ background.js
 - ✅ content-enhanced.js
@@ -67,6 +71,7 @@ python3 -c "import shutil; shutil.make_archive('autochat-v4.0', 'zip', 'build')"
 - ✅ Legacy files (content.js, popup.js, popup.html)
 
 **Files EXCLUDED (not needed):**
+
 - ❌ .git directory
 - ❌ .gitignore
 - ❌ README.md, CHANGELOG.md (documentation)
@@ -90,16 +95,19 @@ python3 -c "import shutil; shutil.make_archive('autochat-v4.0', 'zip', 'build')"
 #### **Product Details Tab:**
 
 **Item Name:**
+
 ```
 AutoChat Enhanced - Auto Message Sender
 ```
 
 **Summary (132 characters max):**
+
 ```
 Advanced auto-message sender with typing simulation, anti-detection, analytics, and smart scheduling for any chat website.
 ```
 
 **Description (detailed):**
+
 ```
 AutoChat Enhanced - Professional automated message sender for Chrome
 
@@ -166,11 +174,13 @@ For support and documentation, visit our GitHub repository.
 ```
 
 **Category:**
+
 ```
 Productivity
 ```
 
 **Language:**
+
 ```
 English (United States)
 ```
@@ -180,8 +190,9 @@ English (United States)
 You need to prepare the following images:
 
 **Required:**
+
 1. **Small tile icon** - 128x128px (your icon48.png upscaled)
-2. **Store icon** - 128x128px 
+2. **Store icon** - 128x128px
 3. **Marquee promo tile** - 1400x560px (promotional banner)
 4. **Screenshots** - 1280x800px or 640x400px (at least 1, max 5)
 
@@ -194,21 +205,22 @@ Let me help you create a list of what you need:
 
 1. icon-128.png (128x128)
    - Upscale your icon48.png to 128x128
-   
+
 2. screenshot-1.png (1280x800)
    - Screenshot of the main popup interface
-   
+
 3. screenshot-2.png (1280x800)
    - Screenshot of settings modal
-   
+
 4. screenshot-3.png (1280x800)
    - Screenshot of analytics dashboard
-   
+
 5. promo-1400x560.png (1400x560)
    - Promotional banner with app name and key features
 ```
 
 **Quick Screenshot Tips:**
+
 - Use Chrome DevTools (F12) → Toggle Device Toolbar
 - Set custom size: 1280x800
 - Take screenshots of your extension in action
@@ -217,11 +229,13 @@ Let me help you create a list of what you need:
 #### **Additional Fields:**
 
 **Official URL (optional):**
+
 ```
 https://github.com/sushiomsky/autochat
 ```
 
 **Support URL (optional):**
+
 ```
 https://github.com/sushiomsky/autochat/issues
 ```
@@ -229,6 +243,7 @@ https://github.com/sushiomsky/autochat/issues
 ### Step 6: Privacy Settings
 
 **Single Purpose:**
+
 ```
 AutoChat automates sending messages to chat applications with customizable timing and content.
 ```
@@ -241,8 +256,9 @@ AutoChat automates sending messages to chat applications with customizable timin
 4. **host_permissions (<all_urls>)** - Required to work on any chat website
 
 **Data Usage:**
+
 ```
-This extension does NOT collect, transmit, or store any user data externally. 
+This extension does NOT collect, transmit, or store any user data externally.
 All data (settings, messages, statistics) is stored locally in the browser using Chrome's storage API.
 No analytics, tracking, or external servers are used.
 ```
@@ -283,14 +299,17 @@ Host this at: `https://github.com/sushiomsky/autochat/blob/main/PRIVACY_POLICY.m
 ### Step 7: Distribution Settings
 
 **Visibility:**
+
 - ☑️ Public (recommended)
 - ☐ Unlisted (only visible via direct link)
 
 **Pricing:**
+
 - ☑️ Free
 - ☐ Paid
 
 **Regions:**
+
 - Select "All regions" or specific countries
 
 ### Step 8: Submit for Review
@@ -332,6 +351,7 @@ Host this at: `https://github.com/sushiomsky/autochat/blob/main/PRIVACY_POLICY.m
 ### After Approval
 
 **Your extension will be available at:**
+
 ```
 https://chrome.google.com/webstore/detail/[EXTENSION_ID]
 ```
@@ -349,6 +369,7 @@ https://chrome.google.com/webstore/detail/[EXTENSION_ID]
 ### Analytics
 
 View in Developer Dashboard:
+
 - Installations
 - Daily active users
 - Weekly active users
@@ -409,15 +430,15 @@ If you encounter issues during submission:
 
 ## Estimated Timeline
 
-| Step | Time |
-|------|------|
-| Register developer account | 5 minutes |
-| Build package | 2 minutes |
-| Fill out listing | 30-60 minutes |
-| Create graphics | 1-2 hours |
-| Review & submit | 5 minutes |
-| **Total active time** | **2-3 hours** |
-| Google review | **1-3 business days** |
+| Step                       | Time                  |
+| -------------------------- | --------------------- |
+| Register developer account | 5 minutes             |
+| Build package              | 2 minutes             |
+| Fill out listing           | 30-60 minutes         |
+| Create graphics            | 1-2 hours             |
+| Review & submit            | 5 minutes             |
+| **Total active time**      | **2-3 hours**         |
+| Google review              | **1-3 business days** |
 
 ---
 

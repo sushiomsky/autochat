@@ -35,14 +35,14 @@ export class PreviewManager {
    */
   previewMessage(message, variables = {}) {
     const processed = this.processTemplateVariables(message, variables);
-    
+
     const preview = {
       original: message,
       processed: processed,
       length: processed.length,
       timestamp: new Date().toISOString(),
       variables: this.extractVariables(message),
-      warnings: this.checkWarnings(processed)
+      warnings: this.checkWarnings(processed),
     };
 
     // Add to history
@@ -67,7 +67,7 @@ export class PreviewManager {
     let processed = text;
 
     // Custom variables first
-    Object.keys(customVars).forEach(key => {
+    Object.keys(customVars).forEach((key) => {
       const regex = new RegExp(`\\{${key}\\}`, 'g');
       processed = processed.replace(regex, customVars[key]);
     });
@@ -117,13 +117,13 @@ export class PreviewManager {
       warnings.push({
         type: 'empty',
         severity: 'error',
-        message: 'Message is empty'
+        message: 'Message is empty',
       });
     } else if (text.length > 2000) {
       warnings.push({
         type: 'length',
         severity: 'warning',
-        message: `Message is very long (${text.length} characters). May be truncated.`
+        message: `Message is very long (${text.length} characters). May be truncated.`,
       });
     }
 
@@ -133,7 +133,7 @@ export class PreviewManager {
       warnings.push({
         type: 'variables',
         severity: 'warning',
-        message: `Unprocessed variables: ${unprocessed.join(', ')}`
+        message: `Unprocessed variables: ${unprocessed.join(', ')}`,
       });
     }
 
@@ -142,25 +142,25 @@ export class PreviewManager {
       warnings.push({
         type: 'value',
         severity: 'error',
-        message: 'Message contains undefined or null values'
+        message: 'Message contains undefined or null values',
       });
     }
 
     // Check for excessive repetition
     const words = text.toLowerCase().split(/\s+/);
     const wordCounts = {};
-    words.forEach(word => {
+    words.forEach((word) => {
       if (word.length > 3) {
         wordCounts[word] = (wordCounts[word] || 0) + 1;
       }
     });
-    
+
     const repeated = Object.entries(wordCounts).filter(([_, count]) => count > 5);
     if (repeated.length > 0) {
       warnings.push({
         type: 'repetition',
         severity: 'info',
-        message: `Word "${repeated[0][0]}" appears ${repeated[0][1]} times`
+        message: `Word "${repeated[0][0]}" appears ${repeated[0][1]} times`,
       });
     }
 
@@ -178,10 +178,10 @@ export class PreviewManager {
 
     return {
       ...preview,
-      wouldSend: !preview.warnings.some(w => w.severity === 'error'),
+      wouldSend: !preview.warnings.some((w) => w.severity === 'error'),
       simulatedDelay: Math.round(delay),
       dryRun: true,
-      message: 'This is a simulation. No message was actually sent.'
+      message: 'This is a simulation. No message was actually sent.',
     };
   }
 
@@ -206,11 +206,15 @@ export class PreviewManager {
    * @returns {string} JSON string
    */
   exportHistory() {
-    return JSON.stringify({
-      exported: new Date().toISOString(),
-      count: this.previewHistory.length,
-      previews: this.previewHistory
-    }, null, 2);
+    return JSON.stringify(
+      {
+        exported: new Date().toISOString(),
+        count: this.previewHistory.length,
+        previews: this.previewHistory,
+      },
+      null,
+      2
+    );
   }
 
   /**
@@ -219,7 +223,7 @@ export class PreviewManager {
    * @returns {Array<object>} Preview results
    */
   batchPreview(messages) {
-    return messages.map(msg => this.previewMessage(msg));
+    return messages.map((msg) => this.previewMessage(msg));
   }
 
   /**
@@ -228,16 +232,15 @@ export class PreviewManager {
    */
   getStats() {
     const total = this.previewHistory.length;
-    const withWarnings = this.previewHistory.filter(p => p.warnings.length > 0).length;
-    const avgLength = total > 0 
-      ? Math.round(this.previewHistory.reduce((sum, p) => sum + p.length, 0) / total)
-      : 0;
+    const withWarnings = this.previewHistory.filter((p) => p.warnings.length > 0).length;
+    const avgLength =
+      total > 0 ? Math.round(this.previewHistory.reduce((sum, p) => sum + p.length, 0) / total) : 0;
 
     return {
       total,
       withWarnings,
       avgLength,
-      mostUsedVariables: this.getMostUsedVariables()
+      mostUsedVariables: this.getMostUsedVariables(),
     };
   }
 
@@ -247,9 +250,9 @@ export class PreviewManager {
    */
   getMostUsedVariables() {
     const counts = {};
-    
-    this.previewHistory.forEach(preview => {
-      preview.variables.forEach(variable => {
+
+    this.previewHistory.forEach((preview) => {
+      preview.variables.forEach((variable) => {
         counts[variable] = (counts[variable] || 0) + 1;
       });
     });

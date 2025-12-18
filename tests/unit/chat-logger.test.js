@@ -51,7 +51,7 @@ describe('ChatLogger', () => {
       const firstObserver = logger.observer;
 
       await logger.startLogging('#chat-container');
-      
+
       expect(logger.observer).toBe(firstObserver);
     });
   });
@@ -137,11 +137,11 @@ describe('ChatLogger', () => {
   describe('detectPlatform', () => {
     test('should detect WhatsApp', () => {
       Object.defineProperty(window, 'location', {
-        value: { 
+        value: {
           href: 'https://web.whatsapp.com/',
-          hostname: 'web.whatsapp.com'
+          hostname: 'web.whatsapp.com',
         },
-        writable: true
+        writable: true,
       });
 
       const platform = logger.detectPlatform();
@@ -151,11 +151,11 @@ describe('ChatLogger', () => {
 
     test('should detect Discord', () => {
       Object.defineProperty(window, 'location', {
-        value: { 
+        value: {
           href: 'https://discord.com/channels/123',
-          hostname: 'discord.com'
+          hostname: 'discord.com',
         },
-        writable: true
+        writable: true,
       });
 
       const platform = logger.detectPlatform();
@@ -165,11 +165,11 @@ describe('ChatLogger', () => {
 
     test('should return Unknown for unrecognized platforms', () => {
       Object.defineProperty(window, 'location', {
-        value: { 
+        value: {
           href: 'https://example.com',
-          hostname: 'example.com'
+          hostname: 'example.com',
         },
-        writable: true
+        writable: true,
       });
 
       const platform = logger.detectPlatform();
@@ -182,7 +182,7 @@ describe('ChatLogger', () => {
     test('should save messages to storage', async () => {
       const messages = [
         { id: '1', text: 'Test 1', timestamp: new Date().toISOString() },
-        { id: '2', text: 'Test 2', timestamp: new Date().toISOString() }
+        { id: '2', text: 'Test 2', timestamp: new Date().toISOString() },
       ];
 
       await logger.saveMessages(messages);
@@ -197,7 +197,7 @@ describe('ChatLogger', () => {
       const existingMessages = Array.from({ length: 10 }, (_, i) => ({
         id: `old_${i}`,
         text: `Old message ${i}`,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }));
 
       global.chrome.storage.local.get = jest.fn((keys, callback) => {
@@ -205,7 +205,7 @@ describe('ChatLogger', () => {
       });
 
       const newMessages = [
-        { id: 'new_1', text: 'New message', timestamp: new Date().toISOString() }
+        { id: 'new_1', text: 'New message', timestamp: new Date().toISOString() },
       ];
 
       await logger.saveMessages(newMessages);
@@ -219,7 +219,7 @@ describe('ChatLogger', () => {
     test('should retrieve all messages', async () => {
       const testMessages = [
         { id: '1', text: 'Test 1', sender: 'User1', timestamp: new Date().toISOString() },
-        { id: '2', text: 'Test 2', sender: 'User2', timestamp: new Date().toISOString() }
+        { id: '2', text: 'Test 2', sender: 'User2', timestamp: new Date().toISOString() },
       ];
 
       global.chrome.storage.local.get = jest.fn((keys, callback) => {
@@ -234,7 +234,7 @@ describe('ChatLogger', () => {
     test('should filter by search query', async () => {
       const testMessages = [
         { id: '1', text: 'Hello World', sender: 'User1', timestamp: new Date().toISOString() },
-        { id: '2', text: 'Goodbye', sender: 'User2', timestamp: new Date().toISOString() }
+        { id: '2', text: 'Goodbye', sender: 'User2', timestamp: new Date().toISOString() },
       ];
 
       global.chrome.storage.local.get = jest.fn((keys, callback) => {
@@ -250,18 +250,18 @@ describe('ChatLogger', () => {
     test('should filter by date range', async () => {
       const now = new Date();
       const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-      
+
       const testMessages = [
         { id: '1', text: 'Recent', sender: 'User1', timestamp: now.toISOString() },
-        { id: '2', text: 'Old', sender: 'User2', timestamp: yesterday.toISOString() }
+        { id: '2', text: 'Old', sender: 'User2', timestamp: yesterday.toISOString() },
       ];
 
       global.chrome.storage.local.get = jest.fn((keys, callback) => {
         callback({ chatLogs: testMessages });
       });
 
-      const messages = await logger.getMessages({ 
-        startDate: new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString() 
+      const messages = await logger.getMessages({
+        startDate: new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString(),
       });
 
       expect(messages).toHaveLength(1);
@@ -273,7 +273,7 @@ describe('ChatLogger', () => {
         id: `${i}`,
         text: `Message ${i}`,
         sender: 'User1',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }));
 
       global.chrome.storage.local.get = jest.fn((keys, callback) => {
@@ -289,9 +289,30 @@ describe('ChatLogger', () => {
   describe('getStats', () => {
     test('should calculate statistics', async () => {
       const testMessages = [
-        { id: '1', text: 'Test 1', sender: 'User1', direction: 'incoming', platform: 'WhatsApp', timestamp: new Date().toISOString() },
-        { id: '2', text: 'Test 2', sender: 'User1', direction: 'outgoing', platform: 'WhatsApp', timestamp: new Date().toISOString() },
-        { id: '3', text: 'Test 3', sender: 'User2', direction: 'incoming', platform: 'Discord', timestamp: new Date().toISOString() }
+        {
+          id: '1',
+          text: 'Test 1',
+          sender: 'User1',
+          direction: 'incoming',
+          platform: 'WhatsApp',
+          timestamp: new Date().toISOString(),
+        },
+        {
+          id: '2',
+          text: 'Test 2',
+          sender: 'User1',
+          direction: 'outgoing',
+          platform: 'WhatsApp',
+          timestamp: new Date().toISOString(),
+        },
+        {
+          id: '3',
+          text: 'Test 3',
+          sender: 'User2',
+          direction: 'incoming',
+          platform: 'Discord',
+          timestamp: new Date().toISOString(),
+        },
       ];
 
       global.chrome.storage.local.get = jest.fn((keys, callback) => {
@@ -314,17 +335,14 @@ describe('ChatLogger', () => {
     test('should clear all logs', async () => {
       await logger.clearLogs();
 
-      expect(chrome.storage.local.set).toHaveBeenCalledWith(
-        { chatLogs: [] },
-        expect.any(Function)
-      );
+      expect(chrome.storage.local.set).toHaveBeenCalledWith({ chatLogs: [] }, expect.any(Function));
     });
   });
 
   describe('exportToJSON', () => {
     test('should export messages as JSON', async () => {
       const testMessages = [
-        { id: '1', text: 'Test', sender: 'User1', timestamp: new Date().toISOString() }
+        { id: '1', text: 'Test', sender: 'User1', timestamp: new Date().toISOString() },
       ];
 
       global.chrome.storage.local.get = jest.fn((keys, callback) => {
@@ -343,7 +361,14 @@ describe('ChatLogger', () => {
   describe('exportToCSV', () => {
     test('should export messages as CSV', async () => {
       const testMessages = [
-        { id: '1', text: 'Test', sender: 'User1', direction: 'outgoing', platform: 'WhatsApp', timestamp: new Date().toISOString() }
+        {
+          id: '1',
+          text: 'Test',
+          sender: 'User1',
+          direction: 'outgoing',
+          platform: 'WhatsApp',
+          timestamp: new Date().toISOString(),
+        },
       ];
 
       global.chrome.storage.local.get = jest.fn((keys, callback) => {
@@ -358,7 +383,14 @@ describe('ChatLogger', () => {
 
     test('should escape quotes in CSV', async () => {
       const testMessages = [
-        { id: '1', text: 'He said "hello"', sender: 'User1', direction: 'outgoing', platform: 'WhatsApp', timestamp: new Date().toISOString() }
+        {
+          id: '1',
+          text: 'He said "hello"',
+          sender: 'User1',
+          direction: 'outgoing',
+          platform: 'WhatsApp',
+          timestamp: new Date().toISOString(),
+        },
       ];
 
       global.chrome.storage.local.get = jest.fn((keys, callback) => {

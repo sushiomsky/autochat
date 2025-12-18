@@ -57,10 +57,10 @@ async function loadMessages() {
 
 function updateStats() {
   const total = allMessages.length;
-  const incoming = allMessages.filter(m => m.direction === 'incoming').length;
-  const outgoing = allMessages.filter(m => m.direction === 'outgoing').length;
-  
-  const platforms = new Set(allMessages.map(m => m.platform));
+  const incoming = allMessages.filter((m) => m.direction === 'incoming').length;
+  const outgoing = allMessages.filter((m) => m.direction === 'outgoing').length;
+
+  const platforms = new Set(allMessages.map((m) => m.platform));
 
   document.getElementById('totalCount').textContent = total;
   document.getElementById('incomingCount').textContent = incoming;
@@ -69,14 +69,14 @@ function updateStats() {
 }
 
 function updatePlatformFilter() {
-  const platforms = new Set(allMessages.map(m => m.platform));
+  const platforms = new Set(allMessages.map((m) => m.platform));
   const select = document.getElementById('platformFilter');
-  
+
   // Clear existing options except "All Platforms"
   select.innerHTML = '<option value="">All Platforms</option>';
-  
+
   // Add platform options
-  platforms.forEach(platform => {
+  platforms.forEach((platform) => {
     const option = document.createElement('option');
     option.value = platform;
     option.textContent = platform;
@@ -91,7 +91,7 @@ function applyFilters() {
   const startDate = document.getElementById('startDate').value;
   const endDate = document.getElementById('endDate').value;
 
-  filteredMessages = allMessages.filter(message => {
+  filteredMessages = allMessages.filter((message) => {
     // Search filter
     if (searchText) {
       const matchesText = message.text.toLowerCase().includes(searchText);
@@ -131,7 +131,7 @@ function applyFilters() {
 
 function displayMessages() {
   const container = document.getElementById('messagesContainer');
-  
+
   if (filteredMessages.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
@@ -151,12 +151,13 @@ function displayMessages() {
   const pageMessages = filteredMessages.slice(startIdx, endIdx);
 
   // Render messages
-  container.innerHTML = pageMessages.map(message => {
-    const timestamp = new Date(message.timestamp);
-    const timeStr = timestamp.toLocaleString();
-    const dateStr = timestamp.toLocaleDateString();
+  container.innerHTML = pageMessages
+    .map((message) => {
+      const timestamp = new Date(message.timestamp);
+      const timeStr = timestamp.toLocaleString();
+      const dateStr = timestamp.toLocaleDateString();
 
-    return `
+      return `
       <div class="message-item ${message.direction}">
         <div class="message-header">
           <span class="message-sender">${escapeHtml(message.sender)}</span>
@@ -171,7 +172,8 @@ function displayMessages() {
         <div class="message-text">${escapeHtml(message.text)}</div>
       </div>
     `;
-  }).join('');
+    })
+    .join('');
 
   // Update pagination
   updatePagination(totalPages);
@@ -190,7 +192,7 @@ function updatePagination(totalPages) {
 
   pagination.style.display = 'flex';
   pageInfo.textContent = `Page ${currentPage} of ${totalPages} (${filteredMessages.length} messages)`;
-  
+
   prevBtn.disabled = currentPage === 1;
   nextBtn.disabled = currentPage === totalPages;
 }
@@ -198,7 +200,7 @@ function updatePagination(totalPages) {
 function changePage(delta) {
   currentPage += delta;
   displayMessages();
-  
+
   // Scroll to top
   document.getElementById('messagesContainer').scrollTop = 0;
 }
@@ -209,7 +211,7 @@ function clearFilters() {
   document.getElementById('platformFilter').value = '';
   document.getElementById('startDate').value = '';
   document.getElementById('endDate').value = '';
-  
+
   applyFilters();
 }
 
@@ -217,7 +219,7 @@ async function exportLogs() {
   try {
     // Create export menu
     const format = await showExportMenu();
-    
+
     if (!format) return;
 
     let content, filename, mimeType;
@@ -226,7 +228,7 @@ async function exportLogs() {
       const exportData = {
         exportDate: new Date().toISOString(),
         messageCount: filteredMessages.length,
-        messages: filteredMessages
+        messages: filteredMessages,
       };
       content = JSON.stringify(exportData, null, 2);
       filename = `chat-logs-${Date.now()}.json`;
@@ -252,7 +254,10 @@ async function exportLogs() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    showNotification(`Exported ${filteredMessages.length} messages as ${format.toUpperCase()}`, 'success');
+    showNotification(
+      `Exported ${filteredMessages.length} messages as ${format.toUpperCase()}`,
+      'success'
+    );
   } catch (error) {
     console.error('Export failed:', error);
     showNotification('Export failed', 'error');
@@ -301,24 +306,26 @@ function convertToCSV(messages) {
   const headers = ['Timestamp', 'Sender', 'Direction', 'Platform', 'Message'];
   const rows = [headers];
 
-  messages.forEach(m => {
+  messages.forEach((m) => {
     rows.push([
       m.timestamp,
       m.sender,
       m.direction,
       m.platform,
-      `"${m.text.replace(/"/g, '""')}"` // Escape quotes
+      `"${m.text.replace(/"/g, '""')}"`, // Escape quotes
     ]);
   });
 
-  return rows.map(row => row.join(',')).join('\n');
+  return rows.map((row) => row.join(',')).join('\n');
 }
 
 function convertToText(messages) {
-  return messages.map(m => {
-    const timestamp = new Date(m.timestamp).toLocaleString();
-    return `[${timestamp}] ${m.sender} (${m.direction}): ${m.text}`;
-  }).join('\n\n');
+  return messages
+    .map((m) => {
+      const timestamp = new Date(m.timestamp).toLocaleString();
+      return `[${timestamp}] ${m.sender} (${m.direction}): ${m.text}`;
+    })
+    .join('\n\n');
 }
 
 async function clearLogs() {
@@ -330,10 +337,10 @@ async function clearLogs() {
     await chrome.storage.local.set({ chatLogs: [] });
     allMessages = [];
     filteredMessages = [];
-    
+
     updateStats();
     displayMessages();
-    
+
     showNotification('All logs cleared', 'success');
   } catch (error) {
     console.error('Failed to clear logs:', error);
@@ -377,9 +384,9 @@ function showNotification(message, type = 'info') {
     animation: slideIn 0.3s;
   `;
   notification.textContent = message;
-  
+
   document.body.appendChild(notification);
-  
+
   setTimeout(() => {
     notification.style.animation = 'slideOut 0.3s';
     setTimeout(() => document.body.removeChild(notification), 300);
@@ -392,9 +399,9 @@ function escapeHtml(text) {
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
-    "'": '&#39;'
+    "'": '&#39;',
   };
-  return text.replace(/[&<>"']/g, char => escapeMap[char]);
+  return text.replace(/[&<>"']/g, (char) => escapeMap[char]);
 }
 
 // Add animations

@@ -37,6 +37,7 @@
 ### Demo GIF Creation
 
 Use tools like:
+
 - **ScreenToGif** (Windows)
 - **Kap** (macOS)
 - **Peek** (Linux)
@@ -45,6 +46,7 @@ Use tools like:
 ### Demo Scenarios
 
 #### 1. Basic Setup (30 seconds)
+
 ```
 1. Click extension icon
 2. Click "Mark Chat Input Field"
@@ -57,6 +59,7 @@ Use tools like:
 ```
 
 #### 2. Advanced Features (45 seconds)
+
 ```
 1. Open Settings modal
 2. Enable typing simulation
@@ -68,6 +71,7 @@ Use tools like:
 ```
 
 #### 3. Dark Mode & Keyboard Shortcuts (15 seconds)
+
 ```
 1. Click moon icon to enable dark mode
 2. Show theme transition
@@ -109,9 +113,11 @@ Use tools like:
 ## Demo Video Script
 
 ### Intro (10 seconds)
+
 "AutoChat Enhanced - The most advanced automated message sender for Chrome"
 
 ### Features (60 seconds)
+
 - Quick setup demonstration
 - Message configuration
 - Typing simulation in action
@@ -119,27 +125,32 @@ Use tools like:
 - Dark mode toggle
 
 ### Call to Action (10 seconds)
+
 "Install now from Chrome Web Store or GitHub"
 
 ## Tools & Resources
 
 ### Screenshot Tools
+
 - Chrome DevTools (built-in)
 - Awesome Screenshot (extension)
 - Lightshot
 - ShareX
 
 ### GIF Optimization
+
 - ezgif.com
 - gifsicle (command-line)
 - gifski (high quality)
 
 ### Image Editing
+
 - GIMP (free)
 - Photopea (web-based)
 - Figma (design tool)
 
 ### Video Recording
+
 - OBS Studio (free, powerful)
 - Loom (easy, cloud-based)
 - SimpleScreenRecorder (Linux)
@@ -160,12 +171,14 @@ Use tools like:
 ## Marketing Copy for Images
 
 ### Taglines
+
 - "Automate with Intelligence"
 - "Human-Like Message Automation"
 - "The Smart Way to Stay Active"
 - "Advanced Anti-Detection Technology"
 
 ### Feature Callouts
+
 - ⌨️ Realistic Typing Simulation
 - 🎭 Anti-Detection Algorithms
 - 📊 Built-in Analytics
@@ -199,6 +212,7 @@ Use tools like:
 ## TODO: Create Actual Screenshots
 
 Run these commands after building:
+
 ```bash
 # Load extension in Chrome
 # Navigate to chrome://extensions

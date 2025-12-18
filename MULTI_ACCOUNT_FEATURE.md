@@ -5,6 +5,7 @@
 The Multi-Account Support feature allows you to manage multiple account profiles within AutoChat. Each profile stores separate settings, making it easy to switch between different automation scenarios without reconfiguring everything.
 
 This feature is especially useful for:
+
 - **Casino rain farmers** managing multiple casino accounts
 - Users with work and personal automation needs
 - Different chat platforms requiring different configurations
@@ -17,13 +18,14 @@ This feature is especially useful for:
 ✅ **Isolated Settings**: Each profile has completely separate settings  
 ✅ **Import/Export**: Backup and share individual profiles  
 ✅ **Protected Default**: Default account cannot be deleted  
-✅ **Safe Deletion**: Cannot delete currently active account  
+✅ **Safe Deletion**: Cannot delete currently active account
 
 ## How It Works
 
 ### Account Profiles
 
 Each account profile stores:
+
 - **Messages**: Custom message list
 - **Keywords**: Mention detection keywords
 - **Reply Messages**: Auto-reply messages
@@ -70,6 +72,7 @@ Method 1: Use the dropdown in the main popup
 Method 2: Use the account management modal
 
 When you switch:
+
 - Current account settings are saved
 - New account settings are loaded
 - All UI updates to reflect new account
@@ -79,6 +82,7 @@ When you switch:
 ### Scenario 1: Multiple Casino Accounts
 
 **Setup**:
+
 - Profile 1: "Stake Rain Farmer"
   - Keywords: rain, drop, giveaway, @myusername1
   - Replies: Thanks!, ty, 🎉, claim
@@ -93,6 +97,7 @@ When you switch:
 ### Scenario 2: Work vs Personal
 
 **Setup**:
+
 - Profile 1: "Work Slack"
   - Messages: Professional responses
   - Keywords: @firstname.lastname, urgent
@@ -107,6 +112,7 @@ When you switch:
 ### Scenario 3: Testing vs Production
 
 **Setup**:
+
 - Profile 1: "Testing"
   - Short intervals for quick testing
   - Test messages
@@ -123,11 +129,13 @@ When you switch:
 ### Creating Accounts
 
 **Requirements**:
+
 - Name: 1-50 characters
 - Name: Cannot be empty or whitespace only
 - Name: Should be descriptive (e.g., "Casino Account 1" not "Account 1")
 
 **Best Practices**:
+
 - Use descriptive names
 - Include platform name (e.g., "Stake - Rain Farmer")
 - Use numbering if you have many (e.g., "Casino 1", "Casino 2")
@@ -135,6 +143,7 @@ When you switch:
 ### Switching Accounts
 
 **What Happens**:
+
 1. Current account settings are saved automatically
 2. Content script is notified (if mention detection is active)
 3. New account settings are loaded from storage
@@ -142,10 +151,12 @@ When you switch:
 5. Notification confirms the switch
 
 **Switch Methods**:
+
 - **Dropdown**: Quick switch from main popup
 - **Manage Modal**: Switch while viewing all accounts
 
 **Safety**:
+
 - All settings are automatically saved before switching
 - No data is lost when switching
 - Previous account remains unchanged
@@ -153,23 +164,27 @@ When you switch:
 ### Exporting Accounts
 
 **Purpose**:
+
 - Backup account configuration
 - Share configuration with others
 - Transfer between browsers/devices
 
 **Export Process**:
+
 1. Open Account Management modal
 2. Find the account to export
 3. Click "📥 Export" button
 4. JSON file downloads automatically
 
 **Export File Contains**:
+
 - Account name
 - All settings (messages, keywords, intervals, etc.)
 - Export timestamp
 - Version information
 
 **File Format**:
+
 ```json
 {
   "name": "Casino Account 1",
@@ -188,17 +203,20 @@ When you switch:
 ### Deleting Accounts
 
 **Restrictions**:
+
 - ❌ Cannot delete "Default Account" (protected)
 - ❌ Cannot delete currently active account (switch first)
 - ✅ Can delete any other account
 
 **Deletion Process**:
+
 1. Ensure account is not active (switch to another if needed)
 2. Open Account Management modal
 3. Click 🗑️ button on the account
 4. Confirm deletion (cannot be undone)
 
 **Safety Notes**:
+
 - Deletion is permanent (no undo)
 - Export account before deleting if you might need it later
 - Deleted account cannot be recovered
@@ -286,6 +304,7 @@ When you switch:
 ### Settings Saved Per Account
 
 All AutoChat settings are saved per account:
+
 - `messageList` - Message list
 - `sendMode` - Random/Sequential
 - `minInterval`, `maxInterval` - Time intervals
@@ -313,12 +332,14 @@ All AutoChat settings are saved per account:
 ### Naming Conventions
 
 ✅ Good Names:
+
 - "Stake - Rain Farmer"
 - "Work Slack Bot"
 - "Casino #1 (VIP)"
 - "Testing Environment"
 
 ❌ Poor Names:
+
 - "Account 1" (not descriptive)
 - "asdfgh" (meaningless)
 - "a" (too short)
@@ -364,6 +385,7 @@ All AutoChat settings are saved per account:
 **Symptoms**: Dropdown changes but settings don't update
 
 **Solutions**:
+
 1. Refresh the popup (close and reopen)
 2. Check browser console for errors
 3. Verify account exists in storage
@@ -374,6 +396,7 @@ All AutoChat settings are saved per account:
 **Symptoms**: Changes are lost when switching accounts
 
 **Solutions**:
+
 1. Wait 1 second after making changes (auto-save delay)
 2. Manually switch accounts to force save
 3. Check browser storage quota
@@ -382,6 +405,7 @@ All AutoChat settings are saved per account:
 ### Can't Delete Account
 
 **Possible Causes**:
+
 1. Trying to delete "Default Account" (not allowed)
 2. Trying to delete active account (switch first)
 3. Account already deleted (refresh popup)
@@ -393,6 +417,7 @@ All AutoChat settings are saved per account:
 **Symptoms**: Cannot import exported file
 
 **Solutions**:
+
 1. Verify file is valid JSON
 2. Check file hasn't been corrupted
 3. Re-export the account
@@ -432,14 +457,14 @@ function deleteAccount(accountId)
 
 ```javascript
 // Main storage keys
-'accounts'        // Object containing all accounts
-'currentAccount'  // String ID of active account
+'accounts'; // Object containing all accounts
+'currentAccount'; // String ID of active account
 
 // Per-account settings (stored in accounts[accountId].settings)
-'messageList'
-'sendMode'
-'minInterval'
-'maxInterval'
+'messageList';
+'sendMode';
+'minInterval';
+'maxInterval';
 // ... all other settings
 ```
 
@@ -461,6 +486,7 @@ Potential improvements for future versions:
 ## Changelog
 
 ### v4.4.0 (2025-11-22)
+
 - ✨ Initial release of multi-account support
 - ✅ Create, switch, export, and delete accounts
 - ✅ Complete settings isolation per account

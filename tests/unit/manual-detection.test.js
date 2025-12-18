@@ -99,7 +99,7 @@ describe('ManualMessageDetector', () => {
 
       expect(mockCallback).toHaveBeenCalledWith({
         text: 'Hello World',
-        timestamp: expect.any(String)
+        timestamp: expect.any(String),
       });
     });
 
@@ -189,7 +189,7 @@ describe('ManualMessageDetector', () => {
   describe('updateInputSelector', () => {
     test('should update selector while monitoring', () => {
       detector.startMonitoring('#test-input', mockCallback);
-      
+
       detector.updateInputSelector('#test-contenteditable');
 
       expect(detector.inputSelector).toBe('#test-contenteditable');

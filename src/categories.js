@@ -16,7 +16,7 @@ export class CategoryManager {
    */
   async loadFromStorage() {
     const data = await chrome.storage.local.get(['categories', 'categorizedPhrases', 'phraseTags']);
-    
+
     this.categories = data.categories || this.getDefaultCategories();
     this.phrases = new Map(data.categorizedPhrases || []);
     this.tags = new Set(data.phraseTags || []);
@@ -29,7 +29,7 @@ export class CategoryManager {
     await chrome.storage.local.set({
       categories: this.categories,
       categorizedPhrases: Array.from(this.phrases.entries()),
-      phraseTags: Array.from(this.tags)
+      phraseTags: Array.from(this.tags),
     });
   }
 
@@ -48,7 +48,7 @@ export class CategoryManager {
       { id: 'funny', name: 'Funny', icon: '😄', color: '#feca57' },
       { id: 'supportive', name: 'Supportive', icon: '💪', color: '#48dbfb' },
       { id: 'business', name: 'Business', icon: '💼', color: '#341f97' },
-      { id: 'personal', name: 'Personal', icon: '❤️', color: '#ee5a6f' }
+      { id: 'personal', name: 'Personal', icon: '❤️', color: '#ee5a6f' },
     ];
   }
 
@@ -65,7 +65,7 @@ export class CategoryManager {
       icon: category.icon || '📁',
       color: category.color || '#667eea',
       description: category.description || '',
-      created: new Date().toISOString()
+      created: new Date().toISOString(),
     };
 
     this.categories.push(newCategory);
@@ -79,7 +79,7 @@ export class CategoryManager {
    * @param {object} updates - Updated fields
    */
   updateCategory(categoryId, updates) {
-    const index = this.categories.findIndex(c => c.id === categoryId);
+    const index = this.categories.findIndex((c) => c.id === categoryId);
     if (index !== -1) {
       this.categories[index] = { ...this.categories[index], ...updates };
       this.saveToStorage();
@@ -91,15 +91,15 @@ export class CategoryManager {
    * @param {string} categoryId - Category ID
    */
   deleteCategory(categoryId) {
-    this.categories = this.categories.filter(c => c.id !== categoryId);
-    
+    this.categories = this.categories.filter((c) => c.id !== categoryId);
+
     // Remove category from phrases
     this.phrases.forEach((phrase, _id) => {
       if (phrase.category === categoryId) {
         phrase.category = 'uncategorized';
       }
     });
-    
+
     this.saveToStorage();
   }
 
@@ -120,14 +120,14 @@ export class CategoryManager {
       created: new Date().toISOString(),
       usageCount: 0,
       lastUsed: null,
-      favorite: false
+      favorite: false,
     };
 
     this.phrases.set(id, phrase);
-    
+
     // Add tags to global tags set
-    tags.forEach(tag => this.tags.add(tag));
-    
+    tags.forEach((tag) => this.tags.add(tag));
+
     this.saveToStorage();
     return id;
   }
@@ -141,12 +141,12 @@ export class CategoryManager {
     const phrase = this.phrases.get(phraseId);
     if (phrase) {
       this.phrases.set(phraseId, { ...phrase, ...updates });
-      
+
       // Update tags
       if (updates.tags) {
-        updates.tags.forEach(tag => this.tags.add(tag));
+        updates.tags.forEach((tag) => this.tags.add(tag));
       }
-      
+
       this.saveToStorage();
     }
   }
@@ -191,8 +191,7 @@ export class CategoryManager {
    * @returns {Array<object>} Phrases
    */
   getPhrasesByCategory(categoryId) {
-    return Array.from(this.phrases.values())
-      .filter(p => p.category === categoryId);
+    return Array.from(this.phrases.values()).filter((p) => p.category === categoryId);
   }
 
   /**
@@ -201,8 +200,7 @@ export class CategoryManager {
    * @returns {Array<object>} Phrases
    */
   getPhrasesByTag(tag) {
-    return Array.from(this.phrases.values())
-      .filter(p => p.tags.includes(tag));
+    return Array.from(this.phrases.values()).filter((p) => p.tags.includes(tag));
   }
 
   /**
@@ -212,11 +210,11 @@ export class CategoryManager {
    */
   searchPhrases(query) {
     const lowerQuery = query.toLowerCase();
-    return Array.from(this.phrases.values())
-      .filter(p => 
+    return Array.from(this.phrases.values()).filter(
+      (p) =>
         p.text.toLowerCase().includes(lowerQuery) ||
-        p.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
-      );
+        p.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))
+    );
   }
 
   /**
@@ -224,8 +222,7 @@ export class CategoryManager {
    * @returns {Array<object>} Favorite phrases
    */
   getFavorites() {
-    return Array.from(this.phrases.values())
-      .filter(p => p.favorite);
+    return Array.from(this.phrases.values()).filter((p) => p.favorite);
   }
 
   /**
@@ -246,7 +243,7 @@ export class CategoryManager {
    */
   getRecentlyUsed(limit = 10) {
     return Array.from(this.phrases.values())
-      .filter(p => p.lastUsed)
+      .filter((p) => p.lastUsed)
       .sort((a, b) => new Date(b.lastUsed) - new Date(a.lastUsed))
       .slice(0, limit);
   }
@@ -272,15 +269,15 @@ export class CategoryManager {
    * @returns {Array<object>} Stats per category
    */
   getCategoryStats() {
-    return this.categories.map(category => {
+    return this.categories.map((category) => {
       const phrases = this.getPhrasesByCategory(category.id);
       const totalUsage = phrases.reduce((sum, p) => sum + p.usageCount, 0);
-      
+
       return {
         ...category,
         phraseCount: phrases.length,
         totalUsage,
-        avgUsage: phrases.length > 0 ? Math.round(totalUsage / phrases.length) : 0
+        avgUsage: phrases.length > 0 ? Math.round(totalUsage / phrases.length) : 0,
       };
     });
   }
@@ -291,9 +288,9 @@ export class CategoryManager {
    */
   getTagStats() {
     const stats = {};
-    
-    this.phrases.forEach(phrase => {
-      phrase.tags.forEach(tag => {
+
+    this.phrases.forEach((phrase) => {
+      phrase.tags.forEach((tag) => {
         if (!stats[tag]) {
           stats[tag] = { tag, count: 0, usage: 0 };
         }
@@ -311,7 +308,7 @@ export class CategoryManager {
    * @param {string} defaultCategory - Default category
    */
   importPhrases(phrases, defaultCategory = 'uncategorized') {
-    phrases.forEach(phrase => {
+    phrases.forEach((phrase) => {
       if (typeof phrase === 'string') {
         this.addPhrase(phrase, defaultCategory, []);
       } else {
@@ -330,20 +327,21 @@ export class CategoryManager {
    * @returns {object} Export data
    */
   exportPhrases(categoryId = 'all') {
-    const phrases = categoryId === 'all' 
-      ? Array.from(this.phrases.values())
-      : this.getPhrasesByCategory(categoryId);
+    const phrases =
+      categoryId === 'all'
+        ? Array.from(this.phrases.values())
+        : this.getPhrasesByCategory(categoryId);
 
     return {
       exported: new Date().toISOString(),
       category: categoryId,
       count: phrases.length,
-      phrases: phrases.map(p => ({
+      phrases: phrases.map((p) => ({
         text: p.text,
         category: p.category,
         tags: p.tags,
-        usageCount: p.usageCount
-      }))
+        usageCount: p.usageCount,
+      })),
     };
   }
 

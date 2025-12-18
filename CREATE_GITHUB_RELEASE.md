@@ -24,10 +24,12 @@ Located in the top-right corner
 ### 3. Fill in Release Details
 
 #### Tag Version
+
 - **Tag**: Select `v4.2.0` (already created)
 - Or type: `v4.2.0` if not visible
 
 #### Release Title
+
 ```
 v4.2.0 - Feature Complete Edition
 ```
@@ -46,24 +48,29 @@ Copy the content from `GITHUB_RELEASE_v4.2.0.md` or use this:
 ## 🆕 What's New
 
 ### 🔔 Browser Notifications
+
 Desktop notifications for all events with customizable sounds
 
-### 👁️ Message Preview & Dry-Run Mode  
+### 👁️ Message Preview & Dry-Run Mode
+
 Test messages safely before sending with warning detection
 
 ### 📁 Phrase Categories & Tags
+
 Organize your messages with 10 default categories and custom tags
 
 ### ⚡ Command Palette (Ctrl+K)
+
 Instant access to all features with fuzzy search
 
 ### 😊 Emoji Picker
+
 300+ emojis organized in 10 categories with smart search
 
 ## 📊 Key Statistics
 
 - **75 Tests Passing** (up from 28)
-- **72+ Features** (up from 22)  
+- **72+ Features** (up from 22)
 - **9,100+ Lines of Code**
 - **100% Test Pass Rate**
 
@@ -104,10 +111,12 @@ v4.3 will include UI integration for all new features.
 Click "Attach binaries by dropping them here or selecting them."
 
 Upload these files from `/home/dennis/autochat/`:
+
 1. **autochat-v4.2.0.tar.gz** (Extension package - for users)
 2. **autochat-v4.2.0-source.tar.gz** (Full source - for developers)
 
 #### Asset Descriptions (add in filename):
+
 - `autochat-v4.2.0.tar.gz` - Chrome Extension Package (Ready to Use)
 - `autochat-v4.2.0-source.tar.gz` - Full Source Code (For Developers)
 
@@ -128,18 +137,21 @@ Click **"Publish release"** button
 After publishing:
 
 ### Verify Release
+
 - [ ] Visit: https://github.com/sushiomsky/autochat/releases/tag/v4.2.0
 - [ ] Verify both files are downloadable
 - [ ] Check release notes display correctly
 - [ ] Ensure tag is linked properly
 
 ### Announce Release
+
 - [ ] Update README.md badges (if any)
 - [ ] Share on social media (optional)
 - [ ] Notify users (if applicable)
 - [ ] Post in discussions
 
 ### Test Downloads
+
 - [ ] Download `autochat-v4.2.0.tar.gz`
 - [ ] Extract and verify files
 - [ ] Test loading in Chrome
@@ -150,6 +162,7 @@ After publishing:
 ## 📦 File Locations
 
 The release packages are located at:
+
 ```
 /home/dennis/autochat/autochat-v4.2.0.tar.gz
 /home/dennis/autochat/autochat-v4.2.0-source.tar.gz
@@ -187,7 +200,7 @@ Everything is prepared. Just follow the steps above to create the release on Git
 **Tag**: v4.2.0 ✅  
 **Packages**: Built ✅  
 **Notes**: Written ✅  
-**Push**: Done ✅  
+**Push**: Done ✅
 
 **Now go to GitHub and click "Draft a new release"!**
 
@@ -206,6 +219,7 @@ Everything is prepared. Just follow the steps above to create the release on Git
 ## ❓ Need Help?
 
 If you encounter issues:
+
 1. Check GitHub's release documentation
 2. Verify tag exists: `git tag -l`
 3. Ensure packages exist: `ls -lh *.tar.gz`

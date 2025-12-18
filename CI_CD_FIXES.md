@@ -3,6 +3,7 @@
 ## 🔧 Issues Fixed
 
 ### 1. ✅ Peer Dependency Conflicts
+
 **Problem**: `npm ci` was failing due to peer dependency conflicts between jest@29 and jest-chrome@0.8
 
 **Solution**: Added `--legacy-peer-deps` flag to all `npm ci` commands
@@ -13,6 +14,7 @@
 ```
 
 ### 2. ✅ Linting Blocking Builds
+
 **Problem**: Linting warnings were causing the entire CI pipeline to fail
 
 **Solution**: Made linter non-blocking by adding `|| echo` fallback
@@ -23,6 +25,7 @@
 ```
 
 ### 3. ✅ Format Check Failures
+
 **Problem**: Format checking was failing the build
 
 **Solution**: Made format check non-blocking
@@ -33,6 +36,7 @@
 ```
 
 ### 4. ✅ Missing Zip Utility
+
 **Problem**: Package job was failing because `zip` command wasn't available
 
 **Solution**: Added zip installation step
@@ -43,6 +47,7 @@
 ```
 
 ### 5. ✅ Codecov Integration Errors
+
 **Problem**: Codecov upload was failing (not configured)
 
 **Solution**: Commented out Codecov step for now
@@ -54,6 +59,7 @@
 ```
 
 ### 6. ✅ Package Job Running on Wrong Trigger
+
 **Problem**: Package job was set to run on main branch pushes instead of tags
 
 **Solution**: Changed condition to only run on tags
@@ -63,6 +69,7 @@ if: startsWith(github.ref, 'refs/tags/')
 ```
 
 ### 7. ✅ Release Assets Not Including Tar Files
+
 **Problem**: GitHub release only included .zip files
 
 **Solution**: Updated file pattern to include both formats
@@ -78,6 +85,7 @@ files: |
 ## 📊 CI/CD Pipeline Status
 
 ### Test Job ✅
+
 - **Runs on**: Push to main/develop, Pull Requests
 - **Node versions**: 16.x, 18.x, 20.x
 - **Steps**:
@@ -87,10 +95,11 @@ files: |
   4. Run linter (non-blocking)
   5. Check formatting (non-blocking)
   6. Run tests with coverage
-  
+
 **Expected Result**: ✅ Pass (even with linting warnings)
 
 ### Build Job ✅
+
 - **Runs on**: Push to main/develop, Pull Requests
 - **Depends on**: Test job
 - **Steps**:
@@ -103,7 +112,8 @@ files: |
 **Expected Result**: ✅ Pass
 
 ### Package Job ✅
-- **Runs on**: Tag pushes only (v*.*.*)
+
+- **Runs on**: Tag pushes only (v*.*.\*)
 - **Depends on**: Build job
 - **Steps**:
   1. Checkout code
@@ -150,12 +160,12 @@ npm run package
 
 ## 📋 Current Status
 
-| Job | Status | Notes |
-|-----|--------|-------|
-| **Test** | ✅ Fixed | Non-blocking linter/formatter |
-| **Build** | ✅ Fixed | --legacy-peer-deps added |
+| Job         | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| **Test**    | ✅ Fixed | Non-blocking linter/formatter   |
+| **Build**   | ✅ Fixed | --legacy-peer-deps added        |
 | **Package** | ✅ Fixed | Zip installed, tag-only trigger |
-| **Release** | ✅ Fixed | Auto-creates releases on tags |
+| **Release** | ✅ Fixed | Auto-creates releases on tags   |
 
 ---
 
@@ -212,6 +222,7 @@ git push origin v4.2.1
 ### Debug Failures
 
 If a job fails:
+
 1. Click on the failed step
 2. Read error messages
 3. Fix locally first
@@ -223,6 +234,7 @@ If a job fails:
 ## 📝 CI/CD Configuration
 
 ### Workflow File
+
 `.github/workflows/ci.yml`
 
 ### Key Settings
@@ -284,19 +296,25 @@ if: startsWith(github.ref, 'refs/tags/')
 ## 🛠️ Troubleshooting
 
 ### Issue: npm ci fails with peer dependency error
+
 **Solution**: Verify `--legacy-peer-deps` is in the command
 
 ### Issue: Linting fails the build
+
 **Solution**: Should be non-blocking now. If not, check for actual errors (not warnings)
 
 ### Issue: Package job doesn't run
+
 **Solution**: Verify you pushed a tag (not just a commit)
 
 ### Issue: Zip command not found
+
 **Solution**: Should be installed in pipeline now. If not, check install step
 
 ### Issue: Release not created
-**Solution**: 
+
+**Solution**:
+
 - Verify tag format matches `v*.*.*`
 - Check Package job ran successfully
 - Verify GITHUB_TOKEN has permissions
@@ -305,14 +323,14 @@ if: startsWith(github.ref, 'refs/tags/')
 
 ## 📈 Improvements Made
 
-| Before | After |
-|--------|-------|
-| ❌ CI failing on peer deps | ✅ Uses --legacy-peer-deps |
-| ❌ Warnings block build | ✅ Non-blocking |
-| ❌ Missing zip utility | ✅ Auto-installed |
-| ❌ Codecov errors | ✅ Disabled (not configured) |
-| ❌ Wrong trigger for package | ✅ Tag-based |
-| ❌ Missing tar.gz in release | ✅ Both formats included |
+| Before                       | After                        |
+| ---------------------------- | ---------------------------- |
+| ❌ CI failing on peer deps   | ✅ Uses --legacy-peer-deps   |
+| ❌ Warnings block build      | ✅ Non-blocking              |
+| ❌ Missing zip utility       | ✅ Auto-installed            |
+| ❌ Codecov errors            | ✅ Disabled (not configured) |
+| ❌ Wrong trigger for package | ✅ Tag-based                 |
+| ❌ Missing tar.gz in release | ✅ Both formats included     |
 
 ---
 

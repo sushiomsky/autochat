@@ -38,10 +38,13 @@ describe('WebhookManager', () => {
 
       async saveWebhooks() {
         return new Promise((resolve) => {
-          chrome.storage.local.set({ 
-            webhooks: this.webhooks,
-            webhooksEnabled: this.enabled
-          }, () => resolve());
+          chrome.storage.local.set(
+            {
+              webhooks: this.webhooks,
+              webhooksEnabled: this.enabled,
+            },
+            () => resolve()
+          );
         });
       }
 
@@ -69,7 +72,7 @@ describe('WebhookManager', () => {
           createdAt: new Date().toISOString(),
           lastTriggered: null,
           triggerCount: 0,
-          failureCount: 0
+          failureCount: 0,
         };
 
         this.webhooks.push(newWebhook);
@@ -78,7 +81,7 @@ describe('WebhookManager', () => {
       }
 
       async updateWebhook(id, updates) {
-        const webhook = this.webhooks.find(w => w.id === id);
+        const webhook = this.webhooks.find((w) => w.id === id);
         if (!webhook) {
           throw new Error('Webhook not found');
         }
@@ -93,7 +96,7 @@ describe('WebhookManager', () => {
       }
 
       async deleteWebhook(id) {
-        const index = this.webhooks.findIndex(w => w.id === id);
+        const index = this.webhooks.findIndex((w) => w.id === id);
         if (index === -1) {
           throw new Error('Webhook not found');
         }
@@ -107,7 +110,7 @@ describe('WebhookManager', () => {
       }
 
       getWebhook(id) {
-        return this.webhooks.find(w => w.id === id);
+        return this.webhooks.find((w) => w.id === id);
       }
 
       async trigger(eventType, data) {
@@ -117,16 +120,18 @@ describe('WebhookManager', () => {
         }
 
         const activeWebhooks = this.webhooks.filter(
-          w => w.enabled && w.events.includes(eventType)
+          (w) => w.enabled && w.events.includes(eventType)
         );
 
         if (activeWebhooks.length === 0) {
           return;
         }
 
-        console.log(`[Webhooks] Triggering ${activeWebhooks.length} webhook(s) for event: ${eventType}`);
+        console.log(
+          `[Webhooks] Triggering ${activeWebhooks.length} webhook(s) for event: ${eventType}`
+        );
 
-        const promises = activeWebhooks.map(webhook => 
+        const promises = activeWebhooks.map((webhook) =>
           this.sendWebhook(webhook, eventType, data)
         );
 
@@ -139,7 +144,7 @@ describe('WebhookManager', () => {
           timestamp: new Date().toISOString(),
           data: data,
           source: 'AutoChat',
-          version: chrome.runtime.getManifest().version
+          version: chrome.runtime.getManifest().version,
         };
 
         let lastError = null;
@@ -153,10 +158,10 @@ describe('WebhookManager', () => {
               method: webhook.method,
               headers: {
                 'Content-Type': 'application/json',
-                ...webhook.headers
+                ...webhook.headers,
               },
               body: JSON.stringify(payload),
-              signal: controller.signal
+              signal: controller.signal,
             });
 
             clearTimeout(timeoutId);
@@ -171,10 +176,12 @@ describe('WebhookManager', () => {
 
             console.log(`[Webhooks] Successfully sent to ${webhook.name}`);
             return { success: true, webhook: webhook.name };
-
           } catch (error) {
             lastError = error;
-            console.warn(`[Webhooks] Attempt ${attempt}/${this.retryAttempts} failed for ${webhook.name}:`, error.message);
+            console.warn(
+              `[Webhooks] Attempt ${attempt}/${this.retryAttempts} failed for ${webhook.name}:`,
+              error.message
+            );
 
             if (attempt < this.retryAttempts) {
               await this.sleep(this.retryDelay * attempt);
@@ -185,19 +192,22 @@ describe('WebhookManager', () => {
         webhook.failureCount++;
         await this.saveWebhooks();
 
-        console.error(`[Webhooks] Failed to send webhook ${webhook.name} after ${this.retryAttempts} attempts:`, lastError);
+        console.error(
+          `[Webhooks] Failed to send webhook ${webhook.name} after ${this.retryAttempts} attempts:`,
+          lastError
+        );
         return { success: false, webhook: webhook.name, error: lastError.message };
       }
 
       async testWebhook(id) {
-        const webhook = this.webhooks.find(w => w.id === id);
+        const webhook = this.webhooks.find((w) => w.id === id);
         if (!webhook) {
           throw new Error('Webhook not found');
         }
 
         const testData = {
           test: true,
-          message: 'This is a test webhook from AutoChat'
+          message: 'This is a test webhook from AutoChat',
         };
 
         return await this.sendWebhook(webhook, 'test', testData);
@@ -211,7 +221,7 @@ describe('WebhookManager', () => {
       }
 
       async setWebhookEnabled(id, enabled) {
-        const webhook = this.webhooks.find(w => w.id === id);
+        const webhook = this.webhooks.find((w) => w.id === id);
         if (!webhook) {
           throw new Error('Webhook not found');
         }
@@ -223,23 +233,23 @@ describe('WebhookManager', () => {
       getStats() {
         return {
           total: this.webhooks.length,
-          enabled: this.webhooks.filter(w => w.enabled).length,
-          disabled: this.webhooks.filter(w => !w.enabled).length,
+          enabled: this.webhooks.filter((w) => w.enabled).length,
+          disabled: this.webhooks.filter((w) => !w.enabled).length,
           totalTriggers: this.webhooks.reduce((sum, w) => sum + w.triggerCount, 0),
-          totalFailures: this.webhooks.reduce((sum, w) => sum + w.failureCount, 0)
+          totalFailures: this.webhooks.reduce((sum, w) => sum + w.failureCount, 0),
         };
       }
 
       async clearStats(id = null) {
         if (id) {
-          const webhook = this.webhooks.find(w => w.id === id);
+          const webhook = this.webhooks.find((w) => w.id === id);
           if (webhook) {
             webhook.triggerCount = 0;
             webhook.failureCount = 0;
             webhook.lastTriggered = null;
           }
         } else {
-          this.webhooks.forEach(webhook => {
+          this.webhooks.forEach((webhook) => {
             webhook.triggerCount = 0;
             webhook.failureCount = 0;
             webhook.lastTriggered = null;
@@ -249,19 +259,47 @@ describe('WebhookManager', () => {
       }
 
       sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        return new Promise((resolve) => setTimeout(resolve, ms));
       }
 
       static getEventTypes() {
         return [
-          { value: 'message_sent', label: 'Message Sent', description: 'Triggered when a message is sent' },
-          { value: 'campaign_started', label: 'Campaign Started', description: 'Triggered when auto-send starts' },
-          { value: 'campaign_stopped', label: 'Campaign Stopped', description: 'Triggered when auto-send stops' },
-          { value: 'campaign_paused', label: 'Campaign Paused', description: 'Triggered when auto-send is paused' },
-          { value: 'campaign_resumed', label: 'Campaign Resumed', description: 'Triggered when auto-send is resumed' },
-          { value: 'daily_limit_reached', label: 'Daily Limit Reached', description: 'Triggered when daily limit is reached' },
+          {
+            value: 'message_sent',
+            label: 'Message Sent',
+            description: 'Triggered when a message is sent',
+          },
+          {
+            value: 'campaign_started',
+            label: 'Campaign Started',
+            description: 'Triggered when auto-send starts',
+          },
+          {
+            value: 'campaign_stopped',
+            label: 'Campaign Stopped',
+            description: 'Triggered when auto-send stops',
+          },
+          {
+            value: 'campaign_paused',
+            label: 'Campaign Paused',
+            description: 'Triggered when auto-send is paused',
+          },
+          {
+            value: 'campaign_resumed',
+            label: 'Campaign Resumed',
+            description: 'Triggered when auto-send is resumed',
+          },
+          {
+            value: 'daily_limit_reached',
+            label: 'Daily Limit Reached',
+            description: 'Triggered when daily limit is reached',
+          },
           { value: 'error', label: 'Error', description: 'Triggered when an error occurs' },
-          { value: 'milestone', label: 'Milestone', description: 'Triggered when a milestone is reached' }
+          {
+            value: 'milestone',
+            label: 'Milestone',
+            description: 'Triggered when a milestone is reached',
+          },
         ];
       }
 
@@ -286,7 +324,7 @@ describe('WebhookManager', () => {
 
         return {
           valid: errors.length === 0,
-          errors
+          errors,
         };
       }
     };
@@ -304,7 +342,7 @@ describe('WebhookManager', () => {
       const webhook = {
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       };
 
       const created = await webhookManager.addWebhook(webhook);
@@ -313,7 +351,7 @@ describe('WebhookManager', () => {
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
         events: ['message_sent'],
-        enabled: true
+        enabled: true,
       });
       expect(created.id).toBeDefined();
       expect(created.createdAt).toBeDefined();
@@ -325,7 +363,7 @@ describe('WebhookManager', () => {
       const webhook = {
         name: 'Invalid Webhook',
         url: 'not-a-url',
-        events: ['message_sent']
+        events: ['message_sent'],
       };
 
       await expect(webhookManager.addWebhook(webhook)).rejects.toThrow('Invalid webhook URL');
@@ -337,20 +375,20 @@ describe('WebhookManager', () => {
       await webhookManager.addWebhook({
         name: 'Webhook 1',
         url: 'https://example.com/webhook1',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await webhookManager.addWebhook({
         name: 'Webhook 2',
         url: 'https://example.com/webhook2',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await expect(
         webhookManager.addWebhook({
           name: 'Webhook 3',
           url: 'https://example.com/webhook3',
-          events: ['message_sent']
+          events: ['message_sent'],
         })
       ).rejects.toThrow('Maximum of 2 webhooks allowed');
     });
@@ -359,12 +397,12 @@ describe('WebhookManager', () => {
       const webhook = await webhookManager.addWebhook({
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       const updated = await webhookManager.updateWebhook(webhook.id, {
         name: 'Updated Webhook',
-        events: ['message_sent', 'error']
+        events: ['message_sent', 'error'],
       });
 
       expect(updated.name).toBe('Updated Webhook');
@@ -382,7 +420,7 @@ describe('WebhookManager', () => {
       const webhook = await webhookManager.addWebhook({
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await webhookManager.deleteWebhook(webhook.id);
@@ -391,22 +429,22 @@ describe('WebhookManager', () => {
     });
 
     test('should throw error when deleting non-existent webhook', async () => {
-      await expect(
-        webhookManager.deleteWebhook('non-existent-id')
-      ).rejects.toThrow('Webhook not found');
+      await expect(webhookManager.deleteWebhook('non-existent-id')).rejects.toThrow(
+        'Webhook not found'
+      );
     });
 
     test('should get all webhooks', async () => {
       await webhookManager.addWebhook({
         name: 'Webhook 1',
         url: 'https://example.com/webhook1',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await webhookManager.addWebhook({
         name: 'Webhook 2',
         url: 'https://example.com/webhook2',
-        events: ['error']
+        events: ['error'],
       });
 
       const webhooks = webhookManager.getWebhooks();
@@ -419,7 +457,7 @@ describe('WebhookManager', () => {
       const webhook = await webhookManager.addWebhook({
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       const found = webhookManager.getWebhook(webhook.id);
@@ -432,7 +470,7 @@ describe('WebhookManager', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        statusText: 'OK'
+        statusText: 'OK',
       });
     });
 
@@ -440,7 +478,7 @@ describe('WebhookManager', () => {
       await webhookManager.addWebhook({
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await webhookManager.trigger('message_sent', { message: 'Hello' });
@@ -450,9 +488,9 @@ describe('WebhookManager', () => {
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           }),
-          body: expect.stringContaining('message_sent')
+          body: expect.stringContaining('message_sent'),
         })
       );
     });
@@ -461,7 +499,7 @@ describe('WebhookManager', () => {
       await webhookManager.addWebhook({
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['error']
+        events: ['error'],
       });
 
       await webhookManager.trigger('message_sent', { message: 'Hello' });
@@ -474,7 +512,7 @@ describe('WebhookManager', () => {
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
         events: ['message_sent'],
-        enabled: false
+        enabled: false,
       });
 
       await webhookManager.trigger('message_sent', { message: 'Hello' });
@@ -486,7 +524,7 @@ describe('WebhookManager', () => {
       await webhookManager.addWebhook({
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await webhookManager.setEnabled(false);
@@ -499,7 +537,7 @@ describe('WebhookManager', () => {
       await webhookManager.addWebhook({
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await webhookManager.trigger('message_sent', { message: 'Hello', count: 5 });
@@ -510,7 +548,7 @@ describe('WebhookManager', () => {
       expect(body).toMatchObject({
         event: 'message_sent',
         data: { message: 'Hello', count: 5 },
-        source: 'AutoChat'
+        source: 'AutoChat',
       });
       expect(body.timestamp).toBeDefined();
       expect(body.version).toBeDefined();
@@ -520,7 +558,7 @@ describe('WebhookManager', () => {
       const webhook = await webhookManager.addWebhook({
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await webhookManager.trigger('message_sent', { message: 'Hello' });
@@ -540,7 +578,7 @@ describe('WebhookManager', () => {
       await webhookManager.addWebhook({
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await webhookManager.trigger('message_sent', { message: 'Hello' });
@@ -554,7 +592,7 @@ describe('WebhookManager', () => {
       const webhook = await webhookManager.addWebhook({
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       webhookManager.retryAttempts = 2;
@@ -569,13 +607,13 @@ describe('WebhookManager', () => {
       await webhookManager.addWebhook({
         name: 'Webhook 1',
         url: 'https://example.com/webhook1',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await webhookManager.addWebhook({
         name: 'Webhook 2',
         url: 'https://example.com/webhook2',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await webhookManager.trigger('message_sent', { message: 'Hello' });
@@ -591,9 +629,9 @@ describe('WebhookManager', () => {
         url: 'https://example.com/webhook',
         events: ['message_sent'],
         headers: {
-          'Authorization': 'Bearer token123',
-          'X-Custom-Header': 'custom-value'
-        }
+          Authorization: 'Bearer token123',
+          'X-Custom-Header': 'custom-value',
+        },
       });
 
       await webhookManager.trigger('message_sent', { message: 'Hello' });
@@ -602,9 +640,9 @@ describe('WebhookManager', () => {
         'https://example.com/webhook',
         expect.objectContaining({
           headers: expect.objectContaining({
-            'Authorization': 'Bearer token123',
-            'X-Custom-Header': 'custom-value'
-          })
+            Authorization: 'Bearer token123',
+            'X-Custom-Header': 'custom-value',
+          }),
         })
       );
     });
@@ -615,7 +653,7 @@ describe('WebhookManager', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        statusText: 'OK'
+        statusText: 'OK',
       });
     });
 
@@ -623,7 +661,7 @@ describe('WebhookManager', () => {
       const webhook = await webhookManager.addWebhook({
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       const result = await webhookManager.testWebhook(webhook.id);
@@ -632,15 +670,15 @@ describe('WebhookManager', () => {
       expect(mockFetch).toHaveBeenCalledWith(
         'https://example.com/webhook',
         expect.objectContaining({
-          body: expect.stringContaining('"test":true')
+          body: expect.stringContaining('"test":true'),
         })
       );
     });
 
     test('should throw error when testing non-existent webhook', async () => {
-      await expect(
-        webhookManager.testWebhook('non-existent-id')
-      ).rejects.toThrow('Webhook not found');
+      await expect(webhookManager.testWebhook('non-existent-id')).rejects.toThrow(
+        'Webhook not found'
+      );
     });
   });
 
@@ -650,14 +688,14 @@ describe('WebhookManager', () => {
         name: 'Webhook 1',
         url: 'https://example.com/webhook1',
         events: ['message_sent'],
-        enabled: true
+        enabled: true,
       });
 
       await webhookManager.addWebhook({
         name: 'Webhook 2',
         url: 'https://example.com/webhook2',
         events: ['error'],
-        enabled: false
+        enabled: false,
       });
 
       const stats = webhookManager.getStats();
@@ -667,7 +705,7 @@ describe('WebhookManager', () => {
         enabled: 1,
         disabled: 1,
         totalTriggers: 0,
-        totalFailures: 0
+        totalFailures: 0,
       });
     });
 
@@ -677,11 +715,11 @@ describe('WebhookManager', () => {
       const webhook = await webhookManager.addWebhook({
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await webhookManager.trigger('message_sent', { message: 'Hello' });
-      
+
       let updated = webhookManager.getWebhook(webhook.id);
       expect(updated.triggerCount).toBe(1);
 
@@ -698,13 +736,13 @@ describe('WebhookManager', () => {
       await webhookManager.addWebhook({
         name: 'Webhook 1',
         url: 'https://example.com/webhook1',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await webhookManager.addWebhook({
         name: 'Webhook 2',
         url: 'https://example.com/webhook2',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await webhookManager.trigger('message_sent', { message: 'Hello' });
@@ -720,7 +758,7 @@ describe('WebhookManager', () => {
       const webhook = {
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       };
 
       const result = WebhookManager.validate(webhook);
@@ -731,7 +769,7 @@ describe('WebhookManager', () => {
     test('should fail validation for missing name', () => {
       const webhook = {
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       };
 
       const result = WebhookManager.validate(webhook);
@@ -743,19 +781,21 @@ describe('WebhookManager', () => {
       const webhook = {
         name: 'Test Webhook',
         url: 'not-a-url',
-        events: ['message_sent']
+        events: ['message_sent'],
       };
 
       const result = WebhookManager.validate(webhook);
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Valid URL is required (must start with http:// or https://)');
+      expect(result.errors).toContain(
+        'Valid URL is required (must start with http:// or https://)'
+      );
     });
 
     test('should fail validation for missing events', () => {
       const webhook = {
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: []
+        events: [],
       };
 
       const result = WebhookManager.validate(webhook);
@@ -768,7 +808,7 @@ describe('WebhookManager', () => {
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
         events: ['message_sent'],
-        method: 'INVALID'
+        method: 'INVALID',
       };
 
       const result = WebhookManager.validate(webhook);
@@ -783,8 +823,8 @@ describe('WebhookManager', () => {
 
       expect(eventTypes).toBeInstanceOf(Array);
       expect(eventTypes.length).toBeGreaterThan(0);
-      
-      const messageSentEvent = eventTypes.find(e => e.value === 'message_sent');
+
+      const messageSentEvent = eventTypes.find((e) => e.value === 'message_sent');
       expect(messageSentEvent).toBeDefined();
       expect(messageSentEvent.label).toBe('Message Sent');
       expect(messageSentEvent.description).toBeDefined();
@@ -804,19 +844,19 @@ describe('WebhookManager', () => {
       const webhook = await webhookManager.addWebhook({
         name: 'Test Webhook',
         url: 'https://example.com/webhook',
-        events: ['message_sent']
+        events: ['message_sent'],
       });
 
       await webhookManager.setWebhookEnabled(webhook.id, false);
-      
+
       const updated = webhookManager.getWebhook(webhook.id);
       expect(updated.enabled).toBe(false);
     });
 
     test('should throw error when enabling non-existent webhook', async () => {
-      await expect(
-        webhookManager.setWebhookEnabled('non-existent-id', true)
-      ).rejects.toThrow('Webhook not found');
+      await expect(webhookManager.setWebhookEnabled('non-existent-id', true)).rejects.toThrow(
+        'Webhook not found'
+      );
     });
   });
 });

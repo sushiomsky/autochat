@@ -3,9 +3,11 @@
 ## Store Listing Information
 
 ### Extension Name
+
 **AutoChat Enhanced - Smart Message Automation**
 
 ### Short Description (132 characters max)
+
 Automate chat messages with human-like typing, webhooks, multi-language support, and intelligent scheduling for any website.
 
 ### Detailed Description
@@ -81,14 +83,17 @@ AutoChat is free and open-source. Support continued development via crypto donat
 **Support**: GitHub Issues & Documentation
 
 ## Category
+
 **Productivity**
 
 ## Language
+
 **English**
 
 ## Privacy Practices
 
 ### Data Usage
+
 - **No data collected**: Extension does not collect any user data
 - **No data shared**: Extension does not share data with third parties
 - **Local storage only**: All settings stored locally in browser
@@ -114,7 +119,7 @@ AutoChat is free and open-source. Support continued development via crypto donat
 ### Promotional Images
 
 - **Small Tile**: 440x280 PNG
-- **Large Tile**: 920x680 PNG  
+- **Large Tile**: 920x680 PNG
 - **Marquee**: 1400x560 PNG
 
 ## Store Categories
@@ -221,9 +226,11 @@ Once published, add this to README:
 
 ```html
 <a href="https://chrome.google.com/webstore/detail/YOUR-EXTENSION-ID">
-  <img src="https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/iNEddTyWiMfLSwFD6qGq.png" 
-       alt="Get AutoChat Enhanced" 
-       height="58">
+  <img
+    src="https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/iNEddTyWiMfLSwFD6qGq.png"
+    alt="Get AutoChat Enhanced"
+    height="58"
+  />
 </a>
 ```
 
@@ -260,20 +267,24 @@ Once published, add this to README:
 ## Version History
 
 ### v4.5.3 (Current)
+
 - Performance monitoring dashboard
 - Chrome Web Store optimization
 - Complete v4.5 roadmap
 
 ### v4.5.2
+
 - Firefox browser support
 - Cross-platform compatibility
 
 ### v4.5.1
+
 - Human-like imperfections
 - Crypto donations
 - Natural language phrases
 
 ### v4.5.0
+
 - Webhook integration system
 - 8 event types
 - CRUD operations

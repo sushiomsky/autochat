@@ -10,17 +10,20 @@ AutoChat Enhanced now supports multiple languages with full internationalization
 ## Features
 
 ### 1. **Full UI Localization**
+
 - All user interface elements are translated
 - Dynamic content updates based on selected language
 - Persistent language preference across sessions
 
 ### 2. **RTL Support**
+
 - Right-to-Left layout for Urdu and other RTL languages
 - Proper text alignment and direction
 - Flipped UI elements (buttons, modals, lists)
 - Custom fonts for better Urdu rendering
 
 ### 3. **Chrome Extension i18n API**
+
 - Uses native Chrome Extension localization system
 - Message files in `_locales/` directory
 - Manifest localization for extension name and description
@@ -206,7 +209,7 @@ Use attribute selectors:
 
 ```css
 /* Apply to RTL languages */
-[dir="rtl"] .my-element {
+[dir='rtl'] .my-element {
   margin-left: 0;
   margin-right: 10px;
 }

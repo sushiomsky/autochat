@@ -3,6 +3,7 @@
 ## Overview
 
 The Chat Logging feature captures and stores all chat messages for later review, search, and analysis. This is useful for:
+
 - Keeping a record of conversations
 - Searching through past messages
 - Analyzing chat patterns
@@ -12,12 +13,14 @@ The Chat Logging feature captures and stores all chat messages for later review,
 ## Features
 
 ### Message Capture
+
 - **Automatic Detection**: Captures all messages in the marked message container
 - **Bidirectional**: Records both incoming and outgoing messages
 - **Metadata**: Stores sender, timestamp, direction, and platform information
 - **Efficient Storage**: Uses chrome.storage.local with automatic rotation
 
 ### Chat Log Viewer
+
 - **Search**: Full-text search across all messages
 - **Filters**: Filter by date range, sender, direction (incoming/outgoing), and platform
 - **Statistics**: View total messages, incoming/outgoing counts, and platforms
@@ -25,6 +28,7 @@ The Chat Logging feature captures and stores all chat messages for later review,
 - **Export**: Export logs to JSON, CSV, or TXT formats
 
 ### Storage Management
+
 - **Automatic Cleanup**: Keeps only the most recent 10,000 messages
 - **Size Limits**: Enforces 5MB storage limit with automatic rotation
 - **Efficient Queuing**: Batches messages for optimal performance
@@ -47,10 +51,12 @@ The Chat Logging feature captures and stores all chat messages for later review,
 ### Viewing Chat Logs
 
 **From Popup**:
+
 - Click "📖 Chat Logs" button in main view
 - Or open Settings and click "📖 View Chat Logs"
 
 **From Browser**:
+
 - Navigate to `chrome-extension://<extension-id>/chat-log-viewer.html`
 
 ### Searching Messages
@@ -90,6 +96,7 @@ The Chat Logging feature captures and stores all chat messages for later review,
 **Export Formats**:
 
 **JSON**:
+
 ```json
 {
   "exportDate": "2025-12-18T05:43:29.096Z",
@@ -109,12 +116,14 @@ The Chat Logging feature captures and stores all chat messages for later review,
 ```
 
 **CSV**:
+
 ```csv
 Timestamp,Sender,Direction,Platform,Message
 2025-12-18T05:40:00.000Z,User1,incoming,WhatsApp,"Hello!"
 ```
 
 **TXT**:
+
 ```
 [12/18/2025, 5:40:00 AM] User1 (incoming): Hello!
 ```
@@ -130,6 +139,7 @@ Timestamp,Sender,Direction,Platform,Message
 ### Message Detection
 
 The logger uses `MutationObserver` to detect new messages:
+
 - Watches for DOM changes in the message container
 - Extracts message text, sender, and metadata
 - Identifies message direction (incoming/outgoing)
@@ -140,6 +150,7 @@ The logger uses `MutationObserver` to detect new messages:
 **Storage Key**: `chatLogs`
 
 **Message Format**:
+
 ```javascript
 {
   id: "msg_<hash>_<timestamp>",
@@ -155,6 +166,7 @@ The logger uses `MutationObserver` to detect new messages:
 ### Platform Detection
 
 Supported platforms:
+
 - WhatsApp Web
 - Discord
 - Telegram Web
@@ -227,31 +239,39 @@ Detection uses hostname matching for security.
 ### Content Script Messages
 
 **Start Logging**:
+
 ```javascript
 chrome.tabs.sendMessage(tabId, {
-  action: 'startChatLogging'
+  action: 'startChatLogging',
 });
 ```
 
 **Stop Logging**:
+
 ```javascript
 chrome.tabs.sendMessage(tabId, {
-  action: 'stopChatLogging'
+  action: 'stopChatLogging',
 });
 ```
 
 **Get Status**:
+
 ```javascript
-chrome.tabs.sendMessage(tabId, {
-  action: 'getChatLogStatus'
-}, (response) => {
-  console.log(response.enabled, response.isLogging);
-});
+chrome.tabs.sendMessage(
+  tabId,
+  {
+    action: 'getChatLogStatus',
+  },
+  (response) => {
+    console.log(response.enabled, response.isLogging);
+  }
+);
 ```
 
 ### Storage Access
 
 **Read Logs**:
+
 ```javascript
 chrome.storage.local.get(['chatLogs'], (data) => {
   const logs = data.chatLogs || [];
@@ -260,6 +280,7 @@ chrome.storage.local.get(['chatLogs'], (data) => {
 ```
 
 **Clear Logs**:
+
 ```javascript
 chrome.storage.local.set({ chatLogs: [] });
 ```
@@ -267,6 +288,7 @@ chrome.storage.local.set({ chatLogs: [] });
 ## Future Enhancements
 
 Planned features:
+
 - [ ] Advanced search with regex support
 - [ ] Message tagging and categories
 - [ ] Conversation threading

@@ -19,6 +19,7 @@ This document outlines all new features added in v4.2, with complete backend imp
 **Status**: ✅ Complete
 
 **Features**:
+
 - Desktop notification support
 - Multiple notification types (success, error, achievement)
 - Customizable sound effects
@@ -27,6 +28,7 @@ This document outlines all new features added in v4.2, with complete backend imp
 - Do Not Disturb mode support
 
 **API**:
+
 ```javascript
 import { notifications } from './src/notifications.js';
 
@@ -39,8 +41,8 @@ notifications.notifyAutoSendStopped();
 notifications.notifyAchievement(title, description);
 
 // Configuration
-notifications.setEnabled(true/false);
-notifications.setSoundEnabled(true/false);
+notifications.setEnabled(true / false);
+notifications.setSoundEnabled(true / false);
 ```
 
 ---
@@ -50,6 +52,7 @@ notifications.setSoundEnabled(true/false);
 **Status**: ✅ Complete
 
 **Features**:
+
 - Preview messages before sending
 - Template variable processing preview
 - Dry-run mode (simulate without sending)
@@ -59,6 +62,7 @@ notifications.setSoundEnabled(true/false);
 - Statistics on previews
 
 **API**:
+
 ```javascript
 import { preview } from './src/preview.js';
 
@@ -85,6 +89,7 @@ const stats = preview.getStats();
 **Status**: ✅ Complete
 
 **Features**:
+
 - 10 default categories (Greetings, Questions, Responses, etc.)
 - Custom category creation with icons and colors
 - Tag system for phrases
@@ -96,6 +101,7 @@ const stats = preview.getStats();
 - Auto-tag suggestions
 
 **API**:
+
 ```javascript
 import { categories } from './src/categories.js';
 
@@ -103,15 +109,14 @@ import { categories } from './src/categories.js';
 const catId = categories.addCategory({
   name: 'Work',
   icon: '💼',
-  color: '#667eea'
+  color: '#667eea',
 });
 
 // Add phrase
-const phraseId = categories.addPhrase(
-  'Hello! How can I help?',
-  'greetings',
-  ['friendly', 'professional']
-);
+const phraseId = categories.addPhrase('Hello! How can I help?', 'greetings', [
+  'friendly',
+  'professional',
+]);
 
 // Search
 const results = categories.searchPhrases('hello');
@@ -131,6 +136,7 @@ const stats = categories.getCategoryStats();
 **Status**: ✅ Complete
 
 **Features**:
+
 - Fuzzy search for commands
 - Recent commands tracking
 - Command categories
@@ -140,6 +146,7 @@ const stats = categories.getCategoryStats();
 - 20+ built-in commands
 
 **API**:
+
 ```javascript
 import { commandPalette } from './src/command-palette.js';
 
@@ -159,11 +166,12 @@ commandPalette.register({
   description: 'Does something cool',
   icon: '⚡',
   keywords: ['custom', 'action'],
-  action: () => console.log('Executed!')
+  action: () => console.log('Executed!'),
 });
 ```
 
 **Built-in Commands**:
+
 - Controls: Start, Stop, Pause, Send Once
 - Settings: Advanced Settings, Theme Toggle, Import/Export
 - Analytics: Open Analytics, Export Data, Reset Stats
@@ -178,6 +186,7 @@ commandPalette.register({
 **Status**: ✅ Complete
 
 **Features**:
+
 - 10 emoji categories with 300+ emojis
 - Emoji search by keyword
 - Recent emojis tracking
@@ -188,6 +197,7 @@ commandPalette.register({
 - Recent GIFs tracking
 
 **API**:
+
 ```javascript
 import { emojiPicker, gifPicker } from './src/emoji-picker.js';
 
@@ -264,6 +274,7 @@ All backend modules are complete and tested. The following UI components need to
 ## 🎯 Integration Checklist
 
 ### Phase 1: Core Integration
+
 - [ ] Add notification settings to popup
 - [ ] Integrate notifications into content script
 - [ ] Add preview button to main UI
@@ -271,6 +282,7 @@ All backend modules are complete and tested. The following UI components need to
 - [ ] Add dry-run mode toggle
 
 ### Phase 2: Organization
+
 - [ ] Create category manager UI
 - [ ] Add category selector to phrase input
 - [ ] Implement tag input with autocomplete
@@ -278,6 +290,7 @@ All backend modules are complete and tested. The following UI components need to
 - [ ] Show usage statistics
 
 ### Phase 3: Enhanced Input
+
 - [ ] Add command palette modal
 - [ ] Bind Ctrl+K to open palette
 - [ ] Implement keyboard navigation
@@ -286,6 +299,7 @@ All backend modules are complete and tested. The following UI components need to
 - [ ] Add GIF picker button (optional)
 
 ### Phase 4: Polish
+
 - [ ] Add animations/transitions
 - [ ] Implement keyboard shortcuts for all features
 - [ ] Add tooltips and help text
@@ -317,11 +331,7 @@ console.log(previewResult.processed); // "Hello 😊! It's 2:30 PM"
 console.log(previewResult.warnings); // []
 
 // 6. Adds to categories
-const phraseId = categories.addPhrase(
-  message,
-  'greetings',
-  ['friendly', 'dynamic']
-);
+const phraseId = categories.addPhrase(message, 'greetings', ['friendly', 'dynamic']);
 
 // 7. Sends with notification
 await sendMessage(previewResult.processed);
@@ -332,24 +342,25 @@ notifications.notifyMessageSent(1);
 
 ## 📊 Feature Comparison
 
-| Feature | v4.1 | v4.2 |
-|---------|------|------|
-| Browser Notifications | ❌ | ✅ |
-| Message Preview | ❌ | ✅ |
-| Dry-Run Mode | ❌ | ✅ |
-| Phrase Categories | ❌ | ✅ |
-| Tag System | ❌ | ✅ |
-| Command Palette | ❌ | ✅ |
-| Emoji Picker | ❌ | ✅ |
-| GIF Support | ❌ | ✅ |
-| Usage Tracking | Basic | Advanced |
-| Search | No | Yes |
+| Feature               | v4.1  | v4.2     |
+| --------------------- | ----- | -------- |
+| Browser Notifications | ❌    | ✅       |
+| Message Preview       | ❌    | ✅       |
+| Dry-Run Mode          | ❌    | ✅       |
+| Phrase Categories     | ❌    | ✅       |
+| Tag System            | ❌    | ✅       |
+| Command Palette       | ❌    | ✅       |
+| Emoji Picker          | ❌    | ✅       |
+| GIF Support           | ❌    | ✅       |
+| Usage Tracking        | Basic | Advanced |
+| Search                | No    | Yes      |
 
 ---
 
 ## 🎨 UI Design Guidelines
 
 ### Notification Toast
+
 ```
 ┌────────────────────────────┐
 │ 🔔 AutoChat                │
@@ -360,6 +371,7 @@ notifications.notifyMessageSent(1);
 ```
 
 ### Command Palette
+
 ```
 ┌─ Quick Actions ──────────── × ─┐
 │ > start                        │
@@ -376,6 +388,7 @@ notifications.notifyMessageSent(1);
 ```
 
 ### Category Manager
+
 ```
 ┌─ Phrases ────────────────── × ─┐
 │ Categories:                    │
@@ -399,18 +412,21 @@ notifications.notifyMessageSent(1);
 ## 🔧 Implementation Priority
 
 ### High Priority (Essential)
+
 1. ✅ Browser Notifications
 2. ✅ Message Preview
 3. ✅ Command Palette
 4. ⏳ UI Integration
 
 ### Medium Priority (Enhanced UX)
+
 5. ✅ Phrase Categories
 6. ✅ Emoji Picker
 7. ⏳ Onboarding Tutorial
 8. ⏳ Keyboard Shortcuts Help
 
 ### Low Priority (Nice to Have)
+
 9. ⏳ GIF Picker (needs API key)
 10. ⏳ Advanced Analytics Charts
 11. ⏳ Theme Marketplace
@@ -443,6 +459,7 @@ notifications.notifyMessageSent(1);
 ## 💡 Future Enhancements
 
 Based on these foundations, future features can include:
+
 - Multi-language support using category/tag system
 - AI message generation using preview system
 - Cloud sync for categories and settings
@@ -452,4 +469,3 @@ Based on these foundations, future features can include:
 ---
 
 **All core modules are production-ready and waiting for UI integration!**
-
