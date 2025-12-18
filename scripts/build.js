@@ -25,6 +25,7 @@ const filesToCopy = [
   'icon48.png',
   'icon128.png',
   'popup-enhanced.html',
+  'chat-log-viewer.html',
   'styles.css',
 ];
 
@@ -33,6 +34,7 @@ const jsFiles = [
   'background.js',
   'content-enhanced.js',
   'popup-enhanced.js',
+  'chat-log-viewer.js',
 ];
 
 // Copy static files

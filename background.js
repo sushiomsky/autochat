@@ -8,6 +8,9 @@ let totalMessagesSent = 0;
 let lastResetDate = new Date().toDateString();
 let isRunning = false;
 
+// Background tab management
+const activeTabs = new Map(); // tabId -> tab state
+
 // Initialize stats from storage
 chrome.storage.local.get(['totalMessagesSent', 'messagesSentToday', 'lastResetDate'], (data) => {
   totalMessagesSent = data.totalMessagesSent || 0;
@@ -138,6 +141,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           totalMessagesSent,
           isAutoSendActive
         });
+    }
+    
+    // Handle manual message detection
+    if (request.action === 'manualMessageDetected') {
+        console.log('[Background] Manual message detected:', request.message);
+        
+        // Trigger webhook for manual send
+        triggerWebhooks('manual_message_sent', {
+            message: request.message,
+            timestamp: request.timestamp || new Date().toISOString()
+        });
+        
+        sendResponse({ ok: true });
     }
     
     // Set up alarm when starting

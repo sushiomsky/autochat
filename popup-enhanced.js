@@ -85,6 +85,15 @@ const elements = {
   mentionKeywords: document.getElementById('mentionKeywords'),
   mentionReplyMessages: document.getElementById('mentionReplyMessages'),
 
+  // Chat Logging
+  chatLoggingEnabled: document.getElementById('chatLoggingEnabled'),
+  viewChatLogs: document.getElementById('viewChatLogs'),
+  openChatLogs: document.getElementById('openChatLogs'),
+
+  // Manual Detection
+  manualDetectionEnabled: document.getElementById('manualDetectionEnabled'),
+  manualDetectionStatus: document.getElementById('manualDetectionStatus'),
+
   // Notifications
   notificationsEnabled: document.getElementById('notificationsEnabled'),
   notificationSound: document.getElementById('notificationSound'),
@@ -1329,6 +1338,8 @@ function getCurrentSettings() {
     mentionDetectionEnabled: elements.mentionDetectionEnabled.checked,
     mentionKeywords: mentionKeywords,
     mentionReplyMessages: mentionReplyMessages,
+    chatLoggingEnabled: elements.chatLoggingEnabled?.checked || false,
+    manualDetectionEnabled: elements.manualDetectionEnabled?.checked || false,
     notificationsEnabled: elements.notificationsEnabled.checked,
     notificationSound: elements.notificationSound.checked
   };
@@ -1442,6 +1453,8 @@ function loadSettings() {
     'mentionDetectionEnabled',
     'mentionKeywords',
     'mentionReplyMessages',
+    'chatLoggingEnabled',
+    'manualDetectionEnabled',
     'notificationsEnabled',
     'notificationSound'
   ], (data) => {
@@ -1468,6 +1481,16 @@ function loadSettings() {
     }
     if (data.mentionReplyMessages && Array.isArray(data.mentionReplyMessages)) {
       elements.mentionReplyMessages.value = data.mentionReplyMessages.join('\n');
+    }
+
+    // Chat logging settings
+    if (elements.chatLoggingEnabled) {
+      elements.chatLoggingEnabled.checked = data.chatLoggingEnabled || false;
+    }
+
+    // Manual detection settings
+    if (elements.manualDetectionEnabled) {
+      elements.manualDetectionEnabled.checked = data.manualDetectionEnabled || false;
     }
 
     // Notification settings
@@ -2326,6 +2349,52 @@ document.getElementById('openHelp')?.addEventListener('click', () => {
   loadSettings();
   await loadDefaultPhrasesFromFile();
   await loadCustomPhrases();
+// Chat logging event handlers
+elements.chatLoggingEnabled?.addEventListener('change', async () => {
+  const enabled = elements.chatLoggingEnabled.checked;
+  await chrome.storage.local.set({ chatLoggingEnabled: enabled });
+  
+  const action = enabled ? 'startChatLogging' : 'stopChatLogging';
+  const response = await sendMessageToContent({ action });
+  
+  if (response?.ok) {
+    showNotification(enabled ? 'Chat logging enabled' : 'Chat logging disabled', true);
+  } else {
+    showNotification('Make sure to mark a message container first', false);
+    elements.chatLoggingEnabled.checked = false;
+  }
+});
+
+elements.viewChatLogs?.addEventListener('click', () => {
+  chrome.tabs.create({ url: chrome.runtime.getURL('chat-log-viewer.html') });
+});
+
+elements.openChatLogs?.addEventListener('click', () => {
+  chrome.tabs.create({ url: chrome.runtime.getURL('chat-log-viewer.html') });
+});
+
+// Manual detection event handlers
+elements.manualDetectionEnabled?.addEventListener('change', async () => {
+  const enabled = elements.manualDetectionEnabled.checked;
+  await chrome.storage.local.set({ manualDetectionEnabled: enabled });
+  
+  const action = enabled ? 'startManualDetection' : 'stopManualDetection';
+  const response = await sendMessageToContent({ action });
+  
+  if (response?.ok) {
+    showNotification(enabled ? 'Manual detection enabled' : 'Manual detection disabled', true);
+    
+    if (elements.manualDetectionStatus) {
+      elements.manualDetectionStatus.textContent = enabled ? 
+        '✅ Timer will reset when you manually send messages' : '';
+      elements.manualDetectionStatus.style.display = enabled ? 'block' : 'none';
+    }
+  } else {
+    showNotification('Make sure to mark an input field first', false);
+    elements.manualDetectionEnabled.checked = false;
+  }
+});
+
   await loadNotificationHistory();
   await loadCategories();
 

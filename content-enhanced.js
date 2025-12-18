@@ -36,6 +36,14 @@ let mentionReplyMessages = []; // messages to use for replies
 let mentionObserver = null;
 const lastProcessedMessages = new Set(); // Track processed messages to avoid duplicates
 
+// Chat logging state
+let chatLogger = null;
+let chatLoggingEnabled = false;
+
+// Manual detection state
+let manualDetector = null;
+let manualDetectionEnabled = false;
+
 // ===== HELPER FUNCTIONS =====
 
 // Build unique CSS selector for element
@@ -421,6 +429,282 @@ chrome.storage.local.get(['sendConfirmTimeout'], (data) => {
     console.log('[AutoChat] Loaded messageContainerSelector:', messageContainerSelector);
   }
 });
+
+// ===== CHAT LOGGING FUNCTIONS =====
+
+function startChatLogging() {
+  if (!messageContainerSelector) {
+    console.warn('[AutoChat] Cannot start chat logging: no message container set');
+    return false;
+  }
+
+  if (!chatLogger) {
+    // Lazy load ChatLogger class (defined inline to avoid external dependencies)
+    chatLogger = createChatLogger();
+  }
+
+  chatLogger.startLogging(messageContainerSelector, {
+    captureOutgoing: true,
+    captureIncoming: true,
+    captureSender: true
+  });
+
+  chatLoggingEnabled = true;
+  console.log('[AutoChat] Chat logging started');
+  return true;
+}
+
+function stopChatLogging() {
+  if (chatLogger) {
+    chatLogger.stopLogging();
+  }
+  chatLoggingEnabled = false;
+  console.log('[AutoChat] Chat logging stopped');
+}
+
+// Create a lightweight chat logger instance
+function createChatLogger() {
+  return {
+    isLogging: false,
+    observer: null,
+    messageQueue: [],
+    processedElements: new WeakSet(),
+
+    startLogging(containerSelector, options) {
+      if (this.isLogging) return;
+      const container = document.querySelector(containerSelector);
+      if (!container) return;
+
+      this.isLogging = true;
+      this.options = options;
+
+      // Capture existing messages
+      this.captureExisting(container);
+
+      // Observe new messages
+      this.observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          if (mutation.type === 'childList') {
+            for (const node of mutation.addedNodes) {
+              if (node.nodeType === 1) {
+                this.processElement(node);
+              }
+            }
+          }
+        }
+      });
+
+      this.observer.observe(container, { childList: true, subtree: true });
+
+      // Flush queue every 5 seconds
+      this.flushInterval = setInterval(() => this.flush(), 5000);
+    },
+
+    stopLogging() {
+      if (!this.isLogging) return;
+      if (this.observer) {
+        this.observer.disconnect();
+        this.observer = null;
+      }
+      if (this.flushInterval) {
+        clearInterval(this.flushInterval);
+        this.flushInterval = null;
+      }
+      this.flush();
+      this.isLogging = false;
+    },
+
+    captureExisting(container) {
+      const selectors = ['.message', '.msg', '.chat-message', '[class*="message"]'];
+      for (const sel of selectors) {
+        const elements = container.querySelectorAll(sel);
+        for (const el of elements) {
+          if (!this.processedElements.has(el)) {
+            this.processElement(el);
+          }
+        }
+      }
+      this.flush();
+    },
+
+    processElement(element) {
+      if (this.processedElements.has(element)) return;
+      this.processedElements.add(element);
+
+      const text = (element.textContent || '').trim();
+      if (!text || text.length < 2) return;
+
+      const message = {
+        id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        text: text.substring(0, 1000),
+        sender: this.extractSender(element),
+        timestamp: new Date().toISOString(),
+        direction: this.detectDirection(element),
+        url: window.location.href,
+        platform: this.detectPlatform()
+      };
+
+      this.messageQueue.push(message);
+    },
+
+    extractSender(element) {
+      const senderSels = ['.sender', '.author', '.username', '[class*="author"]'];
+      for (const sel of senderSels) {
+        const senderEl = element.querySelector(sel);
+        if (senderEl) {
+          const sender = senderEl.textContent?.trim();
+          if (sender && sender.length < 100) return sender;
+        }
+      }
+      return 'Unknown';
+    },
+
+    detectDirection(element) {
+      const classes = element.className || '';
+      if (classes.match(/\b(me|self|own|sent|outgoing)\b/i)) return 'outgoing';
+      if (classes.match(/\b(them|other|received|incoming)\b/i)) return 'incoming';
+      return 'unknown';
+    },
+
+    detectPlatform() {
+      const url = window.location.href.toLowerCase();
+      const hostname = window.location.hostname.toLowerCase();
+      if (hostname === 'web.whatsapp.com' || hostname.endsWith('.web.whatsapp.com')) return 'WhatsApp';
+      if (hostname === 'discord.com' || hostname.endsWith('.discord.com')) return 'Discord';
+      if (hostname === 'web.telegram.org' || hostname.endsWith('.web.telegram.org')) return 'Telegram';
+      return 'Unknown';
+    },
+
+    flush() {
+      if (this.messageQueue.length === 0) return;
+      const messages = [...this.messageQueue];
+      this.messageQueue = [];
+
+      chrome.storage.local.get(['chatLogs'], (data) => {
+        let logs = data.chatLogs || [];
+        logs.push(...messages);
+        
+        // Keep last 10000 messages
+        if (logs.length > 10000) {
+          logs = logs.slice(-10000);
+        }
+
+        chrome.storage.local.set({ chatLogs: logs });
+      });
+    }
+  };
+}
+
+// ===== MANUAL MESSAGE DETECTION =====
+
+function startManualDetection() {
+  if (!chatInputSelector) {
+    console.warn('[AutoChat] Cannot start manual detection: no input field set');
+    return false;
+  }
+
+  if (!manualDetector) {
+    manualDetector = createManualDetector();
+  }
+
+  manualDetector.startMonitoring(chatInputSelector, (event) => {
+    console.log('[AutoChat] Manual message detected:', event.text);
+    
+    // Reset the timer as if an automated message was sent
+    if (autoSendInterval) {
+      // Clear existing timeout
+      if (autoSendInterval !== true) {
+        clearTimeout(autoSendInterval);
+      }
+      
+      // Schedule next message with normal interval
+      const nextInterval = getRandomInterval();
+      console.log(`[AutoChat] Timer reset. Next message in ${(nextInterval/60000).toFixed(2)}m`);
+      
+      autoSendInterval = setTimeout(() => {
+        scheduleNextMessage();
+      }, nextInterval);
+    }
+    
+    // Notify background of manual send
+    chrome.runtime.sendMessage({
+      action: 'manualMessageDetected',
+      message: event.text,
+      timestamp: event.timestamp
+    });
+  });
+
+  manualDetectionEnabled = true;
+  console.log('[AutoChat] Manual message detection started');
+  return true;
+}
+
+function stopManualDetection() {
+  if (manualDetector) {
+    manualDetector.stopMonitoring();
+  }
+  manualDetectionEnabled = false;
+  console.log('[AutoChat] Manual message detection stopped');
+}
+
+// Create a lightweight manual detector
+function createManualDetector() {
+  return {
+    isMonitoring: false,
+    lastValue: '',
+    automatedMessages: new Set(),
+    
+    startMonitoring(inputSelector, callback) {
+      if (this.isMonitoring) return;
+      const inputEl = document.querySelector(inputSelector);
+      if (!inputEl) return;
+
+      this.isMonitoring = true;
+      this.callback = callback;
+      this.inputEl = inputEl;
+      this.lastValue = this.getValue(inputEl);
+
+      // Watch for value changes
+      this.interval = setInterval(() => {
+        const currentValue = this.getValue(inputEl);
+        if (this.lastValue.length > 0 && currentValue.length === 0) {
+          // Input was cleared - check if manual send
+          if (!this.automatedMessages.has(this.lastValue.trim())) {
+            callback({
+              text: this.lastValue,
+              timestamp: new Date().toISOString()
+            });
+          }
+        }
+        this.lastValue = currentValue;
+      }, 500);
+    },
+
+    stopMonitoring() {
+      if (this.interval) {
+        clearInterval(this.interval);
+        this.interval = null;
+      }
+      this.isMonitoring = false;
+    },
+
+    getValue(el) {
+      if (!el) return '';
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        return el.value || '';
+      }
+      return el.textContent || '';
+    },
+
+    markAsAutomated(message) {
+      const trimmed = message.trim();
+      this.automatedMessages.add(trimmed);
+      setTimeout(() => {
+        this.automatedMessages.delete(trimmed);
+      }, 10000);
+    }
+  };
+}
 
 // ===== VISUAL HIGHLIGHTING =====
 
@@ -845,6 +1129,11 @@ async function sendMessage(text, retries = 3) {
     }
 
     if (sent) {
+      // Mark message as automated for manual detection
+      if (manualDetector && manualDetectionEnabled) {
+        manualDetector.markAsAutomated(text);
+      }
+
       // Wait and confirm the message was actually sent (input cleared)
       const confirmed = await confirmMessageSent(inputEl, text, sendConfirmTimeoutMs);
       if (confirmed) {
@@ -1044,7 +1333,9 @@ chrome.storage.local.get([
   'lastResetDate',
   'mentionDetectionEnabled',
   'mentionKeywords',
-  'mentionReplyMessages'
+  'mentionReplyMessages',
+  'chatLoggingEnabled',
+  'manualDetectionEnabled'
 ], (data) => {
   if (data.chatInputSelector) {
     chatInputSelector = data.chatInputSelector;
@@ -1074,6 +1365,18 @@ chrome.storage.local.get([
   // Auto-start mention detection if enabled and container is set
   if (mentionDetectionEnabled && messageContainerSelector) {
     setTimeout(() => startMentionDetection(), 1000);
+  }
+
+  // Load chat logging settings
+  chatLoggingEnabled = data.chatLoggingEnabled || false;
+  if (chatLoggingEnabled && messageContainerSelector) {
+    setTimeout(() => startChatLogging(), 1000);
+  }
+
+  // Load manual detection settings
+  manualDetectionEnabled = data.manualDetectionEnabled || false;
+  if (manualDetectionEnabled && chatInputSelector) {
+    setTimeout(() => startManualDetection(), 1000);
   }
 });
 
@@ -1143,6 +1446,40 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       enabled: mentionDetectionEnabled,
       keywords: mentionKeywords,
       replyMessages: mentionReplyMessages
+    });
+  }
+
+  if (msg.action === 'startChatLogging') {
+    const success = startChatLogging();
+    sendResponse({ ok: success });
+  }
+
+  if (msg.action === 'stopChatLogging') {
+    stopChatLogging();
+    sendResponse({ ok: true });
+  }
+
+  if (msg.action === 'getChatLogStatus') {
+    sendResponse({
+      enabled: chatLoggingEnabled,
+      isLogging: chatLogger?.isLogging || false
+    });
+  }
+
+  if (msg.action === 'startManualDetection') {
+    const success = startManualDetection();
+    sendResponse({ ok: success });
+  }
+
+  if (msg.action === 'stopManualDetection') {
+    stopManualDetection();
+    sendResponse({ ok: true });
+  }
+
+  if (msg.action === 'getManualDetectionStatus') {
+    sendResponse({
+      enabled: manualDetectionEnabled,
+      isMonitoring: manualDetector?.isMonitoring || false
     });
   }
 
