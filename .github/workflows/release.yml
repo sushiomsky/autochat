@@ -1,0 +1,173 @@
+name: Release Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type (patch, minor, major)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+      
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+      
+      - name: Run linter
+        run: npm run lint || echo "Linting completed with warnings"
+        continue-on-error: true
+      
+      - name: Run tests
+        run: npm test
+      
+      - name: Determine version bump
+        id: version_bump
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "bump_type=${{ inputs.version_bump }}" >> $GITHUB_OUTPUT
+          else
+            # Auto-detect from commit messages
+            COMMITS=$(git log --format=%B -n 20)
+            if echo "$COMMITS" | grep -qiE "^(BREAKING CHANGE|major):"; then
+              echo "bump_type=major" >> $GITHUB_OUTPUT
+            elif echo "$COMMITS" | grep -qiE "^(feat|feature):"; then
+              echo "bump_type=minor" >> $GITHUB_OUTPUT
+            else
+              echo "bump_type=patch" >> $GITHUB_OUTPUT
+            fi
+          fi
+      
+      - name: Bump version
+        id: bump_version
+        run: |
+          # Get current version from package.json
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Bump version using npm
+          npm version ${{ steps.version_bump.outputs.bump_type }} --no-git-tag-version
+          
+          # Get new version
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "New version: $NEW_VERSION"
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          
+          # Update manifest.json
+          node -e "
+            const fs = require('fs');
+            const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
+            manifest.version = '$NEW_VERSION';
+            fs.writeFileSync('manifest.json', JSON.stringify(manifest, null, 2) + '\n');
+          "
+      
+      - name: Commit version bump
+        run: |
+          git add package.json package-lock.json manifest.json
+          git commit -m "chore: bump version to v${{ steps.bump_version.outputs.version }}" || echo "No changes to commit"
+      
+      - name: Create and push tag
+        run: |
+          git tag -a "v${{ steps.bump_version.outputs.version }}" -m "Release v${{ steps.bump_version.outputs.version }}"
+          git push origin main
+          git push origin "v${{ steps.bump_version.outputs.version }}"
+      
+      - name: Build and package extension
+        run: npm run package
+      
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          VERSION="${{ steps.bump_version.outputs.version }}"
+          
+          # Create release notes
+          cat > release_notes.md << 'EOF'
+          # AutoChat Enhanced v$VERSION
+          
+          ## What's Changed
+          
+          EOF
+          
+          # Get commits since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$LAST_TAG" ]; then
+            echo "### Commits" >> release_notes.md
+            git log $LAST_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges >> release_notes.md
+          fi
+          
+          cat >> release_notes.md << 'EOF'
+          
+          
+          ## Installation
+          
+          1. Download `autochat-v$VERSION.zip` below
+          2. Open Chrome and go to `chrome://extensions/`
+          3. Enable "Developer mode" in the top right
+          4. Click "Load unpacked" and select the extracted folder
+          
+          ## Documentation
+          
+          - [README](https://github.com/sushiomsky/autochat/blob/main/README.md)
+          - [Features](https://github.com/sushiomsky/autochat/blob/main/FEATURES_v4.2.md)
+          - [Contributing](https://github.com/sushiomsky/autochat/blob/main/CONTRIBUTING.md)
+          
+          **Full Changelog**: https://github.com/sushiomsky/autochat/compare/$LAST_TAG...v$VERSION
+          EOF
+          
+          # Replace $VERSION placeholder
+          sed -i "s/\$VERSION/$VERSION/g" release_notes.md
+          sed -i "s/\$LAST_TAG/$LAST_TAG/g" release_notes.md
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.bump_version.outputs.version }}
+          name: v${{ steps.bump_version.outputs.version }}
+          body_path: release_notes.md
+          files: |
+            autochat-v${{ steps.bump_version.outputs.version }}.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-package-v${{ steps.bump_version.outputs.version }}
+          path: |
+            autochat-v${{ steps.bump_version.outputs.version }}.zip
+            dist/
+          retention-days: 90
