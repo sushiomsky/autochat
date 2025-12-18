@@ -93,9 +93,24 @@ jobs:
             fs.writeFileSync('manifest.json', JSON.stringify(manifest, null, 2) + '\n');
           "
 
+          # Update README.md with new version
+          node -e "
+            const fs = require('fs');
+            const version = '$NEW_VERSION';
+            let readme = fs.readFileSync('README.md', 'utf8');
+            
+            // Update version in 'Current release' section
+            readme = readme.replace(
+              /\*\*v[\d.]+/,
+              '**v' + version
+            );
+            
+            fs.writeFileSync('README.md', readme);
+          "
+
       - name: Commit version bump
         run: |
-          git add package.json package-lock.json manifest.json
+          git add package.json package-lock.json manifest.json README.md
           git commit -m "chore: bump version to v${{ steps.bump_version.outputs.version }}" || echo "No changes to commit"
 
       - name: Create and push tag

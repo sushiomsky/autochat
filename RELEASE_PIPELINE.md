@@ -19,6 +19,7 @@ When a pull request is merged into the `main` branch:
    - `package.json`
    - `package-lock.json`
    - `manifest.json`
+   - `README.md` (current release version)
 
 3. **Git Operations**:
    - Commits the version changes

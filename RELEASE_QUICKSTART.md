@@ -87,6 +87,7 @@ The pipeline automatically updates:
 - `package.json` - version field
 - `package-lock.json` - version field
 - `manifest.json` - version field
+- `README.md` - current release version
 - Git tag (e.g., v4.6.0)
 - GitHub release with release notes
 

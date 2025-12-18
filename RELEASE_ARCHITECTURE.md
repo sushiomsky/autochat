@@ -81,6 +81,7 @@ This document describes the complete architecture of the automated release pipel
           │     - Update package.json    │
           │     - Update manifest.json   │
           │     - Update package-lock    │
+          │     - Update README.md       │
           └────────────┬─────────────────┘
                        │
                        ▼
@@ -177,6 +178,11 @@ npm version {type} --no-git-tag-version
 const manifest = JSON.parse(fs.readFileSync('manifest.json'));
 manifest.version = newVersion;
 fs.writeFileSync('manifest.json', JSON.stringify(manifest, null, 2));
+
+// Step 3: Update README.md
+let readme = fs.readFileSync('README.md', 'utf8');
+readme = readme.replace(/\*\*v[\d.]+/, '**v' + newVersion);
+fs.writeFileSync('README.md', readme);
 ```
 
 ### 4. Git Operations
@@ -187,7 +193,7 @@ git config user.name "github-actions[bot]"
 git config user.email "github-actions[bot]@users.noreply.github.com"
 
 # Commit changes
-git add package.json package-lock.json manifest.json
+git add package.json package-lock.json manifest.json README.md
 git commit -m "chore: bump version to v{version}"
 
 # Create and push tag
