@@ -360,6 +360,7 @@
       <div class="team-header">
         <h3>👥 Team Collaboration Workspace</h3>
         <span class="badge badge-beta">BETA</span>
+        <div id="syncStatus" class="sync-status"></div>
       </div>
       <p class="help">Sync profiles, phrases, and schedules across your team. Collaborate in real-time.</p>
 
@@ -378,9 +379,9 @@
         <div class="col-section">
           <h4>☁️ Shared Cloud Profiles</h4>
           <div id="cloudProfilesList" class="cloud-list">
-            <div class="empty-state">
+            <div class="empty-state" id="cloudProfilesEmptyState">
               <p>No shared profiles found.</p>
-              <button class="btn-primary-small">Connect Cloud</button>
+              <button id="connectCloudBtn" class="btn-primary-small">Connect Cloud</button>
             </div>
           </div>
         </div>

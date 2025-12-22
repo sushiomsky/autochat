@@ -1208,6 +1208,86 @@ document.getElementById('openScheduler')?.addEventListener('click', () => {
 
 document.getElementById('openTeam')?.addEventListener('click', () => {
   openModal('teamModal');
+  updateCloudSyncUI();
+});
+
+async function updateCloudSyncUI() {
+  chrome.runtime.sendMessage({ action: 'getCloudSyncStatus' }, (response) => {
+    if (response && response.success) {
+      const statusEl = document.getElementById('syncStatus');
+      if (statusEl) {
+        if (response.status === 'syncing') {
+          statusEl.textContent = '🔄 Syncing...';
+          statusEl.className = 'sync-status syncing';
+        } else if (response.lastSyncTime) {
+          const time = new Date(response.lastSyncTime).toLocaleTimeString();
+          statusEl.textContent = `Synced at ${time}`;
+          statusEl.className = 'sync-status';
+        } else {
+          statusEl.textContent = response.isEnabled ? 'Idle' : 'Cloud Disabled';
+          statusEl.className = 'sync-status';
+        }
+      }
+
+      const emptyState = document.getElementById('cloudProfilesEmptyState');
+      if (emptyState) {
+        emptyState.style.display = response.isEnabled ? 'none' : 'block';
+      }
+
+      // If enabled and not empty, we would render cloud profiles here
+      if (response.isEnabled) {
+        loadCloudProfiles();
+      }
+    }
+  });
+}
+
+function loadCloudProfiles() {
+  chrome.runtime.sendMessage({ action: 'getSchedules' }, (response) => {
+    // For simulation, we'll just show the local profiles as "Synced"
+    chrome.runtime.sendMessage({ action: 'getProfiles' }, (resp) => {
+      if (resp && resp.success) {
+        renderCloudProfilesList(resp.profiles);
+      }
+    });
+  });
+}
+
+function renderCloudProfilesList(profiles) {
+  const list = document.getElementById('cloudProfilesList');
+  if (!list) return;
+  list.innerHTML = '';
+
+  if (profiles.length === 0) {
+    list.innerHTML = '<div class="empty-state">No cloud profiles.</div>';
+    return;
+  }
+
+  profiles.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'member-item';
+    div.innerHTML = `
+      <span class="status-indicator status-active"></span>
+      <div>
+        <strong>${p.name}</strong>
+        <div class="help">${p.domains.join(', ') || 'No domains'}</div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+document.getElementById('connectCloudBtn')?.addEventListener('click', async () => {
+  const btn = document.getElementById('connectCloudBtn');
+  btn.textContent = 'Connecting...';
+  btn.disabled = true;
+
+  chrome.runtime.sendMessage({ action: 'setCloudSyncEnabled', enabled: true }, (response) => {
+    if (response && response.success) {
+      showNotification('✅ Cloud Sync Enabled', true);
+      updateCloudSyncUI();
+    }
+  });
 });
 
 document.getElementById('createScheduleBtn')?.addEventListener('click', () => {

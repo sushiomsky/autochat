@@ -2553,6 +2553,18 @@ body.dark-mode .account-item-actions button:hover {
   border-radius: 4px;
 }
 
+.sync-status {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.sync-status.syncing {
+  color: var(--primary-color);
+  font-weight: bold;
+  animation: pulse 1.5s infinite;
+}
+
 .collaboration-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -7,6 +7,7 @@ try {
   importScripts('src/profile-service.js');
   importScripts('src/ai-service.js');
   importScripts('src/scheduler-service.js');
+  importScripts('src/cloud-sync-service.js');
 } catch (e) {
   console.error('[Background] Failed to load services:', e);
 }
@@ -30,6 +31,10 @@ async function initServices() {
   if (typeof SchedulerService !== 'undefined') {
     await SchedulerService.init();
     console.log('[Background] SchedulerService initialized');
+  }
+  if (typeof CloudSyncService !== 'undefined') {
+    await CloudSyncService.init();
+    console.log('[Background] CloudSyncService initialized');
   }
 }
 initServices();
@@ -283,6 +288,32 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
   }
 
+  // --- Cloud Sync Handlers ---
+  if (request.action === 'getCloudSyncStatus') {
+    if (typeof CloudSyncService !== 'undefined') {
+      sendResponse({ success: true, ...CloudSyncService.getStatus() });
+      return true;
+    }
+  }
+
+  if (request.action === 'setCloudSyncEnabled') {
+    if (typeof CloudSyncService !== 'undefined') {
+      CloudSyncService.setEnabled(request.enabled)
+        .then(() => sendResponse({ success: true }))
+        .catch(err => sendResponse({ success: false, error: err.message }));
+      return true;
+    }
+  }
+
+  if (request.action === 'performCloudSync') {
+    if (typeof CloudSyncService !== 'undefined') {
+      CloudSyncService.performSync()
+        .then((ok) => sendResponse({ success: ok }))
+        .catch(err => sendResponse({ success: false, error: err.message }));
+      return true;
+    }
+  }
+
   // --- Scheduler Handlers ---
   if (request.action === 'getSchedules') {
     if (typeof SchedulerService !== 'undefined') {
@@ -446,6 +477,13 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 // Monitor tab changes for auto-profile switching
 // --- Alarm Listener ---
 chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'cloudSyncAlarm') {
+    if (typeof CloudSyncService !== 'undefined') {
+      CloudSyncService.performSync();
+    }
+    return;
+  }
+
   if (alarm.name.startsWith('schedule_')) {
     const scheduleId = alarm.name.replace('schedule_', '');
     console.log(`[Background] Alarm triggered for schedule: ${scheduleId}`);
