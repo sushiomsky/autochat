@@ -40,7 +40,11 @@ async function initServices() {
 initServices();
 
 // Background tab management
-const activeTabs = new Map(); // tabId -> tab state
+// chrome.tabs.onRemoved cleanup
+chrome.tabs.onRemoved.addListener((tabId) => {
+  // If we ever store tab-specific data in a Map, clean it here
+  console.log(`[Background] Tab ${tabId} closed, cleaning up.`);
+});
 
 // Initialize stats from storage
 chrome.storage.local.get(['totalMessagesSent', 'messagesSentToday', 'lastResetDate'], (data) => {
