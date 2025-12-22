@@ -13,6 +13,12 @@ if (!fs.existsSync(distDir)) {
   fs.mkdirSync(distDir, { recursive: true });
 }
 
+// Create libs directory
+const libsDir = path.join(distDir, 'libs');
+if (!fs.existsSync(libsDir)) {
+  fs.mkdirSync(libsDir, { recursive: true });
+}
+
 // Files to copy directly
 const filesToCopy = [
   'manifest.json',
@@ -41,7 +47,7 @@ const jsFiles = [
 filesToCopy.forEach((file) => {
   const src = path.join(__dirname, '..', file);
   const dest = path.join(distDir, file);
-  
+
   if (fs.existsSync(src)) {
     fs.copyFileSync(src, dest);
     console.log(`✓ Copied ${file}`);
@@ -54,16 +60,16 @@ filesToCopy.forEach((file) => {
 jsFiles.forEach((file) => {
   const src = path.join(__dirname, '..', file);
   const dest = path.join(distDir, file);
-  
+
   if (fs.existsSync(src)) {
     let content = fs.readFileSync(src, 'utf8');
-    
+
     if (isProd) {
       // Simple minification: remove block comments only (preserve code structure)
       content = content
         .replace(/\/\*[\s\S]*?\*\//g, ''); // Remove block comments only
     }
-    
+
     fs.writeFileSync(dest, content);
     console.log(`✓ Processed ${file}`);
   }
@@ -74,7 +80,7 @@ function copyRecursive(src, dest) {
   const exists = fs.existsSync(src);
   const stats = exists && fs.statSync(src);
   const isDirectory = exists && stats.isDirectory();
-  
+
   if (isDirectory) {
     if (!fs.existsSync(dest)) {
       fs.mkdirSync(dest, { recursive: true });
@@ -102,6 +108,16 @@ if (fs.existsSync(srcDir)) {
   console.log('✓ Copied src directory');
 }
 
+// Copy Chart.js from node_modules
+const chartSource = path.join(__dirname, '../node_modules/chart.js/dist/chart.umd.js');
+const chartDest = path.join(libsDir, 'chart.js');
+if (fs.existsSync(chartSource)) {
+  fs.copyFileSync(chartSource, chartDest);
+  console.log('✓ Copied Chart.js');
+} else {
+  console.warn('⚠ Chart.js not found in node_modules');
+}
+
 // Update manifest version
 const manifestPath = path.join(distDir, 'manifest.json');
 if (fs.existsSync(manifestPath)) {
@@ -115,17 +131,17 @@ console.log(`\n✅ Build complete! Output: ${distDir}`);
 if (isWatch) {
   console.log('\n👀 Watching for changes...');
   const srcDir = path.join(__dirname, '..');
-  
+
   fs.watch(srcDir, { recursive: false }, (eventType, filename) => {
     if (filename && (filesToCopy.includes(filename) || jsFiles.includes(filename))) {
       console.log(`\n🔄 ${filename} changed, rebuilding...`);
-      
+
       const src = path.join(srcDir, filename);
       const dest = path.join(distDir, filename);
-      
+
       if (fs.existsSync(src)) {
         let content = fs.readFileSync(src, 'utf8');
-        
+
         if (jsFiles.includes(filename) && isProd) {
           content = content
             .replace(/\/\*[\s\S]*?\*\//g, '')
@@ -133,7 +149,7 @@ if (isWatch) {
             .replace(/\n\s*\n/g, '\n')
             .replace(/^\s+/gm, '');
         }
-        
+
         fs.writeFileSync(dest, content);
         console.log(`✓ Rebuilt ${filename}`);
       }

@@ -2392,3 +2392,69 @@ body.dark-mode .account-item-actions button:hover {
   border-left-color: #3498db;
   background: rgba(52, 152, 219, 0.1);
 }
+
+/* Scheduler Styles */
+.schedules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 250px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.schedule-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+[data-theme="light"] .schedule-item {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.schedule-info {
+  flex: 1;
+}
+
+.schedule-name {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.schedule-details {
+  font-size: 11px;
+  color: #a0a0a0;
+  margin-top: 4px;
+}
+
+.schedule-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.status-active { background: #00b894; box-shadow: 0 0 5px #00b894; }
+.status-inactive { background: #d63031; }
+
+.campaign-form {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 15px;
+  border-radius: 8px;
+}
+
+[data-theme="light"] .campaign-form {
+  background: rgba(0, 0, 0, 0.02);
+}

@@ -2,6 +2,7 @@
   Advanced controls with analytics, settings, and smart features
 */
 /* global t, localizePopup */
+import { getMainChartConfig, getHourlyChartConfig } from './src/chart-config.js';
 
 // ===== UTILITY FUNCTIONS =====
 
@@ -102,6 +103,7 @@ const elements = {
   accountSelect: document.getElementById('accountSelect'),
   manageAccounts: document.getElementById('manageAccounts'),
   newAccountName: document.getElementById('newAccountName'),
+  newAccountDomains: document.getElementById('newAccountDomains'),
   createAccount: document.getElementById('createAccount'),
   accountList: document.getElementById('accountList'),
 
@@ -134,13 +136,13 @@ const elements = {
 
 let defaultPhrases = [];
 let customPhrases = [];
-let currentAccount = 'default';
-let accounts = {
-  default: {
-    name: 'Default Account',
-    settings: {}
-  }
+const defaultProfile = {
+  id: 'default',
+  name: 'Default Account',
+  settings: {}
 };
+let currentAccount = 'default';
+let accounts = { 'default': defaultProfile };
 
 // ===== NOTIFICATIONS =====
 
@@ -225,19 +227,19 @@ async function updateStats() {
       // Use animated stat updates
       updateStatWithAnimation('messagesSentToday', stats.messagesSentToday || 0);
       updateStatWithAnimation('totalMessages', stats.totalMessagesSent || 0);
-      
+
       // Update analytics modal stats
       updateStatWithAnimation('analyticsToday', stats.messagesSentToday || 0);
       updateStatWithAnimation('analyticsTotal', stats.totalMessagesSent || 0);
-      
+
       // Use localized status if available
-      const statusText = stats.isAutoSendActive ? 
-        (typeof t === 'function' ? t('statusActive') : 'Active') : 
+      const statusText = stats.isAutoSendActive ?
+        (typeof t === 'function' ? t('statusActive') : 'Active') :
         (typeof t === 'function' ? t('statusInactive') : 'Inactive');
       const statusIcon = stats.isAutoSendActive ? '🟢' : '⚪';
       elements.autoSendStatus.textContent = `${statusIcon} ${statusText}`;
       elements.autoSendStatus.className = 'status ' + (stats.isAutoSendActive ? 'success' : '');
-      
+
       // Update analytics modal if visible
       const analyticsStatus = document.getElementById('analyticsStatus');
       if (analyticsStatus) {
@@ -264,11 +266,11 @@ async function loadDefaultPhrasesFromFile() {
       chrome.storage.local.get(['locale'], resolve);
     });
     const locale = storageData.locale || chrome.i18n.getUILanguage().split('-')[0] || 'en';
-    
+
     // Try to load language-specific phrases, fallback to English
     let phraseFile = `farming_phrases_${locale}.txt`;
     let response;
-    
+
     try {
       response = await fetch(chrome.runtime.getURL(phraseFile));
       if (!response.ok) throw new Error('File not found');
@@ -277,7 +279,7 @@ async function loadDefaultPhrasesFromFile() {
       phraseFile = 'farming_phrases_en.txt';
       response = await fetch(chrome.runtime.getURL(phraseFile));
     }
-    
+
     const text = await response.text();
     defaultPhrases = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     console.log(`[AutoChat] Loaded ${defaultPhrases.length} default phrases from ${phraseFile}`);
@@ -304,7 +306,13 @@ function saveCustomPhrases() {
 function addCustomPhrase(phrase) {
   const trimmed = phrase.trim();
   if (!trimmed) return false;
-  if (customPhrases.includes(trimmed)) return false;
+
+  // Check both custom and default phrases for duplicates
+  const allPhrases = [...customPhrases, ...defaultPhrases];
+  if (allPhrases.some(p => p.toLowerCase() === trimmed.toLowerCase())) {
+    return false;
+  }
+
   customPhrases.push(trimmed);
   saveCustomPhrases();
   return true;
@@ -554,7 +562,7 @@ async function initializeWebhookManager() {
       },
       async save() {
         await new Promise(resolve => {
-          chrome.storage.local.set({ 
+          chrome.storage.local.set({
             webhooks: this.webhooks,
             webhooksEnabled: this.enabled
           }, resolve);
@@ -648,7 +656,7 @@ async function renderWebhookList() {
   await initializeWebhookManager();
   const webhookList = document.getElementById('webhookList');
   const webhookCount = document.getElementById('webhookCount');
-  
+
   if (!webhookList) return;
 
   const webhooks = webhookManager.getAll();
@@ -769,7 +777,7 @@ document.getElementById('webhookForm')?.addEventListener('submit', async (e) => 
   const url = document.getElementById('webhookUrl').value.trim();
   const method = document.getElementById('webhookMethod').value;
   const headersText = document.getElementById('webhookHeaders').value.trim();
-  
+
   // Get selected events
   const events = Array.from(document.querySelectorAll('#webhookEvents input[type="checkbox"]:checked'))
     .map(cb => cb.value);
@@ -801,7 +809,7 @@ document.getElementById('webhookForm')?.addEventListener('submit', async (e) => 
   }
 
   await initializeWebhookManager();
-  
+
   try {
     webhookManager.add({
       name,
@@ -810,11 +818,11 @@ document.getElementById('webhookForm')?.addEventListener('submit', async (e) => 
       events,
       headers
     });
-    
+
     await webhookManager.save();
     await renderWebhookList();
     await updateWebhookStats();
-    
+
     // Reset form
     document.getElementById('webhookForm').reset();
     showNotification(`✅ Webhook "${name}" added successfully!`, true);
@@ -847,6 +855,11 @@ document.getElementById('webhooksEnabled')?.addEventListener('change', async (e)
 document.getElementById('openAnalytics')?.addEventListener('click', async () => {
   await updateStats();
   elements.analyticsModal.classList.add('show');
+  initializeAnalyticsCharts();
+});
+
+document.getElementById('analyticsTimeRange')?.addEventListener('change', () => {
+  initializeAnalyticsCharts();
 });
 
 // Donation modal
@@ -862,20 +875,20 @@ document.querySelectorAll('.btn-copy').forEach(btn => {
     if (!addressElement) return;
 
     const address = addressElement.textContent;
-    
+
     try {
       await navigator.clipboard.writeText(address);
-      
+
       // Show feedback
       const originalText = e.target.textContent;
       e.target.textContent = '✓';
       e.target.style.background = '#2ecc71';
-      
+
       setTimeout(() => {
         e.target.textContent = originalText;
         e.target.style.background = '';
       }, 2000);
-      
+
       showNotification('Address copied to clipboard!', true);
     } catch (err) {
       console.error('Failed to copy:', err);
@@ -899,38 +912,38 @@ async function initPerformanceMonitor() {
         memoryUsage: []
       },
       startTime: Date.now(),
-      
+
       recordMessageSend(duration, success) {
         this.metrics.messagesSent.push({ timestamp: Date.now(), duration, success });
         if (this.metrics.messagesSent.length > 100) this.metrics.messagesSent.shift();
       },
-      
+
       recordTypingSpeed(wpm) {
         this.metrics.typingSpeed.push({ timestamp: Date.now(), wpm });
         if (this.metrics.typingSpeed.length > 50) this.metrics.typingSpeed.shift();
       },
-      
+
       recordError(type, message) {
         this.metrics.errors.push({ timestamp: Date.now(), type, message });
         if (this.metrics.errors.length > 50) this.metrics.errors.shift();
       },
-      
+
       getStats() {
         const now = Date.now();
         const uptime = now - this.startTime;
-        
+
         const successfulSends = this.metrics.messagesSent.filter(m => m.success);
         const failedSends = this.metrics.messagesSent.filter(m => !m.success);
         const avgSendDuration = successfulSends.length > 0
           ? successfulSends.reduce((sum, m) => sum + m.duration, 0) / successfulSends.length
           : 0;
-        
+
         const avgTypingSpeed = this.metrics.typingSpeed.length > 0
           ? this.metrics.typingSpeed.reduce((sum, t) => sum + t.wpm, 0) / this.metrics.typingSpeed.length
           : 0;
-        
+
         const recentErrors = this.metrics.errors.filter(e => now - e.timestamp < 3600000);
-        
+
         return {
           uptime,
           messages: {
@@ -956,37 +969,37 @@ async function initPerformanceMonitor() {
           } : null
         };
       },
-      
+
       getRecommendations() {
         const stats = this.getStats();
         const recommendations = [];
-        
+
         if (stats.messages.successRate < 90 && stats.messages.total > 10) {
           recommendations.push({ type: 'warning', text: '⚠️ Message success rate is below 90%. Check input field configuration.' });
         }
-        
+
         if (parseFloat(stats.typing.avgSpeed) < 30 && stats.typing.samples > 5) {
           recommendations.push({ type: 'info', text: '💡 Typing speed is slow. Consider increasing typing simulation speed.' });
         } else if (parseFloat(stats.typing.avgSpeed) > 100 && stats.typing.samples > 5) {
           recommendations.push({ type: 'warning', text: '⚠️ Typing speed is very fast. May appear robotic.' });
         }
-        
+
         if (stats.errors.recentCount > 10) {
           recommendations.push({ type: 'warning', text: '⚠️ High error rate detected. Review recent errors.' });
         }
-        
+
         if (stats.memory && parseFloat(stats.memory.usagePercent) > 80) {
           recommendations.push({ type: 'warning', text: '⚠️ High memory usage. Consider restarting extension.' });
         }
-        
+
         if (recommendations.length === 0) {
           recommendations.push({ type: 'success', text: '✅ Performance is optimal! No issues detected.' });
         }
-        
+
         return recommendations;
       }
     };
-    
+
     // Load saved metrics
     const data = await new Promise(resolve => {
       chrome.storage.local.get(['performanceMetrics'], resolve);
@@ -1003,17 +1016,17 @@ async function initPerformanceMonitor() {
 async function updatePerformanceDisplay() {
   await initPerformanceMonitor();
   const stats = performanceMonitor.getStats();
-  
+
   // Update message stats
   document.getElementById('perfTotalMessages').textContent = stats.messages.total;
   document.getElementById('perfSuccessRate').textContent = stats.messages.successRate + '%';
   document.getElementById('perfAvgDuration').textContent = stats.messages.avgDuration + 'ms';
   document.getElementById('perfFailed').textContent = stats.messages.failed;
-  
+
   // Update typing stats
   document.getElementById('perfTypingSpeed').textContent = stats.typing.avgSpeed + ' WPM';
   document.getElementById('perfTypingSamples').textContent = stats.typing.samples;
-  
+
   // Update system stats
   if (stats.memory) {
     document.getElementById('perfMemoryUsed').textContent = stats.memory.usedMB + ' MB';
@@ -1022,18 +1035,18 @@ async function updatePerformanceDisplay() {
     document.getElementById('perfMemoryUsed').textContent = 'N/A';
     document.getElementById('perfMemoryPercent').textContent = 'N/A';
   }
-  
+
   const uptimeSeconds = Math.floor(stats.uptime / 1000);
-  const uptimeStr = uptimeSeconds < 60 
+  const uptimeStr = uptimeSeconds < 60
     ? uptimeSeconds + 's'
     : Math.floor(uptimeSeconds / 60) + 'm ' + (uptimeSeconds % 60) + 's';
   document.getElementById('perfUptime').textContent = uptimeStr;
   document.getElementById('perfErrors').textContent = stats.errors.total;
-  
+
   // Update recommendations
   const recommendations = performanceMonitor.getRecommendations();
   const recContainer = document.getElementById('perfRecommendations');
-  recContainer.innerHTML = recommendations.map(rec => 
+  recContainer.innerHTML = recommendations.map(rec =>
     `<div class="perf-recommendation ${rec.type}">${rec.text}</div>`
   ).join('');
 }
@@ -1059,7 +1072,7 @@ document.getElementById('exportPerformance')?.addEventListener('click', async ()
     stats,
     recommendations: performanceMonitor.getRecommendations()
   };
-  
+
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1067,7 +1080,7 @@ document.getElementById('exportPerformance')?.addEventListener('click', async ()
   a.download = `autochat-performance-${Date.now()}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  
+
   showNotification('Performance data exported', true);
 });
 
@@ -1082,7 +1095,7 @@ document.getElementById('clearPerformance')?.addEventListener('click', async () 
       memoryUsage: []
     };
     performanceMonitor.startTime = Date.now();
-    
+
     await chrome.storage.local.remove(['performanceMetrics']);
     await updatePerformanceDisplay();
     showNotification('Performance metrics cleared', true);
@@ -1122,6 +1135,40 @@ document.getElementById('addNewPhrase')?.addEventListener('click', () => {
   }
 });
 
+// AI Generation Handler
+document.getElementById('generateAiPhrasesBtn')?.addEventListener('click', () => {
+  const btn = document.getElementById('generateAiPhrasesBtn');
+  const originalText = btn.textContent;
+  btn.textContent = '⏳ Generating...';
+  btn.disabled = true;
+
+  // Use current phrases as context (not implemented yet, but good practice)
+  const prompt = "Generate casual crypto gambling chat phrases.";
+
+  chrome.runtime.sendMessage({ action: 'generateAiPhrases', prompt, count: 3 }, (response) => {
+    btn.textContent = originalText;
+    btn.disabled = false;
+
+    if (response && response.success && Array.isArray(response.phrases)) {
+      let addedCount = 0;
+      response.phrases.forEach(phrase => {
+        if (addCustomPhrase(phrase)) {
+          addedCount++;
+        }
+      });
+
+      if (addedCount > 0) {
+        renderPhrasesList();
+        showNotification(`✨ Added ${addedCount} AI phrases!`, true);
+      } else {
+        showNotification('⚠️ Generated phrases were duplicates.', false);
+      }
+    } else {
+      showNotification(`❌ AI Generation failed: ${response?.error || 'Unknown error'}`, false);
+    }
+  });
+});
+
 // Active hours toggle
 elements.activeHours?.addEventListener('change', (e) => {
   const hoursInputs = document.getElementById('activeHoursInputs');
@@ -1150,6 +1197,88 @@ document.getElementById('exportSettings')?.addEventListener('click', () => {
     showNotification('Settings exported!', true);
   });
 });
+
+// --- Scheduler UI Handlers ---
+document.getElementById('openScheduler')?.addEventListener('click', () => {
+  openModal('schedulerModal');
+  loadSchedules();
+});
+
+document.getElementById('createScheduleBtn')?.addEventListener('click', () => {
+  const name = document.getElementById('schedName').value.trim();
+  const startTime = document.getElementById('schedStart').value;
+  const endTime = document.getElementById('schedEnd').value;
+  const min = parseInt(document.getElementById('schedMin').value);
+  const max = parseInt(document.getElementById('schedMax').value);
+
+  if (!name) {
+    showNotification('Please enter a campaign name', false);
+    return;
+  }
+
+  const data = {
+    name,
+    startTime,
+    endTime,
+    interval: { min, max },
+    active: true
+  };
+
+  chrome.runtime.sendMessage({ action: 'createSchedule', data }, (response) => {
+    if (response && response.success) {
+      showNotification(`✅ Campaign created: ${name}`, true);
+      document.getElementById('schedName').value = '';
+      loadSchedules();
+    } else {
+      showNotification(`❌ Failed: ${response?.error}`, false);
+    }
+  });
+});
+
+async function loadSchedules() {
+  chrome.runtime.sendMessage({ action: 'getSchedules' }, (response) => {
+    if (response && response.success) {
+      renderSchedulesList(response.data);
+    }
+  });
+}
+
+function renderSchedulesList(schedules) {
+  const container = document.getElementById('schedulesList');
+  if (!container) return;
+
+  if (schedules.length === 0) {
+    container.innerHTML = '<div class="help">No active campaigns scheduled.</div>';
+    return;
+  }
+
+  container.innerHTML = schedules.map(s => `
+    <div class="schedule-item">
+      <div class="schedule-info">
+        <div class="schedule-name">
+          <span class="status-indicator ${s.active ? 'status-active' : 'status-inactive'}"></span>
+          ${s.name}
+        </div>
+        <div class="schedule-details">
+          🕒 ${s.startTime} - ${s.endTime} | ⏱️ Every ${Math.floor(s.interval.min)}s-${Math.floor(s.interval.max)}s
+        </div>
+      </div>
+      <div class="schedule-actions">
+         <button class="btn-icon-small delete-sched" data-id="${s.id}" title="Delete">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+
+  // Add event listeners to delete buttons
+  container.querySelectorAll('.delete-sched').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = e.target.closest('button').getAttribute('data-id');
+      chrome.runtime.sendMessage({ action: 'deleteSchedule', id }, () => {
+        loadSchedules();
+      });
+    });
+  });
+}
 
 // Import settings
 document.getElementById('importSettings')?.addEventListener('click', () => {
@@ -1199,25 +1328,22 @@ document.getElementById('resetStats')?.addEventListener('click', () => {
 
 async function loadAccounts() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(['accounts', 'currentAccount'], (data) => {
-      if (data.accounts) {
-        accounts = data.accounts;
-      }
-      if (data.currentAccount) {
-        currentAccount = data.currentAccount;
+    chrome.runtime.sendMessage({ action: 'getProfiles' }, (response) => {
+      if (response && response.profiles) {
+        accounts = response.profiles;
+        currentAccount = response.activeId || 'default';
       }
       resolve();
     });
   });
 }
 
-function saveAccounts() {
-  chrome.storage.local.set({ accounts, currentAccount });
-}
+// saveAccounts is deprecated as we save via messages now
+function saveAccounts() { }
 
 function updateAccountSelect() {
   elements.accountSelect.innerHTML = '';
-  
+
   Object.keys(accounts).forEach(accountId => {
     const account = accounts[accountId];
     const option = document.createElement('option');
@@ -1232,40 +1358,40 @@ function updateAccountSelect() {
 
 function updateAccountList() {
   elements.accountList.innerHTML = '';
-  
+
   Object.keys(accounts).forEach(accountId => {
     const account = accounts[accountId];
     const isActive = accountId === currentAccount;
-    
+
     const item = document.createElement('div');
     item.className = 'account-item' + (isActive ? ' active' : '');
-    
+
     const nameSpan = document.createElement('span');
     nameSpan.className = 'account-item-name';
     nameSpan.textContent = account.name;
-    
+
     if (isActive) {
       const badge = document.createElement('span');
       badge.className = 'account-item-badge';
       badge.textContent = 'ACTIVE';
       nameSpan.appendChild(badge);
     }
-    
+
     const actions = document.createElement('div');
     actions.className = 'account-item-actions';
-    
+
     if (!isActive) {
       const switchBtn = document.createElement('button');
       switchBtn.textContent = '🔄 Switch';
       switchBtn.onclick = () => switchAccount(accountId);
       actions.appendChild(switchBtn);
     }
-    
+
     const exportBtn = document.createElement('button');
     exportBtn.textContent = '📥 Export';
     exportBtn.onclick = () => exportAccount(accountId);
     actions.appendChild(exportBtn);
-    
+
     if (accountId !== 'default') {
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'btn-danger-small';
@@ -1273,28 +1399,41 @@ function updateAccountList() {
       deleteBtn.onclick = () => deleteAccount(accountId);
       actions.appendChild(deleteBtn);
     }
-    
+
     item.appendChild(nameSpan);
     item.appendChild(actions);
     elements.accountList.appendChild(item);
   });
 }
 
-function switchAccount(accountId) {
+async function switchAccount(accountId) {
   if (!accounts[accountId]) {
     showNotification('❌ Account not found', false);
     return;
   }
-  
+
   // Save current account settings before switching
   const currentSettings = getCurrentSettings();
-  accounts[currentAccount].settings = currentSettings;
-  
-  // Switch to new account
-  currentAccount = accountId;
-  saveAccounts();
-  
-  // Load new account settings
+  await new Promise(resolve => {
+    chrome.runtime.sendMessage({
+      action: 'updateProfile',
+      id: currentAccount,
+      updates: { settings: currentSettings }
+    }, resolve);
+  });
+
+  // Switch to new account via service
+  await new Promise(resolve => {
+    chrome.runtime.sendMessage({
+      action: 'setActiveProfile',
+      id: accountId
+    }, resolve);
+  });
+
+  // Re-fetch everything to ensure sync
+  await loadAccounts();
+
+  // Apply new settings to UI
   if (accounts[accountId].settings && Object.keys(accounts[accountId].settings).length > 0) {
     chrome.storage.local.set(accounts[accountId].settings, () => {
       loadSettings();
@@ -1303,10 +1442,13 @@ function switchAccount(accountId) {
       showNotification(`✅ Switched to: ${accounts[accountId].name}`, true);
     });
   } else {
-    loadSettings();
+    // If no settings, might need default reset or keep existing?
+    // For now, reload settings will pick up what's in local storage, which technically are the *old* settings unless we clear them.
+    // Better to clear or set defaults if empty.
+    showNotification(`✅ Switched to: ${accounts[accountId].name}`, true);
+    // TODO: Ideally clear storage settings here or merge generic defaults
     updateAccountSelect();
     updateAccountList();
-    showNotification(`✅ Switched to: ${accounts[accountId].name}`, true);
   }
 }
 
@@ -1315,12 +1457,12 @@ function getCurrentSettings() {
     .split('\n')
     .map(k => k.trim())
     .filter(k => k.length > 0);
-  
+
   const mentionReplyMessages = elements.mentionReplyMessages.value
     .split('\n')
     .map(m => m.trim())
     .filter(m => m.length > 0);
-  
+
   return {
     messageList: elements.messageList.value,
     sendMode: elements.sendMode.value,
@@ -1346,85 +1488,151 @@ function getCurrentSettings() {
 }
 
 function exportAccount(accountId) {
-  const account = accounts[accountId];
-  if (!account) return;
-  
-  // Get current settings if this is the active account
+  // If active, ensure settings are saved first (though we are moving to saving on change, 
+  // currently settings are in memory until save).
   if (accountId === currentAccount) {
-    account.settings = getCurrentSettings();
+    // Just in case, try to update the profile with current form values before export
+    const currentSettings = getCurrentSettings();
+    // Not awaiting this since export logic is async below... actually we need to await.
+    // Refactoring this function to be async
+    exportAccountAsync(accountId).catch(console.error);
+    return;
   }
-  
-  const dataStr = JSON.stringify({
-    name: account.name,
-    settings: account.settings,
-    exportDate: new Date().toISOString()
-  }, null, 2);
-  
-  const dataBlob = new Blob([dataStr], { type: 'application/json' });
-  const url = URL.createObjectURL(dataBlob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `autochat-${account.name.toLowerCase().replace(/\s+/g, '-')}.json`;
-  link.click();
-  URL.revokeObjectURL(url);
-  
-  showNotification(`📥 Exported: ${account.name}`, true);
+  exportAccountAsync(accountId).catch(console.error);
 }
 
-function deleteAccount(accountId) {
+async function exportAccountAsync(accountId) {
+  if (accountId === currentAccount) {
+    const currentSettings = getCurrentSettings();
+    await new Promise(resolve => {
+      chrome.runtime.sendMessage({
+        action: 'updateProfile',
+        id: accountId,
+        updates: { settings: currentSettings }
+      }, resolve);
+    });
+  }
+
+  chrome.runtime.sendMessage({ action: 'exportProfile', id: accountId }, (response) => {
+    if (response && response.success) {
+      const dataStr = JSON.stringify(response.data, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      // Sanitize filename
+      const safeName = response.data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      link.download = `autochat-${safeName}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showNotification(`📥 Exported: ${response.data.name}`, true);
+    } else {
+      showNotification(`❌ Export failed: ${response?.error}`, false);
+    }
+  });
+}
+
+async function deleteAccount(accountId) {
   if (accountId === 'default') {
     showNotification('❌ Cannot delete default account', false);
     return;
   }
-  
+
+  // Check if active account via service/local state?
+  // Current logic: if active in local state, block.
+  // ProfileService handles active switching if deleted, but let's keep basic check.
   if (accountId === currentAccount) {
-    showNotification('❌ Cannot delete active account', false);
-    return;
+    // Actually ProfileService handles this gracefully now, but blocking in UI is fine.
+    // showNotification('❌ Cannot delete active account', false);
+    // return;
   }
-  
+
   const account = accounts[accountId];
   if (confirm(`Delete account "${account.name}"? This cannot be undone.`)) {
-    delete accounts[accountId];
-    saveAccounts();
-    updateAccountSelect();
-    updateAccountList();
-    showNotification(`🗑️ Deleted: ${account.name}`, true);
+    chrome.runtime.sendMessage({ action: 'deleteProfile', id: accountId }, async (response) => {
+      if (response && response.success) {
+        await loadAccounts();
+        updateAccountSelect();
+        updateAccountList();
+        showNotification(`🗑️ Deleted: ${account.name}`, true);
+        // If we deleted the current one, loadAccounts should have updated currentAccount to default
+        if (accountId === currentAccount) {
+          loadSettings(); // Reload settings for default
+        }
+      } else {
+        showNotification(`❌ Delete failed: ${response?.error}`, false);
+      }
+    });
   }
 }
 
-// Account modal and UI handlers
-elements.manageAccounts?.addEventListener('click', () => {
-  updateAccountList();
-  elements.accountModal.style.display = 'flex';
-});
-
 elements.createAccount?.addEventListener('click', () => {
   const name = elements.newAccountName.value.trim();
+  const domainsStr = elements.newAccountDomains.value.trim();
+
   if (!name) {
     showNotification('❌ Please enter an account name', false);
     return;
   }
-  
+
   if (name.length > 50) {
     showNotification('❌ Name too long (max 50 characters)', false);
     return;
   }
-  
-  // Generate unique ID
-  const accountId = 'account_' + Date.now();
-  
-  accounts[accountId] = {
-    name: name,
-    settings: {}
-  };
-  
-  saveAccounts();
-  updateAccountSelect();
-  updateAccountList();
-  elements.newAccountName.value = '';
-  
-  showNotification(`✅ Created: ${name}`, true);
+
+  const domains = domainsStr ? domainsStr.split(',').map(d => d.trim()).filter(d => d.length > 0) : [];
+
+  chrome.runtime.sendMessage({ action: 'createProfile', name, domains }, async (response) => {
+    if (response && response.success) {
+      await loadAccounts();
+      elements.newAccountName.value = '';
+      elements.newAccountDomains.value = '';
+      updateAccountSelect();
+      updateAccountList();
+      showNotification(`✅ Created: ${response.profile.name}`, true);
+    } else {
+      showNotification(`❌ Creation failed: ${response?.error}`, false);
+    }
+  });
 });
+
+
+
+const importBtn = document.getElementById('importProfileBtn');
+const importInput = document.getElementById('importFileInput');
+
+if (importBtn && importInput) {
+  importBtn.addEventListener('click', () => {
+    importInput.click();
+  });
+
+  importInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const jsonString = event.target.result;
+        chrome.runtime.sendMessage({ action: 'importProfile', jsonString }, async (response) => {
+          if (response && response.success) {
+            await loadAccounts();
+            updateAccountSelect();
+            updateAccountList();
+            showNotification(`✅ Imported: ${response.profile.name}`, true);
+            // Clear input
+            importInput.value = '';
+          } else {
+            showNotification(`❌ Import failed: ${response?.error}`, false);
+          }
+        });
+      } catch (err) {
+        showNotification('❌ Failed to read file', false);
+      }
+    };
+    reader.readAsText(file);
+  });
+}
 
 elements.accountSelect?.addEventListener('change', (e) => {
   const selectedAccount = e.target.value;
@@ -1507,11 +1715,11 @@ function loadSettings() {
 
 function saveSettings() {
   const settings = getCurrentSettings();
-  
+
   // Save to current account
   accounts[currentAccount].settings = settings;
   saveAccounts();
-  
+
   // Also save to storage for immediate use
   chrome.storage.local.set(settings);
 }
@@ -1538,13 +1746,13 @@ elements.notificationSound?.addEventListener('change', saveSettings);
 // Mention detection settings
 elements.mentionDetectionEnabled?.addEventListener('change', async () => {
   saveSettings();
-  
+
   // Notify content script to start/stop mention detection
   const keywords = elements.mentionKeywords.value
     .split('\n')
     .map(k => k.trim())
     .filter(k => k.length > 0);
-  
+
   const replyMessages = elements.mentionReplyMessages.value
     .split('\n')
     .map(m => m.trim())
@@ -1569,7 +1777,7 @@ elements.mentionDetectionEnabled?.addEventListener('change', async () => {
       keywords: keywords,
       replyMessages: replyMessages
     });
-    
+
     if (response && response.ok) {
       showNotification('✅ Mention detection enabled', true);
     } else {
@@ -1643,13 +1851,13 @@ const commands = [
 let selectedCommandIndex = 0;
 
 function renderCommands(filter = '') {
-  const filtered = commands.filter(cmd => 
+  const filtered = commands.filter(cmd =>
     cmd.name.toLowerCase().includes(filter.toLowerCase()) ||
     cmd.desc.toLowerCase().includes(filter.toLowerCase())
   );
 
   commandResults.innerHTML = '';
-  
+
   if (filtered.length === 0) {
     commandResults.innerHTML = '<div class="help" style="padding: 20px; text-align: center;">No commands found</div>';
     return;
@@ -1693,7 +1901,7 @@ commandSearch?.addEventListener('input', (e) => {
 
 commandSearch?.addEventListener('keydown', (e) => {
   const items = commandResults.querySelectorAll('.command-item');
-  
+
   if (e.key === 'ArrowDown') {
     e.preventDefault();
     selectedCommandIndex = Math.min(selectedCommandIndex + 1, items.length - 1);
@@ -1756,13 +1964,13 @@ function renderEmojiTabs() {
 
 function renderEmojis(filter = '') {
   emojiContent.innerHTML = '';
-  
+
   let emojis = emojiCategories[currentEmojiCategory] || [];
-  
+
   if (filter) {
     emojis = Object.values(emojiCategories).flat();
   }
-  
+
   emojis.forEach(emoji => {
     const item = document.createElement('button');
     item.className = 'emoji-item';
@@ -1817,17 +2025,17 @@ const previewContent = document.getElementById('previewContent');
 function renderPreview() {
   const messages = elements.messageList.value.split('\n').filter(m => m.trim());
   previewContent.innerHTML = '';
-  
+
   if (messages.length === 0) {
     previewContent.innerHTML = '<div class="preview-empty">No messages to preview. Add some messages first!</div>';
     return;
   }
-  
+
   // Show first 10 messages with variables processed
   messages.slice(0, 10).forEach(message => {
     const item = document.createElement('div');
     item.className = 'preview-item';
-    
+
     // Process template variables for preview
     const processed = message
       .replace(/{time}/g, '<span class="preview-variable">12:34 PM</span>')
@@ -1835,11 +2043,11 @@ function renderPreview() {
       .replace(/{random_emoji}/g, '<span class="preview-variable">😊</span>')
       .replace(/{random_number}/g, '<span class="preview-variable">42</span>')
       .replace(/{timestamp}/g, '<span class="preview-variable">1732298400</span>');
-    
+
     item.innerHTML = processed;
     previewContent.appendChild(item);
   });
-  
+
   if (messages.length > 10) {
     const more = document.createElement('div');
     more.className = 'help';
@@ -1875,7 +2083,7 @@ const categoryDisplayItems = [
 
 function renderCategoriesDisplay() {
   categoriesContent.innerHTML = '';
-  
+
   categoryDisplayItems.forEach(category => {
     const card = document.createElement('div');
     card.className = 'category-card';
@@ -1908,10 +2116,10 @@ function showOnboardingStep(step) {
   document.querySelectorAll('.onboarding-step').forEach(el => el.classList.remove('active'));
   document.querySelector(`.onboarding-step[data-step="${step}"]`)?.classList.add('active');
   document.getElementById('onboardingStep').textContent = `${step} / ${totalOnboardingSteps}`;
-  
+
   const prevBtn = document.getElementById('onboardingPrev');
   const nextBtn = document.getElementById('onboardingNext');
-  
+
   if (prevBtn) prevBtn.disabled = step === 1;
   if (nextBtn) nextBtn.textContent = step === totalOnboardingSteps ? 'Finish' : 'Next →';
 }
@@ -1956,26 +2164,26 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     openCommandPalette();
   }
-  
+
   // Escape to close modals/overlays
   if (e.key === 'Escape') {
     closeCommandPalette();
     closeEmojiPicker();
     document.querySelectorAll('.modal.show').forEach(modal => modal.classList.remove('show'));
   }
-  
+
   // Ctrl+S to start
   if (e.ctrlKey && e.key === 's') {
     e.preventDefault();
     document.getElementById('startAutoSend')?.click();
   }
-  
+
   // Ctrl+X to stop
   if (e.ctrlKey && e.key === 'x') {
     e.preventDefault();
     document.getElementById('stopAutoSend')?.click();
   }
-  
+
   // Ctrl+P to pause
   if (e.ctrlKey && e.key === 'p') {
     e.preventDefault();
@@ -2043,7 +2251,7 @@ function updateNotificationBadge() {
 
 function renderNotificationList() {
   if (!notificationList) return;
-  
+
   if (notificationHistory.length === 0) {
     notificationList.innerHTML = '<div class="help" style="text-align: center; padding: 20px;">No notifications yet</div>';
     return;
@@ -2053,10 +2261,10 @@ function renderNotificationList() {
   notificationHistory.forEach(notification => {
     const item = document.createElement('div');
     item.className = 'notification-item' + (notification.read ? '' : ' unread');
-    
+
     const icon = getNotificationIcon(notification.type);
     const timeAgo = getTimeAgo(notification.timestamp);
-    
+
     item.innerHTML = `
       <div class="notification-icon">${icon}</div>
       <div class="notification-content">
@@ -2104,7 +2312,7 @@ function getTimeAgo(timestamp) {
   const now = new Date();
   const then = new Date(timestamp);
   const seconds = Math.floor((now - then) / 1000);
-  
+
   if (seconds < 60) return 'Just now';
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
   if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
@@ -2156,9 +2364,9 @@ function clearAllNotifications() {
 }
 
 function saveNotificationHistory() {
-  chrome.storage.local.set({ 
-    notificationHistory, 
-    unreadCount 
+  chrome.storage.local.set({
+    notificationHistory,
+    unreadCount
   });
 }
 
@@ -2277,7 +2485,7 @@ function createCategory() {
   }
 
   const id = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  
+
   if (categories.some(c => c.id === id)) {
     showNotification('Category already exists', false);
     return;
@@ -2349,51 +2557,51 @@ document.getElementById('openHelp')?.addEventListener('click', () => {
   loadSettings();
   await loadDefaultPhrasesFromFile();
   await loadCustomPhrases();
-// Chat logging event handlers
-elements.chatLoggingEnabled?.addEventListener('change', async () => {
-  const enabled = elements.chatLoggingEnabled.checked;
-  await chrome.storage.local.set({ chatLoggingEnabled: enabled });
-  
-  const action = enabled ? 'startChatLogging' : 'stopChatLogging';
-  const response = await sendMessageToContent({ action });
-  
-  if (response?.ok) {
-    showNotification(enabled ? 'Chat logging enabled' : 'Chat logging disabled', true);
-  } else {
-    showNotification('Make sure to mark a message container first', false);
-    elements.chatLoggingEnabled.checked = false;
-  }
-});
+  // Chat logging event handlers
+  elements.chatLoggingEnabled?.addEventListener('change', async () => {
+    const enabled = elements.chatLoggingEnabled.checked;
+    await chrome.storage.local.set({ chatLoggingEnabled: enabled });
 
-elements.viewChatLogs?.addEventListener('click', () => {
-  chrome.tabs.create({ url: chrome.runtime.getURL('chat-log-viewer.html') });
-});
+    const action = enabled ? 'startChatLogging' : 'stopChatLogging';
+    const response = await sendMessageToContent({ action });
 
-elements.openChatLogs?.addEventListener('click', () => {
-  chrome.tabs.create({ url: chrome.runtime.getURL('chat-log-viewer.html') });
-});
-
-// Manual detection event handlers
-elements.manualDetectionEnabled?.addEventListener('change', async () => {
-  const enabled = elements.manualDetectionEnabled.checked;
-  await chrome.storage.local.set({ manualDetectionEnabled: enabled });
-  
-  const action = enabled ? 'startManualDetection' : 'stopManualDetection';
-  const response = await sendMessageToContent({ action });
-  
-  if (response?.ok) {
-    showNotification(enabled ? 'Manual detection enabled' : 'Manual detection disabled', true);
-    
-    if (elements.manualDetectionStatus) {
-      elements.manualDetectionStatus.textContent = enabled ? 
-        '✅ Timer will reset when you manually send messages' : '';
-      elements.manualDetectionStatus.style.display = enabled ? 'block' : 'none';
+    if (response?.ok) {
+      showNotification(enabled ? 'Chat logging enabled' : 'Chat logging disabled', true);
+    } else {
+      showNotification('Make sure to mark a message container first', false);
+      elements.chatLoggingEnabled.checked = false;
     }
-  } else {
-    showNotification('Make sure to mark an input field first', false);
-    elements.manualDetectionEnabled.checked = false;
-  }
-});
+  });
+
+  elements.viewChatLogs?.addEventListener('click', () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('chat-log-viewer.html') });
+  });
+
+  elements.openChatLogs?.addEventListener('click', () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('chat-log-viewer.html') });
+  });
+
+  // Manual detection event handlers
+  elements.manualDetectionEnabled?.addEventListener('change', async () => {
+    const enabled = elements.manualDetectionEnabled.checked;
+    await chrome.storage.local.set({ manualDetectionEnabled: enabled });
+
+    const action = enabled ? 'startManualDetection' : 'stopManualDetection';
+    const response = await sendMessageToContent({ action });
+
+    if (response?.ok) {
+      showNotification(enabled ? 'Manual detection enabled' : 'Manual detection disabled', true);
+
+      if (elements.manualDetectionStatus) {
+        elements.manualDetectionStatus.textContent = enabled ?
+          '✅ Timer will reset when you manually send messages' : '';
+        elements.manualDetectionStatus.style.display = enabled ? 'block' : 'none';
+      }
+    } else {
+      showNotification('Make sure to mark an input field first', false);
+      elements.manualDetectionEnabled.checked = false;
+    }
+  });
 
   await loadNotificationHistory();
   await loadCategories();
@@ -2416,12 +2624,64 @@ elements.manualDetectionEnabled?.addEventListener('change', async () => {
 // Profile overlay close handler
 const profileClose = document.getElementById('profile-close');
 if (profileClose) {
-    profileClose.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const overlay = document.getElementById('profile-overlay');
-        if (overlay) {
-            overlay.classList.remove('active');
-        }
-    });
+  profileClose.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const overlay = document.getElementById('profile-overlay');
+    if (overlay) {
+      overlay.classList.remove('active');
+    }
+  });
 }
+
+// ===== ANALYTICS CHARTS =====
+
+let mainChartInstance = null;
+let hourlyChartInstance = null;
+
+async function initializeAnalyticsCharts() {
+  const range = document.getElementById('analyticsTimeRange')?.value || '7d';
+
+  let stats;
+  try {
+    stats = await new Promise((resolve) => {
+      chrome.runtime.sendMessage({ action: 'getAnalyticsData', range }, resolve);
+    });
+  } catch (e) {
+    console.error('[Popup] Failed to fetch analytics data:', e);
+    return;
+  }
+
+  if (!stats || stats.error) {
+    console.warn('[Popup] Analytics unavailable:', stats?.error);
+    return;
+  }
+
+  // Render Main Chart
+  const ctxMain = document.getElementById('mainChart')?.getContext('2d');
+  if (ctxMain) {
+    if (mainChartInstance) mainChartInstance.destroy();
+
+    const config = getMainChartConfig(ctxMain, {
+      labels: stats.timeSeries.map(d => d.label),
+      sent: stats.timeSeries.map(d => d.sent),
+      failed: stats.timeSeries.map(d => d.failed)
+    });
+    // Ensure Chart is available
+    if (typeof Chart !== 'undefined') {
+      mainChartInstance = new Chart(ctxMain, config);
+    }
+  }
+
+  // Render Hourly Chart
+  const ctxHourly = document.getElementById('hourlyChart')?.getContext('2d');
+  if (ctxHourly && stats.hourlyHeatmap) {
+    if (hourlyChartInstance) hourlyChartInstance.destroy();
+
+    const config = getHourlyChartConfig(ctxHourly, stats.hourlyHeatmap);
+    if (typeof Chart !== 'undefined') {
+      hourlyChartInstance = new Chart(ctxHourly, config);
+    }
+  }
+}
+

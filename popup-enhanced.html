@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>AutoChat Enhanced</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
   <div class="container">
     <h2>
       <span>💬 AutoChat Enhanced</span>
       <div class="header-actions">
-        <button id="openNotificationCenter" class="header-btn" title="Notification Center" aria-label="Open Notification Center">
+        <button id="openNotificationCenter" class="header-btn" title="Notification Center"
+          aria-label="Open Notification Center">
           🔔
           <span id="notificationBadge" class="notification-count-badge" style="display: none;">0</span>
         </button>
-        <button id="openDonation" class="header-btn" title="Support Development" aria-label="Donate with Crypto">💝</button>
+        <button id="openDonation" class="header-btn" title="Support Development"
+          aria-label="Donate with Crypto">💝</button>
         <button id="themeToggle" class="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
       </div>
     </h2>
@@ -81,7 +85,8 @@
 
     <!-- Messages -->
     <label>Messages (one per line):
-      <textarea id="messageList" placeholder="Hello!&#10;How are you?&#10;{time} - Nice to meet you&#10;Random number: {random_number}"></textarea>
+      <textarea id="messageList"
+        placeholder="Hello!&#10;How are you?&#10;{time} - Nice to meet you&#10;Random number: {random_number}"></textarea>
       <div class="help">Use {time}, {date}, {random_emoji}, {random_number} for variables</div>
     </label>
 
@@ -134,6 +139,7 @@
     <div class="btn-row">
       <button id="openPerformance" class="btn-secondary">⚡ Performance</button>
       <button id="openChatLogs" class="btn-secondary">📖 Chat Logs</button>
+      <button id="openScheduler" class="btn-secondary">📅 Scheduler</button>
     </div>
 
     <div class="shortcuts-info">
@@ -250,7 +256,8 @@
 
       <label>
         Reply Messages (one per line):
-        <textarea id="mentionReplyMessages" rows="3" placeholder="Thanks for mentioning me!&#10;Hello! I'm here.&#10;Hi! What's up?"></textarea>
+        <textarea id="mentionReplyMessages" rows="3"
+          placeholder="Thanks for mentioning me!&#10;Hello! I'm here.&#10;Hi! What's up?"></textarea>
       </label>
       <div class="help">Random reply will be selected from this list</div>
 
@@ -310,7 +317,11 @@
         <label>Add New Phrase:
           <textarea id="newPhraseInput" placeholder="Type a new phrase here..." rows="3"></textarea>
         </label>
-        <button id="addNewPhrase" class="btn-success">➕ Add Phrase</button>
+        <div style="display: flex; gap: 10px; margin-top: 8px;">
+          <button id="addNewPhrase" class="btn-success" style="flex: 1;">➕ Add Phrase</button>
+          <button id="generateAiPhrasesBtn" class="btn-secondary"
+            style="flex: 1; background-color: #6C5CE7; color: white;">✨ AI Generate</button>
+        </div>
       </div>
 
       <hr>
@@ -326,6 +337,43 @@
         <strong>Default Phrases:</strong> <span id="defaultPhrasesCount" class="badge">0</span>
         <div class="help">From farming_phrases.txt</div>
         <div id="defaultPhrasesList" class="phrases-list"></div>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Smart Scheduler Modal -->
+  <div id="schedulerModal" class="modal">
+    <div class="modal-content modal-large">
+      <h3>📅 Smart Scheduling & Campaigns</h3>
+      <p class="help">Create automated drip campaigns and recurring schedules for your messages. Smart timing helps
+        avoid detection.</p>
+
+      <div class="section">
+        <h4>➕ Create New Campaign</h4>
+        <div class="campaign-form">
+          <label>Campaign Name: <input type="text" id="schedName" placeholder="Morning Farming"></label>
+          <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <label style="flex: 1;">Start Time: <input type="time" id="schedStart" value="09:00"></label>
+            <label style="flex: 1;">End Time: <input type="time" id="schedEnd" value="18:00"></label>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <label style="flex: 1;">Min Interval (s): <input type="number" id="schedMin" value="300"></label>
+            <label style="flex: 1;">Max Interval (s): <input type="number" id="schedMax" value="600"></label>
+          </div>
+          <button id="createScheduleBtn" class="btn-success" style="margin-top: 15px; width: 100%;">Create
+            Campaign</button>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <h4>📋 Active Campaigns</h4>
+        <div id="schedulesList" class="schedules-list">
+          <div class="help">No active campaigns scheduled.</div>
+        </div>
       </div>
 
       <button class="close-modal btn-primary">Close</button>
@@ -353,18 +401,35 @@
           <div class="analytics-value" id="analyticsStatus">Inactive</div>
         </div>
       </div>
-
-      <hr>
-
-      <div class="help">Statistics track all messages sent by AutoChat</div>
-
-      <hr>
-
-      <div class="help">Recent activity and errors will be logged here in future updates</div>
-
-      <button id="resetStats" class="btn-danger">🗑️ Reset Statistics</button>
-      <button class="close-modal btn-primary">Close</button>
     </div>
+
+    <div class="chart-controls" style="margin: 16px 0; display: flex; justify-content: flex-end;">
+      <select id="analyticsTimeRange" style="width: auto;">
+        <option value="24h">Last 24 Hours</option>
+        <option value="7d" selected>Last 7 Days</option>
+        <option value="30d">Last 30 Days</option>
+      </select>
+    </div>
+
+    <div class="chart-container" style="position: relative; height: 200px; width: 100%; margin-bottom: 20px;">
+      <canvas id="mainChart"></canvas>
+    </div>
+
+    <div class="chart-container" style="position: relative; height: 150px; width: 100%;">
+      <canvas id="hourlyChart"></canvas>
+    </div>
+
+    <hr>
+
+    <div class="help">Statistics track all messages sent by AutoChat</div>
+
+    <hr>
+
+    <div class="help">Recent activity and errors will be logged here in future updates</div>
+
+    <button id="resetStats" class="btn-danger">🗑️ Reset Statistics</button>
+    <button class="close-modal btn-primary">Close</button>
+  </div>
   </div>
 
   <!-- Account Management Modal -->
@@ -376,7 +441,14 @@
         <label>Create New Profile:
           <input type="text" id="newAccountName" placeholder="e.g., Casino Account 1" maxlength="50">
         </label>
-        <button id="createAccount" class="btn-success">➕ Create Profile</button>
+        <label style="margin-top: 8px; display: block;">Linked Domains (comma separated):
+          <input type="text" id="newAccountDomains" placeholder="e.g., example.com, casino.com" style="width: 100%;">
+        </label>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button id="createAccount" class="btn-success" style="flex: 1;">➕ Create Profile</button>
+          <button id="importProfileBtn" class="btn-secondary" style="flex: 1;">📥 Import JSON</button>
+        </div>
+        <input type="file" id="importFileInput" accept=".json" style="display: none;">
       </div>
 
       <hr>
@@ -447,7 +519,8 @@
         </div>
         <div class="onboarding-step" data-step="2">
           <h4>Step 2: Add Messages</h4>
-          <p>Enter your messages (one per line). Use variables like {time}, {date}, {random_emoji} for dynamic content.</p>
+          <p>Enter your messages (one per line). Use variables like {time}, {date}, {random_emoji} for dynamic content.
+          </p>
         </div>
         <div class="onboarding-step" data-step="3">
           <h4>Step 3: Configure Settings</h4>
@@ -501,7 +574,7 @@
   <div id="categoryManagerModal" class="modal">
     <div class="modal-content">
       <h3>📁 Category Manager</h3>
-      
+
       <div class="section">
         <label>Create New Category:</label>
         <div class="input-row">
@@ -534,7 +607,7 @@
   <div id="helpModal" class="modal">
     <div class="modal-content">
       <h3>❓ Help & Documentation</h3>
-      
+
       <div class="help-section">
         <h4>🎯 Getting Started</h4>
         <p>1. Click "Mark Chat Input Field" and select the text input on the page</p>
@@ -588,7 +661,8 @@
   <div id="webhookModal" class="modal">
     <div class="modal-content modal-large">
       <h3>🔗 Webhook Management</h3>
-      <p class="help">Webhooks allow you to send HTTP requests when specific events occur. Connect AutoChat with external services like Slack, Discord, Zapier, or your own custom endpoints.</p>
+      <p class="help">Webhooks allow you to send HTTP requests when specific events occur. Connect AutoChat with
+        external services like Slack, Discord, Zapier, or your own custom endpoints.</p>
 
       <div class="section">
         <h4>➕ Add New Webhook</h4>
@@ -629,7 +703,8 @@
 
           <label>
             Custom Headers (optional, JSON format):
-            <textarea id="webhookHeaders" rows="3" placeholder='{"Authorization": "Bearer token123", "X-Custom": "value"}'></textarea>
+            <textarea id="webhookHeaders" rows="3"
+              placeholder='{"Authorization": "Bearer token123", "X-Custom": "value"}'></textarea>
           </label>
 
           <div class="btn-row">
@@ -682,7 +757,7 @@
 
       <div class="donation-section">
         <h4>🪙 Crypto Donations</h4>
-        
+
         <div class="crypto-address">
           <label>Bitcoin (BTC)</label>
           <div class="address-box">
@@ -818,7 +893,10 @@
     <div class="loading-text">Loading...</div>
   </div>
 
+  <script src="libs/chart.js"></script>
+  <script src="src/analytics-service.js"></script>
   <script src="src/popup-i18n.js"></script>
   <script type="module" src="popup-enhanced.js"></script>
 </body>
+
 </html>
