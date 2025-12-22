@@ -12,6 +12,18 @@ function sanitizeHTML(str) {
   return div.innerHTML;
 }
 
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    if (theme === 'dark' || theme === 'cyberpunk' || theme === 'midnight-gold') {
+      themeToggle.textContent = '☀️';
+    } else {
+      themeToggle.textContent = '🌙';
+    }
+  }
+}
+
 async function getActiveTab() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   return tab;
@@ -99,6 +111,7 @@ const elements = {
   // Notifications
   notificationsEnabled: document.getElementById('notificationsEnabled'),
   notificationSound: document.getElementById('notificationSound'),
+  themeSelect: document.getElementById('themeSelect'),
 
   // Account Management
   accountSelect: document.getElementById('accountSelect'),
@@ -1209,7 +1222,54 @@ document.getElementById('openScheduler')?.addEventListener('click', () => {
 document.getElementById('openTeam')?.addEventListener('click', () => {
   openModal('teamModal');
   updateCloudSyncUI();
+  updateTeamGoalsUI();
+  // Ensure we are connected to the pulse
+  chrome.runtime.sendMessage({ action: 'connectTeamPulse' });
 });
+
+async function updateTeamGoalsUI() {
+  chrome.runtime.sendMessage({ action: 'getTeamStats' }, (response) => {
+    if (response && response.success) {
+      const data = response.data;
+      const progressText = document.getElementById('teamGoalProgressText');
+      const progressFill = document.querySelector('.team-goals .progress-fill');
+
+      if (progressText) {
+        progressText.textContent = `${data.totalSent.toLocaleString()} / ${data.goal.toLocaleString()}`;
+      }
+      if (progressFill) {
+        progressFill.style.width = `${data.progress}%`;
+      }
+    }
+  });
+}
+
+// Listener for Real-time Pulses
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.type === 'team_pulse') {
+    addTeamActivity(msg.payload.user, msg.payload.text);
+  }
+});
+
+function addTeamActivity(user, text) {
+  const feed = document.getElementById('teamActivityFeed');
+  if (!feed) return;
+
+  const item = document.createElement('div');
+  item.className = 'activity-item';
+  item.innerHTML = `
+    <span class="time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+    <span class="text"><strong>${user}</strong> ${text}</span>
+  `;
+
+  // Prepend to show latest first
+  feed.insertBefore(item, feed.firstChild);
+
+  // Keep internal feed clean
+  if (feed.children.length > 20) {
+    feed.removeChild(feed.lastChild);
+  }
+}
 
 async function updateCloudSyncUI() {
   chrome.runtime.sendMessage({ action: 'getCloudSyncStatus' }, (response) => {
@@ -1582,7 +1642,8 @@ function getCurrentSettings() {
     chatLoggingEnabled: elements.chatLoggingEnabled?.checked || false,
     manualDetectionEnabled: elements.manualDetectionEnabled?.checked || false,
     notificationsEnabled: elements.notificationsEnabled.checked,
-    notificationSound: elements.notificationSound.checked
+    notificationSound: elements.notificationSound.checked,
+    theme: elements.themeSelect?.value || 'light'
   };
 }
 
@@ -1764,7 +1825,8 @@ function loadSettings() {
     'chatLoggingEnabled',
     'manualDetectionEnabled',
     'notificationsEnabled',
-    'notificationSound'
+    'notificationSound',
+    'theme'
   ], (data) => {
     if (data.messageList) elements.messageList.value = data.messageList;
     if (data.sendMode) elements.sendMode.value = data.sendMode;
@@ -1806,6 +1868,11 @@ function loadSettings() {
     elements.notificationsEnabled.checked = data.notificationsEnabled !== false;
     elements.notificationSound.checked = data.notificationSound !== false;
 
+    if (data.theme && elements.themeSelect) {
+      elements.themeSelect.value = data.theme;
+      applyTheme(data.theme);
+    }
+
     // Show/hide active hours inputs
     const hoursInputs = document.getElementById('activeHoursInputs');
     if (hoursInputs) {
@@ -1843,6 +1910,11 @@ elements.sendConfirmTimeout?.addEventListener('change', saveSettings);
 // Notification settings
 elements.notificationsEnabled?.addEventListener('change', saveSettings);
 elements.notificationSound?.addEventListener('change', saveSettings);
+elements.themeSelect?.addEventListener('change', () => {
+  const newTheme = elements.themeSelect.value;
+  applyTheme(newTheme);
+  saveSettings();
+});
 
 // Mention detection settings
 elements.mentionDetectionEnabled?.addEventListener('change', async () => {
@@ -2305,24 +2377,16 @@ document.addEventListener('keydown', (e) => {
 
 const themeToggle = document.getElementById('themeToggle');
 
-function setTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
-  chrome.storage.local.set({ theme });
-}
-
 themeToggle?.addEventListener('click', () => {
   const currentTheme = document.documentElement.getAttribute('data-theme');
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  setTheme(newTheme);
-  showNotification(`${newTheme === 'dark' ? 'Dark' : 'Light'} mode enabled`, true);
-});
+  // If in a pro theme, toggle back to light/dark. Otherwise swap light/dark.
+  const newTheme = (currentTheme === 'dark' || currentTheme === 'cyberpunk' || currentTheme === 'midnight-gold') ? 'light' : 'dark';
 
-// Load saved theme
-chrome.storage.local.get(['theme'], (data) => {
-  if (data.theme) {
-    setTheme(data.theme);
-  }
+  applyTheme(newTheme);
+  if (elements.themeSelect) elements.themeSelect.value = newTheme;
+  saveSettings();
+
+  showNotification(`${newTheme === 'dark' ? 'Dark' : 'Light'} mode enabled`, true);
 });
 
 // ===== NOTIFICATION CENTER =====

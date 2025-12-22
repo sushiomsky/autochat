@@ -95,15 +95,24 @@ class AIService {
 
         const positiveKeywords = ['win', 'won', 'luck', 'great', 'good', 'nice', 'awesome', 'amazing', 'love', 'happy', 'multiplier', 'x100', 'payout'];
         const negativeKeywords = ['lose', 'lost', 'bad', 'sad', 'scam', 'unlucky', 'rip', 'f', 'worst', 'horrible', 'banned'];
+        const aggressiveKeywords = ['hate', 'stupid', 'idiot', 'dumb', 'trash', 'garbage', 'shut up', 'delete', 'worst app', 'faker'];
+        const sarcasticKeywords = ['yeah right', 'oh sure', 'of course', 'totally', 'real smart', 'nice try', 'classic'];
 
         positiveKeywords.forEach(k => { if (lower.includes(k)) score++; });
         negativeKeywords.forEach(k => { if (lower.includes(k)) score--; });
 
         let sentiment = 'neutral';
-        if (score > 0) sentiment = 'positive';
+
+        // Nuance detection
+        const isAggressive = aggressiveKeywords.some(k => lower.includes(k)) || (text === text.toUpperCase() && text.length > 5);
+        const isSarcastic = sarcasticKeywords.some(k => lower.includes(k)); // More sensitive detection
+
+        if (isAggressive) sentiment = 'aggressive';
+        else if (isSarcastic) sentiment = 'sarcastic';
+        else if (score > 0) sentiment = 'positive';
         else if (score < 0) sentiment = 'negative';
 
-        return { sentiment, score };
+        return { sentiment, score, isAggressive, isSarcastic };
     }
 
     /**
@@ -137,6 +146,18 @@ class AIService {
                 "I see you! 👀",
                 "Good luck on your next round! 🎯",
                 "Just hanging out in the chat! 😊"
+            ],
+            aggressive: [
+                "Let's keep it civil, please! 🙏",
+                "No need for that. Just here for the community. 😊",
+                "Sending some positive vibes your way! ✨",
+                "We're all here to have a good time. Good luck! 🍀"
+            ],
+            sarcastic: [
+                "Haha, I see what you did there! 😉",
+                "Nice one! Glad you're keeping it interesting. 😂",
+                "Always good to have some humor in the chat! ✨",
+                "Stay sharp! I like your style. 😎"
             ]
         };
 

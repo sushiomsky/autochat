@@ -43,6 +43,18 @@ describe('AIService', () => {
         expect(negative.score).toBeLessThan(0);
     });
 
+    test('should detect sarcasm', async () => {
+        const sarcastic = await aiService.analyzeSentiment("Oh sure, nice try buddy classic RIP");
+        expect(sarcastic.sentiment).toBe('sarcastic');
+        expect(sarcastic.isSarcastic).toBe(true);
+    });
+
+    test('should detect aggression', async () => {
+        const aggressive = await aiService.analyzeSentiment("YOU ARE A STUPID FAKER SHUT UP");
+        expect(aggressive.sentiment).toBe('aggressive');
+        expect(aggressive.isAggressive).toBe(true);
+    });
+
     test('should generate contextual replies', async () => {
         const reply = await aiService.generateReply("Great win!", "positive");
         expect(reply).toBeDefined();

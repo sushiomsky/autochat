@@ -140,6 +140,24 @@ class AnalyticsService {
         return stats;
     }
 
+    /**
+     * Get team-wide performance stats (simulated for Pro)
+     */
+    async getTeamStats() {
+        const localStats = await this.getStats('24h');
+
+        // Simulate a team of 4 members
+        const teamTotal = localStats.summary.totalSent * 3.5 + 850;
+        const teamGoal = 5000;
+
+        return {
+            totalSent: Math.floor(teamTotal),
+            goal: teamGoal,
+            progress: Math.min(100, Math.floor((teamTotal / teamGoal) * 100)),
+            activeMembers: 3
+        };
+    }
+
     async _appendLog(event) {
         const logs = await this._getStorage(this.STORAGE_KEYS.LOGS) || [];
         logs.push(event);

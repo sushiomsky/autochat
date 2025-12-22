@@ -8,6 +8,7 @@ try {
   importScripts('src/ai-service.js');
   importScripts('src/scheduler-service.js');
   importScripts('src/cloud-sync-service.js');
+  importScripts('src/socket-service.js');
 } catch (e) {
   console.error('[Background] Failed to load services:', e);
 }
@@ -35,6 +36,21 @@ async function initServices() {
   if (typeof CloudSyncService !== 'undefined') {
     await CloudSyncService.init();
     console.log('[Background] CloudSyncService initialized');
+  }
+  if (typeof SocketService !== 'undefined') {
+    await SocketService.init();
+    console.log('[Background] SocketService initialized');
+
+    // Handle incoming pulses
+    SocketService.onMessage((msg) => {
+      if (msg.type === 'team_pulse') {
+        console.log(`[Background] Team Pulse: ${msg.payload.user} ${msg.payload.text}`);
+        // Broadcast to popup/content
+        chrome.runtime.sendMessage(msg).catch(() => {
+          // Ignore error if popup/tab is not listening
+        });
+      }
+    });
   }
 }
 initServices();
@@ -314,6 +330,29 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       CloudSyncService.performSync()
         .then((ok) => sendResponse({ success: ok }))
         .catch(err => sendResponse({ success: false, error: err.message }));
+      return true;
+    }
+  }
+
+  // --- Socket / Team Handlers ---
+  if (request.action === 'connectTeamPulse') {
+    if (typeof SocketService !== 'undefined') {
+      SocketService.connect();
+      sendResponse({ success: true, ...SocketService.getStatus() });
+      return true;
+    }
+  }
+
+  if (request.action === 'getTeamPulseStatus') {
+    if (typeof SocketService !== 'undefined') {
+      sendResponse({ success: true, ...SocketService.getStatus() });
+      return true;
+    }
+  }
+
+  if (request.action === 'getTeamStats') {
+    if (typeof AnalyticsService !== 'undefined') {
+      AnalyticsService.getTeamStats().then(data => sendResponse({ success: true, data }));
       return true;
     }
   }
