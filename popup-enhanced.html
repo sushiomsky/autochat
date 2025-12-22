@@ -144,6 +144,7 @@
       <button id="openPerformance" class="btn-secondary">⚡ Performance</button>
       <button id="openChatLogs" class="btn-secondary">📖 Chat Logs</button>
       <button id="openScheduler" class="btn-secondary">📅 Scheduler</button>
+      <button id="openTeam" class="btn-secondary">👥 Team</button>
     </div>
 
     <div class="shortcuts-info">
@@ -253,6 +254,12 @@
       <div class="help">Automatically reply when someone mentions you in chat</div>
 
       <label>
+        <input type="checkbox" id="aiAutoRepliesEnabled">
+        ✨ AI Smart Replies
+      </label>
+      <div class="help">Use AI to generate contextual replies based on message sentiment</div>
+
+      <label>
         Keywords to Watch (one per line):
         <textarea id="mentionKeywords" rows="3" placeholder="@username&#10;your name&#10;hey you"></textarea>
       </label>
@@ -341,6 +348,54 @@
         <strong>Default Phrases:</strong> <span id="defaultPhrasesCount" class="badge">0</span>
         <div class="help">From farming_phrases.txt</div>
         <div id="defaultPhrasesList" class="phrases-list"></div>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Team Collaboration Workspace Modal -->
+  <div id="teamModal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="team-header">
+        <h3>👥 Team Collaboration Workspace</h3>
+        <span class="badge badge-beta">BETA</span>
+      </div>
+      <p class="help">Sync profiles, phrases, and schedules across your team. Collaborate in real-time.</p>
+
+      <div class="collaboration-grid">
+        <div class="col-section">
+          <h4>🛰️ Active Team Members</h4>
+          <div class="team-members" id="teamMembersList">
+            <div class="member-item">
+              <span class="status-indicator status-active"></span>
+              <strong>You (Admin)</strong>
+            </div>
+            <div class="help">Connect to a team server to see others.</div>
+          </div>
+        </div>
+
+        <div class="col-section">
+          <h4>☁️ Shared Cloud Profiles</h4>
+          <div id="cloudProfilesList" class="cloud-list">
+            <div class="empty-state">
+              <p>No shared profiles found.</p>
+              <button class="btn-primary-small">Connect Cloud</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <h4>📈 Team Activity Feed</h4>
+        <div class="activity-feed" id="teamActivityFeed">
+          <div class="activity-item">
+            <span class="time">Just now</span>
+            <span class="text">You initialized the team workspace.</span>
+          </div>
+        </div>
       </div>
 
       <button class="close-modal btn-primary">Close</button>

@@ -83,6 +83,7 @@ const elements = {
 
   // Mention Detection
   mentionDetectionEnabled: document.getElementById('mentionDetectionEnabled'),
+  aiAutoRepliesEnabled: document.getElementById('aiAutoRepliesEnabled'),
   mentionKeywords: document.getElementById('mentionKeywords'),
   mentionReplyMessages: document.getElementById('mentionReplyMessages'),
 
@@ -1205,6 +1206,10 @@ document.getElementById('openScheduler')?.addEventListener('click', () => {
   loadSchedules();
 });
 
+document.getElementById('openTeam')?.addEventListener('click', () => {
+  openModal('teamModal');
+});
+
 document.getElementById('createScheduleBtn')?.addEventListener('click', () => {
   const name = document.getElementById('schedName').value.trim();
   const startTime = document.getElementById('schedStart').value;
@@ -1491,6 +1496,7 @@ function getCurrentSettings() {
     activeHoursEnd: elements.activeHoursEnd.value,
     sendConfirmTimeout: elements.sendConfirmTimeout ? elements.sendConfirmTimeout.value : 3,
     mentionDetectionEnabled: elements.mentionDetectionEnabled.checked,
+    aiAutoRepliesEnabled: elements.aiAutoRepliesEnabled.checked,
     mentionKeywords: mentionKeywords,
     mentionReplyMessages: mentionReplyMessages,
     chatLoggingEnabled: elements.chatLoggingEnabled?.checked || false,
@@ -1672,6 +1678,7 @@ function loadSettings() {
     'activeHoursEnd',
     'sendConfirmTimeout',
     'mentionDetectionEnabled',
+    'aiAutoRepliesEnabled',
     'mentionKeywords',
     'mentionReplyMessages',
     'chatLoggingEnabled',
@@ -1697,6 +1704,7 @@ function loadSettings() {
 
     // Mention detection settings
     elements.mentionDetectionEnabled.checked = data.mentionDetectionEnabled || false;
+    elements.aiAutoRepliesEnabled.checked = data.aiAutoRepliesEnabled || false;
     if (data.mentionKeywords && Array.isArray(data.mentionKeywords)) {
       elements.mentionKeywords.value = data.mentionKeywords.join('\n');
     }
@@ -1788,7 +1796,8 @@ elements.mentionDetectionEnabled?.addEventListener('change', async () => {
     const response = await sendMessageToContent({
       action: 'startMentionDetection',
       keywords: keywords,
-      replyMessages: replyMessages
+      replyMessages: replyMessages,
+      aiEnabled: elements.aiAutoRepliesEnabled.checked
     });
 
     if (response && response.ok) {
@@ -1801,6 +1810,14 @@ elements.mentionDetectionEnabled?.addEventListener('change', async () => {
   } else {
     await sendMessageToContent({ action: 'stopMentionDetection' });
     showNotification('🛑 Mention detection disabled', true);
+  }
+});
+
+elements.aiAutoRepliesEnabled?.addEventListener('change', () => {
+  saveSettings();
+  if (elements.mentionDetectionEnabled.checked) {
+    // Trigger update in content script
+    elements.mentionDetectionEnabled.dispatchEvent(new Event('change'));
   }
 });
 

@@ -85,14 +85,63 @@ class AIService {
     }
 
     /**
-     * Analyze text sentiment (Stub)
+     * Analyze text sentiment (Scored)
+     * @param {string} text 
+     * @returns {Promise<{sentiment: string, score: number}>}
      */
     async analyzeSentiment(text) {
-        // Simple keyword based stub
         const lower = text.toLowerCase();
-        if (lower.includes('win') || lower.includes('won') || lower.includes('luck') || lower.includes('great')) return 'positive';
-        if (lower.includes('lose') || lower.includes('sad') || lower.includes('bad')) return 'negative';
-        return 'neutral';
+        let score = 0;
+
+        const positiveKeywords = ['win', 'won', 'luck', 'great', 'good', 'nice', 'awesome', 'amazing', 'love', 'happy', 'multiplier', 'x100', 'payout'];
+        const negativeKeywords = ['lose', 'lost', 'bad', 'sad', 'scam', 'unlucky', 'rip', 'f', 'worst', 'horrible', 'banned'];
+
+        positiveKeywords.forEach(k => { if (lower.includes(k)) score++; });
+        negativeKeywords.forEach(k => { if (lower.includes(k)) score--; });
+
+        let sentiment = 'neutral';
+        if (score > 0) sentiment = 'positive';
+        else if (score < 0) sentiment = 'negative';
+
+        return { sentiment, score };
+    }
+
+    /**
+     * Generate a contextual reply based on sentiment
+     * @param {string} originalText 
+     * @param {string} sentiment 
+     * @returns {Promise<string>}
+     */
+    async generateReply(originalText, sentiment) {
+        // Simulation delay
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        const replies = {
+            positive: [
+                "Absolutely! Feeling lucky! 🍀",
+                "Thanks! Hope you're winning too! 💰",
+                "Appreciate it! Let's go! 🚀",
+                "It's been a great session so far! ✨",
+                "Nice one, right? 😄"
+            ],
+            negative: [
+                "Yeah, it's been tough today... 😔",
+                "Sorry to hear/see that. Better luck next time! 🙏",
+                "Ouch, that's rough. 📉",
+                "Don't worry, a big one is coming! 🍀",
+                "We've all been there. Stay positive! 💪"
+            ],
+            neutral: [
+                "Hello! How's it going? 👋",
+                "Interesting... 🤔",
+                "I see you! 👀",
+                "Good luck on your next round! 🎯",
+                "Just hanging out in the chat! 😊"
+            ]
+        };
+
+        const pool = replies[sentiment] || replies.neutral;
+        return pool[Math.floor(Math.random() * pool.length)];
     }
 }
 

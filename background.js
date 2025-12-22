@@ -272,6 +272,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
   }
 
+  if (request.action === 'getAiReply') {
+    if (typeof AIService !== 'undefined') {
+      AIService.analyzeSentiment(request.text).then(({ sentiment }) => {
+        AIService.generateReply(request.text, sentiment)
+          .then(reply => sendResponse({ success: true, reply, sentiment }))
+          .catch(err => sendResponse({ success: false, error: err.message }));
+      });
+      return true;
+    }
+  }
+
   // --- Scheduler Handlers ---
   if (request.action === 'getSchedules') {
     if (typeof SchedulerService !== 'undefined') {

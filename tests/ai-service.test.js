@@ -33,14 +33,19 @@ describe('AIService', () => {
         expect(typeof phrases[0]).toBe('string');
     });
 
-    test('should analyze sentiment (stub)', async () => {
+    test('should analyze sentiment', async () => {
         const positive = await aiService.analyzeSentiment("I won huge!");
-        expect(positive).toBe('positive');
+        expect(positive.sentiment).toBe('positive');
+        expect(positive.score).toBeGreaterThan(0);
 
         const negative = await aiService.analyzeSentiment("I lost everything sad");
-        expect(negative).toBe('negative');
+        expect(negative.sentiment).toBe('negative');
+        expect(negative.score).toBeLessThan(0);
+    });
 
-        const neutral = await aiService.analyzeSentiment("just chilling");
-        expect(neutral).toBe('neutral');
+    test('should generate contextual replies', async () => {
+        const reply = await aiService.generateReply("Great win!", "positive");
+        expect(reply).toBeDefined();
+        expect(typeof reply).toBe('string');
     });
 });

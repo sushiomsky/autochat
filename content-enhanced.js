@@ -34,6 +34,7 @@ let mentionDetectionEnabled = false;
 let mentionKeywords = []; // keywords/username to watch for
 let mentionReplyMessages = []; // messages to use for replies
 let mentionObserver = null;
+let aiAutoRepliesEnabled = false;
 const lastProcessedMessages = new Set(); // Track processed messages to avoid duplicates
 
 // Chat logging state
@@ -85,7 +86,7 @@ function processTemplateVariables(text) {
 function addHumanImperfections(text) {
   // Only apply to 10% of messages to stay natural
   if (Math.random() > 0.1) return text;
-  
+
   const imperfections = [
     // Common typos (swap adjacent letters)
     () => {
@@ -117,7 +118,7 @@ function addHumanImperfections(text) {
       return words.join(' ');
     }
   ];
-  
+
   // Randomly pick one imperfection
   const imperfection = imperfections[Math.floor(Math.random() * imperfections.length)];
   return imperfection();
@@ -275,7 +276,7 @@ function checkDailyLimit() {
 // Check if a message contains any of the mention keywords
 function containsMention(text) {
   if (!text || mentionKeywords.length === 0) return false;
-  
+
   const lowerText = text.toLowerCase();
   return mentionKeywords.some(keyword => {
     const lowerKeyword = keyword.toLowerCase();
@@ -306,7 +307,7 @@ async function handleMentionDetected(messageElement) {
 
   // Mark as processed
   lastProcessedMessages.add(msgId);
-  
+
   // Limit the set size to prevent memory issues
   if (lastProcessedMessages.size > 100) {
     const oldestEntries = Array.from(lastProcessedMessages).slice(0, 50);
@@ -319,17 +320,40 @@ async function handleMentionDetected(messageElement) {
   const replyDelay = Math.random() * 2000 + 1000; // 1-3 seconds
   await sleep(replyDelay);
 
-  // Pick a random reply message
-  const replyMessage = mentionReplyMessages[Math.floor(Math.random() * mentionReplyMessages.length)];
-  
+  // Pick a reply message (AI or Static)
+  let replyMessage = '';
+
+  if (aiAutoRepliesEnabled) {
+    console.log('[AutoChat] Requesting AI reply for mention...');
+    const originalText = (messageElement.textContent || '').trim();
+
+    try {
+      const response = await new Promise((resolve) => {
+        chrome.runtime.sendMessage({ action: 'getAiReply', text: originalText }, resolve);
+      });
+
+      if (response && response.success) {
+        replyMessage = response.reply;
+        console.log(`[AutoChat] AI generated ${response.sentiment} reply: ${replyMessage}`);
+      }
+    } catch (e) {
+      console.error('[AutoChat] AI reply generation failed:', e);
+    }
+  }
+
+  // Fallback to static selection
+  if (!replyMessage) {
+    replyMessage = mentionReplyMessages[Math.floor(Math.random() * mentionReplyMessages.length)];
+  }
+
   // Process template variables
   let processedMessage = processTemplateVariables(replyMessage);
-  
+
   // Add human-like imperfections
   processedMessage = addHumanImperfections(processedMessage);
 
   // Send the reply
-  console.log('[AutoChat] Sending auto-reply to mention:', processedMessage);
+  console.log('[AutoChat] Sending auto-reply:', processedMessage);
   await sendMessage(processedMessage);
 }
 
@@ -369,7 +393,7 @@ function startMentionDetection() {
 
         // Check if this node or its children contain messages
         const messagesToCheck = [];
-        
+
         // Check the node itself
         if (node.textContent && node.textContent.trim()) {
           messagesToCheck.push(node);
@@ -583,7 +607,7 @@ function createChatLogger() {
       chrome.storage.local.get(['chatLogs'], (data) => {
         let logs = data.chatLogs || [];
         logs.push(...messages);
-        
+
         // Keep last 10000 messages
         if (logs.length > 10000) {
           logs = logs.slice(-10000);
@@ -609,23 +633,23 @@ function startManualDetection() {
 
   manualDetector.startMonitoring(chatInputSelector, (event) => {
     console.log('[AutoChat] Manual message detected:', event.text);
-    
+
     // Reset the timer as if an automated message was sent
     if (autoSendInterval) {
       // Clear existing timeout
       if (autoSendInterval !== true) {
         clearTimeout(autoSendInterval);
       }
-      
+
       // Schedule next message with normal interval
       const nextInterval = getRandomInterval();
-      console.log(`[AutoChat] Timer reset. Next message in ${(nextInterval/60000).toFixed(2)}m`);
-      
+      console.log(`[AutoChat] Timer reset. Next message in ${(nextInterval / 60000).toFixed(2)}m`);
+
       autoSendInterval = setTimeout(() => {
         scheduleNextMessage();
       }, nextInterval);
     }
-    
+
     // Notify background of manual send
     chrome.runtime.sendMessage({
       action: 'manualMessageDetected',
@@ -653,7 +677,7 @@ function createManualDetector() {
     isMonitoring: false,
     lastValue: '',
     automatedMessages: new Set(),
-    
+
     startMonitoring(inputSelector, callback) {
       if (this.isMonitoring) return;
       const inputEl = document.querySelector(inputSelector);
@@ -784,7 +808,7 @@ function startMarkingMode() {
     if (!markingMode) return;
     const target = e.target;
     if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' ||
-        target.contentEditable === 'true' || target.getAttribute('contenteditable') === 'true') {
+      target.contentEditable === 'true' || target.getAttribute('contenteditable') === 'true') {
       createHighlight(target);
     } else {
       removeHighlight();
@@ -796,7 +820,7 @@ function startMarkingMode() {
     const target = e.target;
 
     if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' ||
-        target.contentEditable === 'true' || target.getAttribute('contenteditable') === 'true') {
+      target.contentEditable === 'true' || target.getAttribute('contenteditable') === 'true') {
       e.preventDefault();
       e.stopPropagation();
 
@@ -1139,7 +1163,7 @@ async function sendMessage(text, retries = 3) {
       if (confirmed) {
         messagesSentToday++;
         totalMessagesSent++;
-        chrome.runtime.sendMessage({ 
+        chrome.runtime.sendMessage({
           action: 'incrementMessageCount',
           message: text.substring(0, 100) // Send first 100 chars for webhook
         });
@@ -1230,7 +1254,7 @@ async function scheduleNextMessage() {
     console.log('[AutoChat] Daily limit reached, stopping...');
     stopAutoSend();
     chrome.runtime.sendMessage({ action: 'updateBadge', active: false });
-    chrome.runtime.sendMessage({ 
+    chrome.runtime.sendMessage({
       action: 'dailyLimitReached',
       limit: dailyLimit
     });
@@ -1249,7 +1273,7 @@ async function scheduleNextMessage() {
   await sendMessage(message);
 
   const nextInterval = getRandomInterval();
-  console.log(`[AutoChat] Next message in ${(nextInterval/60000).toFixed(2)}m`);
+  console.log(`[AutoChat] Next message in ${(nextInterval / 60000).toFixed(2)}m`);
 
   autoSendInterval = setTimeout(() => {
     scheduleNextMessage();
@@ -1305,10 +1329,10 @@ function startAutoSend(messages, config = {}) {
   return true;
 }
 
-  // Allow startAutoSend to also receive updated sendConfirmTimeout in config
-  // (already handled above by reading config when set), but if someone calls
-  // startAutoSend with a config containing sendConfirmTimeout, apply it here
-  // Note: this code path is executed when content script receives startAutoSend message.
+// Allow startAutoSend to also receive updated sendConfirmTimeout in config
+// (already handled above by reading config when set), but if someone calls
+// startAutoSend with a config containing sendConfirmTimeout, apply it here
+// Note: this code path is executed when content script receives startAutoSend message.
 
 function stopAutoSend() {
   if (autoSendInterval) {
@@ -1431,12 +1455,14 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     mentionDetectionEnabled = true;
     mentionKeywords = msg.keywords || [];
     mentionReplyMessages = msg.replyMessages || [];
+    aiAutoRepliesEnabled = !!msg.aiEnabled;
     startMentionDetection();
     sendResponse({ ok: true });
   }
 
   if (msg.action === 'stopMentionDetection') {
     mentionDetectionEnabled = false;
+    aiAutoRepliesEnabled = false;
     stopMentionDetection();
     sendResponse({ ok: true });
   }
@@ -1445,7 +1471,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     sendResponse({
       enabled: mentionDetectionEnabled,
       keywords: mentionKeywords,
-      replyMessages: mentionReplyMessages
+      replyMessages: mentionReplyMessages,
+      aiEnabled: aiAutoRepliesEnabled
     });
   }
 
