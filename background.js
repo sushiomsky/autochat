@@ -458,10 +458,58 @@ async function handleScheduledEvent(scheduleId) {
     const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
     if (currentTime >= schedule.startTime && currentTime <= schedule.endTime) {
-      console.log(`[Background] Executing schedule ${schedule.name}`);
-      // TODO: Select phrase and send to active tab
-      // For now, trigger a webhook if configured
-      triggerWebhooks('campaign_started', { scheduleId, name: schedule.name });
+      console.log(`[Background] Executing schedule ${schedule.name} for profile ${schedule.profileId}`);
+
+      // 1. Get profile data
+      const profiles = await ProfileService.getAll();
+      const profile = profiles[schedule.profileId];
+      if (!profile) {
+        console.warn(`[Background] Profile ${schedule.profileId} not found for schedule ${scheduleId}`);
+        return;
+      }
+
+      // 2. Find target tab
+      const tabs = await chrome.tabs.query({});
+      const targetTab = tabs.find(tab => {
+        if (!tab.url) return false;
+        try {
+          const host = new URL(tab.url).hostname;
+          return profile.domains && profile.domains.some(d => host.includes(d));
+        } catch (e) { return false; }
+      });
+
+      if (targetTab) {
+        console.log(`[Background] Target tab found: ${targetTab.id} (${targetTab.url})`);
+
+        // 3. Select message
+        // Profiles store settings in the .settings property now in v5
+        const phrases = (profile.settings && profile.settings.messageList)
+          ? profile.settings.messageList.split('\n').filter(p => p.trim())
+          : ["Hello from AutoChat! 👋"]; // Fallback
+
+        const message = phrases[Math.floor(Math.random() * phrases.length)];
+
+        // 4. Send to tab
+        chrome.tabs.sendMessage(targetTab.id, {
+          action: 'sendAutomatedMessage',
+          message,
+          typingSimulation: profile.settings?.typingSimulation !== false
+        }, (response) => {
+          if (chrome.runtime.lastError) {
+            console.error(`[Background] Failed to send message to tab ${targetTab.id}:`, chrome.runtime.lastError);
+          } else {
+            console.log(`[Background] Scheduled message sent successfully to tab ${targetTab.id}`);
+            triggerWebhooks('campaign_started', {
+              scheduleId,
+              name: schedule.name,
+              profile: profile.name,
+              message
+            });
+          }
+        });
+      } else {
+        console.log(`[Background] No suitable tab open for profile: ${profile.name}`);
+      }
     } else {
       console.log(`[Background] Schedule ${schedule.name} outside of time window (${currentTime})`);
     }

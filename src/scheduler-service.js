@@ -24,6 +24,7 @@ class SchedulerService {
         const newSchedule = {
             id,
             name: scheduleData.name || 'Untitled Schedule',
+            profileId: scheduleData.profileId || 'default',
             type: scheduleData.type || 'drip',
             startTime: scheduleData.startTime || '00:00',
             endTime: scheduleData.endTime || '23:59',

@@ -218,6 +218,7 @@ function updateStatWithAnimation(elementId, value) {
 }
 
 async function updateStats() {
+  loadSchedules();
   try {
     const stats = await new Promise((resolve) => {
       chrome.runtime.sendMessage({ action: 'getStats' }, resolve);
@@ -1218,6 +1219,7 @@ document.getElementById('createScheduleBtn')?.addEventListener('click', () => {
 
   const data = {
     name,
+    profileId: currentAccount,
     startTime,
     endTime,
     interval: { min, max },
@@ -1239,6 +1241,17 @@ async function loadSchedules() {
   chrome.runtime.sendMessage({ action: 'getSchedules' }, (response) => {
     if (response && response.success) {
       renderSchedulesList(response.data);
+
+      // Update main UI count
+      const activeCount = response.data.filter(s => {
+        if (!s.active) return false;
+        const now = new Date();
+        const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        return currentTime >= s.startTime && currentTime <= s.endTime;
+      }).length;
+
+      const countEl = document.getElementById('activeCampaignsCount');
+      if (countEl) countEl.textContent = activeCount;
     }
   });
 }
@@ -2551,6 +2564,7 @@ document.getElementById('openHelp')?.addEventListener('click', () => {
 
 (async function init() {
   await loadAccounts();
+  loadSchedules();
   updateAccountSelect();
   await updateInputStatus();
   await updateStats();
