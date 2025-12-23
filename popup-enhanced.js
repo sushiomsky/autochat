@@ -143,7 +143,8 @@ const elements = {
   newPhraseInput: document.getElementById('newPhraseInput'),
 
   // Notifications
-  notification: document.getElementById('notification')
+  notification: document.getElementById('notification'),
+  conflictModal: document.getElementById('conflictModal')
 };
 
 // ===== STATE =====
@@ -157,6 +158,7 @@ const defaultProfile = {
 };
 let currentAccount = 'default';
 let accounts = { 'default': defaultProfile };
+let activeLocks = {}; // profileId -> userId (if locked by someone else)
 
 // ===== NOTIFICATIONS =====
 
@@ -1244,11 +1246,46 @@ async function updateTeamGoalsUI() {
   });
 }
 
-// Listener for Real-time Pulses
+// Listener for Real-time Pulses & Locking
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.type === 'team_pulse') {
     addTeamActivity(msg.payload.user, msg.payload.text);
   }
+
+  if (msg.type === 'lock_profile') {
+    activeLocks[msg.payload.profileId] = msg.payload.userId;
+    updateAccountList();
+  }
+
+  if (msg.type === 'unlock_profile') {
+    delete activeLocks[msg.payload.profileId];
+    updateAccountList();
+  }
+
+  if (msg.type === 'sync_conflict') {
+    elements.conflictModal.classList.add('show');
+  }
+});
+
+// Conflict Resolution Handlers
+document.getElementById('resolveLocal')?.addEventListener('click', () => {
+  chrome.runtime.sendMessage({ action: 'resolveSyncConflict', choice: 'local' }, (res) => {
+    elements.conflictModal.classList.remove('show');
+    showNotification('✅ Local changes preserved', true);
+    loadAccounts();
+  });
+});
+
+document.getElementById('resolveCloud')?.addEventListener('click', () => {
+  chrome.runtime.sendMessage({ action: 'resolveSyncConflict', choice: 'cloud' }, (res) => {
+    elements.conflictModal.classList.remove('show');
+    showNotification('✅ Cloud version applied', true);
+    loadAccounts();
+  });
+});
+
+document.getElementById('closeConflictModal')?.addEventListener('click', () => {
+  elements.conflictModal.classList.remove('show');
 });
 
 function addTeamActivity(user, text) {
@@ -1567,25 +1604,66 @@ function updateAccountList() {
   Object.keys(accounts).forEach(accountId => {
     const account = accounts[accountId];
     const isActive = accountId === currentAccount;
+    const isLocked = activeLocks[accountId];
+    const userRole = account.role || 'viewer';
 
     const item = document.createElement('div');
-    item.className = 'account-item' + (isActive ? ' active' : '');
+    item.className = 'account-item' + (isActive ? ' active' : '') + (isLocked ? ' locked' : '');
 
     const nameSpan = document.createElement('span');
     nameSpan.className = 'account-item-name';
     nameSpan.textContent = account.name;
 
+    // Role Badge (Clickable for admins if not active)
+    const roleBadge = document.createElement('span');
+    roleBadge.className = 'role-badge ' + userRole;
+    roleBadge.textContent = userRole.toUpperCase();
+    nameSpan.appendChild(roleBadge);
+
+    // Role Select (Visible if admin and not active)
+    if (!isActive && currentAccount === 'default') { // Simple check: 'default' is the local super-admin
+      const roleSelect = document.createElement('select');
+      roleSelect.className = 'role-select-mini';
+      ['admin', 'editor', 'viewer'].forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r;
+        opt.textContent = r.charAt(0).toUpperCase() + r.slice(1);
+        opt.selected = r === userRole;
+        roleSelect.appendChild(opt);
+      });
+
+      roleSelect.onchange = (e) => {
+        const newRole = e.target.value;
+        chrome.runtime.sendMessage({
+          action: 'updateProfile',
+          id: accountId,
+          updates: { role: newRole }
+        }, () => {
+          showNotification(`Role for "${account.name}" updated to ${newRole}`, true);
+          loadAccounts();
+        });
+      };
+      nameSpan.appendChild(roleSelect);
+    }
+
     if (isActive) {
-      const badge = document.createElement('span');
-      badge.className = 'account-item-badge';
-      badge.textContent = 'ACTIVE';
-      nameSpan.appendChild(badge);
+      const activeBadge = document.createElement('span');
+      activeBadge.className = 'account-item-badge';
+      activeBadge.textContent = 'ACTIVE';
+      nameSpan.appendChild(activeBadge);
+    }
+
+    if (isLocked) {
+      const lockBadge = document.createElement('span');
+      lockBadge.className = 'lock-badge';
+      lockBadge.textContent = `🔒 Locked by ${isLocked}`;
+      nameSpan.appendChild(lockBadge);
     }
 
     const actions = document.createElement('div');
     actions.className = 'account-item-actions';
 
-    if (!isActive) {
+    if (!isActive && !isLocked) {
       const switchBtn = document.createElement('button');
       switchBtn.textContent = '🔄 Switch';
       switchBtn.onclick = () => switchAccount(accountId);
@@ -1597,7 +1675,7 @@ function updateAccountList() {
     exportBtn.onclick = () => exportAccount(accountId);
     actions.appendChild(exportBtn);
 
-    if (accountId !== 'default') {
+    if (accountId !== 'default' && !isLocked && userRole === 'admin') {
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'btn-danger-small';
       deleteBtn.textContent = '🗑️';
@@ -1627,6 +1705,11 @@ async function switchAccount(accountId) {
     }, resolve);
   });
 
+  // Unlock current account before switching
+  if (currentAccount !== 'default') {
+    chrome.runtime.sendMessage({ action: 'unlockProfile', profileId: currentAccount });
+  }
+
   // Switch to new account via service
   await new Promise(resolve => {
     chrome.runtime.sendMessage({
@@ -1634,6 +1717,11 @@ async function switchAccount(accountId) {
       id: accountId
     }, resolve);
   });
+
+  // Lock the new account
+  if (accountId !== 'default') {
+    chrome.runtime.sendMessage({ action: 'lockProfile', profileId: accountId, userId: 'You' });
+  }
 
   // Re-fetch everything to ensure sync
   await loadAccounts();
@@ -1647,13 +1735,21 @@ async function switchAccount(accountId) {
       showNotification(`✅ Switched to: ${accounts[accountId].name}`, true);
     });
   } else {
-    // If no settings, might need default reset or keep existing?
-    // For now, reload settings will pick up what's in local storage, which technically are the *old* settings unless we clear them.
-    // Better to clear or set defaults if empty.
-    showNotification(`✅ Switched to: ${accounts[accountId].name}`, true);
-    // TODO: Ideally clear storage settings here or merge generic defaults
+    loadSettings();
     updateAccountSelect();
     updateAccountList();
+    showNotification(`✅ Switched to: ${accounts[accountId].name}`, true);
+  }
+}
+
+// Ensure lock is released on close
+window.addEventListener('beforeunload', () => {
+  if (currentAccount !== 'default') {
+    chrome.runtime.sendMessage({ action: 'unlockProfile', profileId: currentAccount });
+  }
+});
+updateAccountSelect();
+updateAccountList();
   }
 }
 

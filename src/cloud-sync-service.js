@@ -17,6 +17,7 @@ class CloudSyncService {
 
         this.googleDriveEnabled = false;
         this.CLIENT_FILE_NAME = 'autochat_sync.json';
+        this.pendingConflict = null; // { local, cloud }
     }
 
     async init() {
@@ -108,7 +109,15 @@ class CloudSyncService {
             let localProfiles = localProfilesResult.profiles_v5 || [];
 
             // 3. Resolve Conflicts & Merge
-            const { merged, changed } = this._merge(localProfiles, cloudData.profiles);
+            const { merged, changed, conflict } = this._merge(localProfiles, cloudData.profiles);
+
+            if (conflict) {
+                console.warn('[CloudSync] Conflict detected!');
+                this.pendingConflict = { local: localProfiles, cloud: cloudData.profiles };
+                this.status = 'idle'; // Wait for resolution
+                this._broadcastConflict();
+                return { success: true, conflict: true };
+            }
 
             if (changed) {
                 console.log('[CloudSync] Local data updated from cloud.');
@@ -181,25 +190,40 @@ class CloudSyncService {
      */
     _merge(local, cloud) {
         let changed = false;
+        let conflict = false;
+
         const localMap = new Map(local.map(p => [p.id, p]));
         const cloudMap = new Map(cloud.map(p => [p.id, p]));
 
-        const merged = [];
+        // Check if global state has diverged significantly
+        // For simulation, if count of differences > 2, trigger conflict
+        let diffCount = 0;
         const allIds = new Set([...localMap.keys(), ...cloudMap.keys()]);
 
         for (const id of allIds) {
             const loc = localMap.get(id);
             const cld = cloudMap.get(id);
+            if (loc && cld && (loc.lastActive || 0) !== (cld.lastActive || 0)) {
+                diffCount++;
+            }
+        }
+
+        if (diffCount > 1) {
+            conflict = true;
+            return { merged: local, changed: false, conflict: true };
+        }
+
+        const merged = [];
+        for (const id of allIds) {
+            const loc = localMap.get(id);
+            const cld = cloudMap.get(id);
 
             if (!loc) {
-                // New on cloud
                 merged.push(cld);
                 changed = true;
             } else if (!cld) {
-                // Only on local
                 merged.push(loc);
             } else {
-                // Present in both, check lastActive timestamp
                 const locTime = loc.lastActive || loc.created || 0;
                 const cldTime = cld.lastActive || cld.created || 0;
 
@@ -212,7 +236,35 @@ class CloudSyncService {
             }
         }
 
-        return { merged, changed };
+        return { merged, changed, conflict: false };
+    }
+
+    /**
+     * Manual Resolution
+     */
+    async resolveConflict(choice) { // 'local' or 'cloud'
+        if (!this.pendingConflict) return;
+
+        const data = choice === 'local' ? this.pendingConflict.local : this.pendingConflict.cloud;
+
+        // 1. Update local
+        await chrome.storage.local.set({ profiles_v5: data });
+
+        // 2. Push to cloud
+        await this._pushToCloud(data);
+
+        // 3. Cleanup
+        this.pendingConflict = null;
+        this.lastSyncTime = Date.now();
+        await chrome.storage.local.set({
+            cloudSyncSettings: { lastSyncTime: this.lastSyncTime }
+        });
+
+        return true;
+    }
+
+    _broadcastConflict() {
+        chrome.runtime.sendMessage({ type: 'sync_conflict', payload: {} });
     }
 
     getStatus() {

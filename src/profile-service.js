@@ -17,6 +17,7 @@ class ProfileService {
             id: 'default',
             name: 'Default Account',
             domains: [],
+            role: 'admin', // Default is admin
             settings: {}, // Stores validation/automation settings
             created: Date.now(),
             lastActive: Date.now()
@@ -54,6 +55,7 @@ class ProfileService {
             id: newId,
             name: name || 'New Profile',
             domains: Array.isArray(domains) ? domains : [],
+            role: 'admin', // Creator is admin
             settings: {},
             created: Date.now(),
             lastActive: Date.now()
@@ -71,6 +73,12 @@ class ProfileService {
         if (!this.profiles) await this._loadFromStorage();
         if (!this.profiles[id]) throw new Error('Profile not found');
 
+        // Permission check
+        const currentRole = this.profiles[id].role || 'viewer';
+        if (typeof RoleService !== 'undefined' && !RoleService.can(currentRole, 'profile.update')) {
+            throw new Error('Unauthorized: Missing permission to update profile');
+        }
+
         // Merge updates
         this.profiles[id] = { ...this.profiles[id], ...updates, lastActive: Date.now() };
 
@@ -84,6 +92,13 @@ class ProfileService {
     async delete(id) {
         if (id === 'default') throw new Error('Cannot delete default profile');
         if (!this.profiles) await this._loadFromStorage();
+        if (!this.profiles[id]) throw new Error('Profile not found');
+
+        // Permission check
+        const currentRole = this.profiles[id].role || 'viewer';
+        if (typeof RoleService !== 'undefined' && !RoleService.can(currentRole, 'profile.delete')) {
+            throw new Error('Unauthorized: Missing permission to delete profile');
+        }
 
         delete this.profiles[id];
 
@@ -181,6 +196,7 @@ class ProfileService {
             id: newId,
             name: name,
             domains: Array.isArray(data.domains) ? data.domains : [],
+            role: data.role || 'viewer', // Imported role or default viewer
             settings: data.settings,
             created: data.created || Date.now(),
             lastActive: Date.now()
@@ -207,7 +223,8 @@ class ProfileService {
                 // Add missing fields to legacy profiles
                 Object.values(this.profiles).forEach(p => {
                     if (!p.domains) p.domains = [];
-                    if (!p.id) p.id = 'default'; // Legacy format might differ, but usually keyed by ID
+                    if (!p.role) p.role = 'admin'; // Migrated are admins
+                    if (!p.id) p.id = 'default';
                 });
                 await this._saveToStorage();
             } else {

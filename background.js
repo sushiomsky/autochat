@@ -4,6 +4,7 @@
 
 try {
   importScripts('src/analytics-service.js');
+  importScripts('src/role-service.js');
   importScripts('src/profile-service.js');
   importScripts('src/ai-service.js');
   importScripts('src/scheduler-service.js');
@@ -343,8 +344,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'performCloudSync') {
     if (typeof CloudSyncService !== 'undefined') {
       CloudSyncService.performSync()
-        .then((ok) => sendResponse({ success: ok }))
+        .then((res) => sendResponse({ ...res }))
         .catch(err => sendResponse({ success: false, error: err.message }));
+      return true;
+    }
+  }
+
+  if (request.action === 'resolveSyncConflict') {
+    if (typeof CloudSyncService !== 'undefined') {
+      CloudSyncService.resolveConflict(request.choice).then(() => sendResponse({ success: true }));
       return true;
     }
   }
@@ -361,6 +369,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'getTeamPulseStatus') {
     if (typeof SocketService !== 'undefined') {
       sendResponse({ success: true, ...SocketService.getStatus() });
+      return true;
+    }
+  }
+
+  if (request.action === 'lockProfile') {
+    if (typeof SocketService !== 'undefined') {
+      SocketService.lockProfile(request.profileId, request.userId);
+      sendResponse({ success: true });
+      return true;
+    }
+  }
+
+  if (request.action === 'unlockProfile') {
+    if (typeof SocketService !== 'undefined') {
+      SocketService.unlockProfile(request.profileId);
+      sendResponse({ success: true });
       return true;
     }
   }

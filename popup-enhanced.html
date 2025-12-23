@@ -1006,6 +1006,27 @@
   <script src="src/analytics-service.js"></script>
   <script src="src/popup-i18n.js"></script>
   <script type="module" src="popup-enhanced.js"></script>
+  <!-- Conflict Resolution Modal -->
+  <div id="conflictModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeConflictModal">&times;</span>
+      <h3>⚠️ Sync Conflict Detected</h3>
+      <p>Multi-user changes detected. How would you like to resolve this?</p>
+      <div class="conflict-options">
+        <div class="conflict-option" id="resolveLocal">
+          <h4>Keep My Data</h4>
+          <p>Overwrites cloud version with your local changes.</p>
+          <button class="btn-primary">Use Local</button>
+        </div>
+        <div class="conflict-divider">OR</div>
+        <div class="conflict-option" id="resolveCloud">
+          <h4>Take Cloud Version</h4>
+          <p>Discards your local edits and uses the teamu0027s version.</p>
+          <button class="btn-secondary">Use Cloud</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>

@@ -16,12 +16,50 @@ class SocketService {
             { id: 'u2', name: 'Sarah (Elite)', status: 'away' },
             { id: 'u3', name: 'Mike (Team)', status: 'active' }
         ];
+
+        this.currentLocks = new Map(); // profileId -> userId
     }
 
     async init() {
         console.log('[SocketService] Initializing...');
-        // In a real pro app, we would check for a 'team_token' or similar
         return Promise.resolve();
+    }
+
+    /**
+     * Send a lock request
+     */
+    lockProfile(profileId, userId = 'Me') {
+        if (!this.isConnected) return;
+
+        const message = {
+            type: 'lock_profile',
+            timestamp: Date.now(),
+            payload: { profileId, userId }
+        };
+
+        this.currentLocks.set(profileId, userId);
+        this._broadcast(message);
+    }
+
+    /**
+     * Send an unlock request
+     */
+    unlockProfile(profileId) {
+        if (!this.isConnected) return;
+
+        const message = {
+            type: 'unlock_profile',
+            timestamp: Date.now(),
+            payload: { profileId }
+        };
+
+        this.currentLocks.delete(profileId);
+        this._broadcast(message);
+    }
+
+    _broadcast(message) {
+        console.log('[SocketService] Broadcasting:', message);
+        this.handlers.forEach(h => h(message));
     }
 
     connect() {
