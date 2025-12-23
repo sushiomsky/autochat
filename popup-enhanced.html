@@ -395,8 +395,26 @@
           <div id="cloudProfilesList" class="cloud-list">
             <div class="empty-state" id="cloudProfilesEmptyState">
               <p>No shared profiles found.</p>
-              <button id="connectCloudBtn" class="btn-primary-small">Connect Cloud</button>
+              <button id="connectCloudBtn" class="btn-primary-small">Simulate Sync</button>
             </div>
+          </div>
+
+          <hr style="margin: 10px 0; border: 0; border-top: 1px solid var(--border-color); opacity: 0.3;">
+
+          <div id="googleDriveSection" class="section-small">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+              <span style="font-size: 0.85em; font-weight: bold;">Google Drive Sync</span>
+              <span id="googleDriveStatus" class="sync-status" style="font-size: 0.75em;">Disconnected</span>
+            </div>
+            <button id="connectGoogleDriveBtn" class="btn-secondary-small"
+              style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <img src="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png"
+                style="width: 16px; height: 16px;">
+              Connect Google Drive
+            </button>
+            <button id="disconnectGoogleDriveBtn" class="btn-danger-small" style="width: 100%; display: none;">
+              Unlink Google Account
+            </button>
           </div>
         </div>
       </div>

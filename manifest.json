@@ -8,9 +8,18 @@
     "storage",
     "activeTab",
     "scripting",
-    "alarms"
+    "alarms",
+    "identity"
   ],
-  "host_permissions": ["<all_urls>"],
+  "oauth2": {
+    "client_id": "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/drive.appdata"
+    ]
+  },
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "action": {
     "default_popup": "popup-enhanced.html",
     "default_icon": {
@@ -22,15 +31,26 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content-enhanced.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content-enhanced.js"
+      ],
       "run_at": "document_start"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["farming_phrases.txt", "farming_phrases_en.txt", "farming_phrases_ur.txt", "farming_phrases_es.txt"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "farming_phrases.txt",
+        "farming_phrases_en.txt",
+        "farming_phrases_ur.txt",
+        "farming_phrases_es.txt"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
   "content_security_policy": {

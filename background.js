@@ -8,6 +8,7 @@ try {
   importScripts('src/ai-service.js');
   importScripts('src/scheduler-service.js');
   importScripts('src/cloud-sync-service.js');
+  importScripts('src/google-drive-service.js');
   importScripts('src/socket-service.js');
 } catch (e) {
   console.error('[Background] Failed to load services:', e);
@@ -321,6 +322,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       CloudSyncService.setEnabled(request.enabled)
         .then(() => sendResponse({ success: true }))
         .catch(err => sendResponse({ success: false, error: err.message }));
+      return true;
+    }
+  }
+
+  if (request.action === 'connectGoogleDrive') {
+    if (typeof CloudSyncService !== 'undefined') {
+      CloudSyncService.connectGoogleDrive().then(res => sendResponse(res));
+      return true;
+    }
+  }
+
+  if (request.action === 'disconnectGoogleDrive') {
+    if (typeof CloudSyncService !== 'undefined') {
+      CloudSyncService.disconnectGoogleDrive().then(res => sendResponse(res));
       return true;
     }
   }

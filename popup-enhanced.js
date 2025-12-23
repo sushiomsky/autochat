@@ -1298,9 +1298,56 @@ async function updateCloudSyncUI() {
       if (response.isEnabled) {
         loadCloudProfiles();
       }
+
+      // Update Google Drive UI
+      const gdStatus = document.getElementById('googleDriveStatus');
+      const gdConnectBtn = document.getElementById('connectGoogleDriveBtn');
+      const gdDisconnectBtn = document.getElementById('disconnectGoogleDriveBtn');
+
+      if (gdStatus && gdConnectBtn && gdDisconnectBtn) {
+        if (response.googleDriveEnabled) {
+          gdStatus.textContent = '✅ Connected';
+          gdStatus.style.color = 'var(--text-primary)';
+          gdConnectBtn.style.display = 'none';
+          gdDisconnectBtn.style.display = 'block';
+        } else {
+          gdStatus.textContent = 'Disconnected';
+          gdStatus.style.color = 'var(--text-tertiary)';
+          gdConnectBtn.style.display = 'flex';
+          gdDisconnectBtn.style.display = 'none';
+        }
+      }
     }
   });
 }
+
+document.getElementById('connectGoogleDriveBtn')?.addEventListener('click', () => {
+  showNotification('Connecting to Google...', true);
+  chrome.runtime.sendMessage({ action: 'connectGoogleDrive' }, (response) => {
+    if (response && response.success) {
+      showNotification('Google Drive connected!', true);
+      updateCloudSyncUI();
+    } else {
+      showNotification('Connection failed: ' + (response?.error || 'Unknown error'), false);
+    }
+  });
+});
+
+document.getElementById('disconnectGoogleDriveBtn')?.addEventListener('click', () => {
+  chrome.runtime.sendMessage({ action: 'disconnectGoogleDrive' }, (response) => {
+    if (response && response.success) {
+      showNotification('Google Drive unlinked.', true);
+      updateCloudSyncUI();
+    }
+  });
+});
+
+document.getElementById('connectCloudBtn')?.addEventListener('click', () => {
+  chrome.runtime.sendMessage({ action: 'setCloudSyncEnabled', enabled: true }, () => {
+    updateCloudSyncUI();
+    showNotification('Simulated sync enabled', true);
+  });
+});
 
 function loadCloudProfiles() {
   chrome.runtime.sendMessage({ action: 'getSchedules' }, (response) => {

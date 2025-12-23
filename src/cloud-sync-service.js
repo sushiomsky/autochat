@@ -9,21 +9,60 @@ class CloudSyncService {
         this.syncInterval = 5 * 60 * 1000; // 5 minutes default
         this.isEnabled = false;
 
-        // Mock cloud data for simulation
+        // Mock cloud data for simulation fallback
         this.mockCloud = {
             profiles: [],
             updatedAt: Date.now()
         };
+
+        this.googleDriveEnabled = false;
+        this.CLIENT_FILE_NAME = 'autochat_sync.json';
     }
 
     async init() {
-        const settings = await chrome.storage.local.get(['cloudSyncSettings', 'cloudSyncEnabled']);
+        const settings = await chrome.storage.local.get(['cloudSyncSettings', 'cloudSyncEnabled', 'googleDriveEnabled']);
         this.isEnabled = !!settings.cloudSyncEnabled;
+        this.googleDriveEnabled = !!settings.googleDriveEnabled;
         this.lastSyncTime = settings.cloudSyncSettings?.lastSyncTime || null;
 
         if (this.isEnabled) {
             this.startSyncTimer();
         }
+    }
+
+    /**
+     * Connect to Google Drive (Interactive)
+     */
+    async connectGoogleDrive() {
+        try {
+            if (typeof GoogleDriveService === 'undefined') {
+                throw new Error('GoogleDriveService not loaded');
+            }
+
+            // Interactive login
+            await GoogleDriveService.getAccessToken(true);
+            this.googleDriveEnabled = true;
+            await chrome.storage.local.set({ googleDriveEnabled: true });
+
+            // Trigger immediate sync
+            await this.performSync();
+            return { success: true };
+        } catch (error) {
+            console.error('[CloudSync] Google Drive connection failed:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Unlink Google Drive
+     */
+    async disconnectGoogleDrive() {
+        if (typeof GoogleDriveService !== 'undefined') {
+            await GoogleDriveService.removeCachedToken();
+        }
+        this.googleDriveEnabled = false;
+        await chrome.storage.local.set({ googleDriveEnabled: false });
+        return { success: true };
     }
 
     /**
@@ -98,18 +137,41 @@ class CloudSyncService {
      * Simulate fetching from a remote server
      */
     async _fetchFromCloud() {
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 1200));
+        if (this.googleDriveEnabled && typeof GoogleDriveService !== 'undefined') {
+            try {
+                const file = await GoogleDriveService.findFile(this.CLIENT_FILE_NAME);
+                if (file) {
+                    return await GoogleDriveService.getFileContent(file.id);
+                }
+            } catch (error) {
+                console.error('[CloudSync] Drive fetch failed, using mock:', error);
+            }
+        }
 
-        // In a real app, this would be an API call
+        // Simulation delay fallback
+        await new Promise(resolve => setTimeout(resolve, 800));
         return this.mockCloud;
     }
 
     /**
-     * Simulate pushing to a remote server
+     * Push to "Cloud" (Drive or Mock)
      */
     async _pushToCloud(profiles) {
-        await new Promise(resolve => setTimeout(resolve, 800));
+        if (this.googleDriveEnabled && typeof GoogleDriveService !== 'undefined') {
+            try {
+                const content = {
+                    profiles,
+                    updatedAt: Date.now(),
+                    clientVersion: '5.0.0'
+                };
+                await GoogleDriveService.saveFile(this.CLIENT_FILE_NAME, content);
+                return;
+            } catch (error) {
+                console.error('[CloudSync] Drive push failed, using mock:', error);
+            }
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 500));
         this.mockCloud.profiles = JSON.parse(JSON.stringify(profiles));
         this.mockCloud.updatedAt = Date.now();
     }
@@ -157,7 +219,8 @@ class CloudSyncService {
         return {
             status: this.status,
             lastSyncTime: this.lastSyncTime,
-            isEnabled: this.isEnabled
+            isEnabled: this.isEnabled,
+            googleDriveEnabled: this.googleDriveEnabled
         };
     }
 }
