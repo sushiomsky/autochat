@@ -1,4 +1,4 @@
-import { RateLimiter } from '../../src/utils';
+const { RateLimiter } = require('../../src/utils');
 
 describe('RateLimiter', () => {
   beforeEach(() => {

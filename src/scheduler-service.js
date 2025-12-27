@@ -2,7 +2,7 @@
  * SchedulerService
  * Manages automated message schedules and drip campaigns.
  */
-class SchedulerService {
+const SchedulerServiceClass = class {
     constructor() {
         this.STORAGE_KEY = 'schedules_v5';
         this.schedules = null;
@@ -97,14 +97,16 @@ class SchedulerService {
     async _saveSchedules() {
         await chrome.storage.local.set({ [this.STORAGE_KEY]: this.schedules });
     }
-}
+};
 
-// Export singleton
-const schedulerService = new SchedulerService();
+// Export singleton - wrapped in IIFE
+(function () {
+    const schedulerService = new SchedulerServiceClass();
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = schedulerService;
-} else {
-    const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
-    globalScope.SchedulerService = schedulerService;
-}
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = schedulerService;
+    } else {
+        const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
+        globalScope.SchedulerService = schedulerService;
+    }
+})();

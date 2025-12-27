@@ -2,7 +2,7 @@
  * GoogleDriveService
  * Handles OAuth2 authentication and interactions with the Google Drive REST API.
  */
-class GoogleDriveService {
+const GoogleDriveServiceClass = class {
     constructor() {
         this.BASE_URL = 'https://www.googleapis.com/drive/v3/files';
         this.UPLOAD_URL = 'https://www.googleapis.com/upload/drive/v3/files';
@@ -110,14 +110,16 @@ class GoogleDriveService {
             await new Promise(resolve => chrome.identity.removeCachedAuthToken({ token }, resolve));
         }
     }
-}
+};
 
-// Export singleton
-const googleDriveService = new GoogleDriveService();
+// Export singleton - wrapped in IIFE
+(function () {
+    const googleDriveService = new GoogleDriveServiceClass();
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = googleDriveService;
-} else {
-    const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
-    globalScope.GoogleDriveService = googleDriveService;
-}
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = googleDriveService;
+    } else {
+        const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
+        globalScope.GoogleDriveService = googleDriveService;
+    }
+})();

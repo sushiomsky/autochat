@@ -3,7 +3,7 @@
  * Handles AI-powered features including message generation and sentiment analysis.
  * Supports swappable providers (initially LocalSimulation, scalable to OpenAI/Claude).
  */
-class AIService {
+const AIServiceClass = class {
     constructor() {
         this.provider = 'simulation'; // 'simulation', 'openai', 'claude'
         this.apiKey = null;
@@ -164,14 +164,16 @@ class AIService {
         const pool = replies[sentiment] || replies.neutral;
         return pool[Math.floor(Math.random() * pool.length)];
     }
-}
+};
 
-// Export singleton
-const aiService = new AIService();
+// Export singleton - wrapped in IIFE
+(function () {
+    const aiService = new AIServiceClass();
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = aiService;
-} else {
-    const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
-    globalScope.AIService = aiService;
-}
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = aiService;
+    } else {
+        const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
+        globalScope.AIService = aiService;
+    }
+})();

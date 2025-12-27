@@ -2,7 +2,7 @@
  * RoleService
  * Manages roles and permissions for team collaboration.
  */
-class RoleService {
+const RoleServiceClass = class {
     constructor() {
         this.ROLES = {
             ADMIN: 'admin',
@@ -55,14 +55,16 @@ class RoleService {
     getRoles() {
         return Object.values(this.ROLES);
     }
-}
+};
 
-// Export singleton
-const roleService = new RoleService();
+// Export singleton - wrapped in IIFE
+(function () {
+    const roleService = new RoleServiceClass();
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = roleService;
-} else {
-    const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
-    globalScope.RoleService = roleService;
-}
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = roleService;
+    } else {
+        const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
+        globalScope.RoleService = roleService;
+    }
+})();

@@ -24,8 +24,14 @@ let isRunning = false;
 // Initialize Services
 async function initServices() {
   if (typeof ProfileService !== 'undefined') {
+    console.log('[Background] ProfileService type:', typeof ProfileService);
+    console.log('[Background] ProfileService keys:', Object.keys(ProfileService));
+    console.log('[Background] ProfileService.init type:', typeof ProfileService.init);
+    console.log('[Background] ProfileService constructor:', ProfileService.constructor.name);
     await ProfileService.init();
     console.log('[Background] ProfileService initialized');
+  } else {
+    console.error('[Background] ProfileService is undefined!');
   }
   if (typeof AIService !== 'undefined') {
     await AIService.init();

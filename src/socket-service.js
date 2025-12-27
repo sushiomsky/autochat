@@ -3,7 +3,7 @@
  * Handles real-time communication for team pulses.
  * Currently simulates WebSocket messages for "Pro" feature demonstration.
  */
-class SocketService {
+const SocketServiceClass = class {
     constructor() {
         this.socket = null;
         this.isConnected = false;
@@ -29,7 +29,10 @@ class SocketService {
      * Send a lock request
      */
     lockProfile(profileId, userId = 'Me') {
-        if (!this.isConnected) return;
+        if (!this.isConnected) {
+            console.warn('[SocketService] Cannot lock: Not connected');
+            return;
+        }
 
         const message = {
             type: 'lock_profile',
@@ -38,6 +41,7 @@ class SocketService {
         };
 
         this.currentLocks.set(profileId, userId);
+        console.log(`[SocketService] User ${userId} locked profile ${profileId}`);
         this._broadcast(message);
     }
 
@@ -45,7 +49,10 @@ class SocketService {
      * Send an unlock request
      */
     unlockProfile(profileId) {
-        if (!this.isConnected) return;
+        if (!this.isConnected) {
+            console.warn('[SocketService] Cannot unlock: Not connected');
+            return;
+        }
 
         const message = {
             type: 'unlock_profile',
@@ -53,7 +60,9 @@ class SocketService {
             payload: { profileId }
         };
 
+        const userId = this.currentLocks.get(profileId);
         this.currentLocks.delete(profileId);
+        console.log(`[SocketService] Profile ${profileId} unlocked (previously locked by ${userId})`);
         this._broadcast(message);
     }
 
@@ -126,14 +135,16 @@ class SocketService {
             memberCount: this.teamMembers.length
         };
     }
-}
+};
 
-// Export singleton
-const socketService = new SocketService();
+// Export singleton - wrapped in IIFE
+(function () {
+    const socketService = new SocketServiceClass();
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = socketService;
-} else {
-    const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
-    globalScope.SocketService = socketService;
-}
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = socketService;
+    } else {
+        const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
+        globalScope.SocketService = socketService;
+    }
+})();

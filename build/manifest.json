@@ -1,10 +1,25 @@
 {
   "manifest_version": 3,
-  "name": "AutoChat - Auto Message Sender",
-  "version": "4.0",
-  "description": "Enhanced automated message sender with typing simulation, anti-detection, analytics, and smart scheduling features.",
-  "permissions": ["scripting", "activeTab", "storage"],
-  "host_permissions": ["<all_urls>"],
+  "name": "__MSG_extName__",
+  "version": "4.5.4",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "alarms",
+    "identity"
+  ],
+  "oauth2": {
+    "client_id": "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/drive.appdata"
+    ]
+  },
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "action": {
     "default_popup": "popup-enhanced.html",
     "default_icon": {
@@ -16,15 +31,30 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content-enhanced.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content-enhanced.js"
+      ],
       "run_at": "document_start"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["farming_phrases.txt"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "farming_phrases.txt",
+        "farming_phrases_en.txt",
+        "farming_phrases_ur.txt",
+        "farming_phrases_es.txt"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
-  ]
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "version_name": "4.5.4-dev"
 }

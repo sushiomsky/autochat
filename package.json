@@ -48,13 +48,14 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-webextension-mock": "^3.9.0",
     "selenium-webdriver": "^4.10.0",
-    "chromedriver": "^117.0.0",
+    "chromedriver": "^143.0.0",
     "http-server": "^14.1.1",
-    "puppeteer": "^21.3.8",
+    "puppeteer-core": "^22.0.0",
     "prettier": "^3.0.3",
     "terser-webpack-plugin": "^5.3.9",
     "webpack": "^5.88.0",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "ws": "^8.18.0"
   },
   "jest": {
     "testEnvironment": "jest-environment-jsdom",

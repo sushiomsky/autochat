@@ -3,7 +3,7 @@
  * Handles storage and management of user profiles (accounts).
  * Supports domain mapping for auto-detection.
  */
-class ProfileService {
+const ProfileServiceClass = class {
     constructor() {
         this.STORAGE_KEY = 'profiles_v5';
         this.CURRENT_PROFILE_KEY = 'current_profile_id';
@@ -238,15 +238,18 @@ class ProfileService {
     async _saveToStorage() {
         await chrome.storage.local.set({ [this.STORAGE_KEY]: this.profiles });
     }
-}
+};
 
-// Export singleton
-const profileService = new ProfileService();
+// Export singleton - wrapped in IIFE to avoid name collision with class
+(function () {
+    const profileService = new ProfileServiceClass();
 
-// Support both module environment (tests) and browser environment (extension)
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = profileService;
-} else {
+    // Always export to global scope first for service workers
     const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
     globalScope.ProfileService = profileService;
-}
+
+    // Support module environment (tests) as secondary
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = profileService;
+    }
+})();

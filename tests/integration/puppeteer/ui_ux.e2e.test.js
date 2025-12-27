@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 const path = require('path');
 
 jest.setTimeout(180000);
@@ -12,26 +12,27 @@ describe('Comprehensive UI/UX tests (popup)', () => {
     const extensionPath = path.join(process.cwd(), 'build');
     browser = await puppeteer.launch({
       headless: false,
+      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
       args: [
         `--disable-extensions-except=${extensionPath}`,
         `--load-extension=${extensionPath}`,
         '--no-sandbox',
         '--disable-setuid-sandbox'
-      ]
+      ],
+      pipe: true
     });
 
-    // find extension id
-    const targets = await browser.targets();
-    const extTarget = targets.find(t => t.url().startsWith('chrome-extension://'));
-    if (extTarget) extensionId = extTarget.url().split('/')[2];
-    if (!extensionId) {
-      await new Promise(r => setTimeout(r, 1000));
-      const t2 = await browser.targets();
-      const extTarget2 = t2.find(t => t.url().startsWith('chrome-extension://'));
-      if (extTarget2) extensionId = extTarget2.url().split('/')[2];
+    // Wait for extension to load using waitForTarget
+    const extensionTarget = await browser.waitForTarget(
+      target => target.type() === 'service_worker' && target.url().startsWith('chrome-extension://'),
+      { timeout: 10000 }
+    );
+
+    if (extensionTarget) {
+      extensionId = extensionTarget.url().split('/')[2];
     }
 
-    if (!extensionId) throw new Error('Extension id not found');
+    if (!extensionId) throw new Error('Extension id not found after 10 seconds');
 
     const popupUrl = `chrome-extension://${extensionId}/popup-enhanced.html`;
     page = await browser.newPage();
@@ -44,8 +45,8 @@ describe('Comprehensive UI/UX tests (popup)', () => {
 
   test('all primary UI elements present', async () => {
     const selectors = [
-      '#markInput','#inputStatus','#messageList','#loadDefaultPhrases','#managePhrases','#openSettings',
-      '#sendMode','#minInterval','#maxInterval','#startAutoSend','#stopAutoSend','#sendOnce','#openAnalytics'
+      '#markInput', '#inputStatus', '#messageList', '#loadDefaultPhrases', '#managePhrases', '#openSettings',
+      '#sendMode', '#minInterval', '#maxInterval', '#startAutoSend', '#stopAutoSend', '#sendOnce', '#openAnalytics'
     ];
     for (const sel of selectors) {
       await page.waitForSelector(sel, { timeout: 5000 });
@@ -106,7 +107,7 @@ describe('Comprehensive UI/UX tests (popup)', () => {
       if (!btn.dataset.mockedLoad) {
         btn.addEventListener('click', () => {
           list.innerHTML = '';
-          ['one','two','three'].forEach(t => {
+          ['one', 'two', 'three'].forEach(t => {
             const d = document.createElement('div'); d.textContent = t; list.appendChild(d);
           });
           count.textContent = list.children.length;

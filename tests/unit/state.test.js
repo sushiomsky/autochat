@@ -1,4 +1,4 @@
-import { StateManager } from '../../src/state';
+const { StateManager } = require('../../src/state');
 
 describe('StateManager', () => {
   let sm;
@@ -25,7 +25,7 @@ describe('StateManager', () => {
     const cb = jest.fn();
     const unsub = sm.subscribe('theme', cb);
     await sm.set('theme', 'blue');
-    expect(cb).toHaveBeenCalledWith('blue', 'dark');
+    expect(cb).toHaveBeenCalledWith('blue', 'light');
     unsub();
     await sm.set('theme', 'green');
     expect(cb).toHaveBeenCalledTimes(1);

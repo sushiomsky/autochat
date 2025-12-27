@@ -1,4 +1,4 @@
-import {
+const {
   debounce,
   sanitizeInput,
   validateSettings,
@@ -9,11 +9,18 @@ import {
   exportJSON,
   importJSON,
   RateLimiter
-} from '../../src/utils';
+} = require('../../src/utils');
 
 describe('utils', () => {
   beforeEach(() => {
     jest.useRealTimers();
+    // Mock URL APIs not available in jsdom
+    if (typeof URL.createObjectURL === 'undefined') {
+      URL.createObjectURL = jest.fn();
+    }
+    if (typeof URL.revokeObjectURL === 'undefined') {
+      URL.revokeObjectURL = jest.fn();
+    }
   });
 
   test('debounce delays calls', () => {

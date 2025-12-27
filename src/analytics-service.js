@@ -3,7 +3,7 @@
  * Handles storage, tracking, and aggregation of usage data.
  * Uses chrome.storage.local for persistence.
  */
-class AnalyticsService {
+const AnalyticsServiceClass = class {
     constructor() {
         this.STORAGE_KEYS = {
             DAILY: 'analytics_daily',
@@ -252,16 +252,221 @@ class AnalyticsService {
         const d = new Date(timestamp);
         return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
     }
-}
 
-// Export singleton
-// Export singleton
-const analyticsService = new AnalyticsService();
-// If using modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = analyticsService;
-} else {
-    // Browser/Service Worker environment
-    const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
-    globalScope.AnalyticsService = analyticsService;
-}
+    /**
+     * Predictive Analytics: Find best send times based on historical success
+     */
+    async predictBestSendTimes() {
+        const stats = await this.getStats('30d');
+        const hourlySuccess = Array(24).fill(0).map(() => ({ sent: 0, failed: 0 }));
+
+        // Aggregate success rates by hour
+        const dailyData = await this._getStorage(this.STORAGE_KEYS.DAILY) || {};
+        Object.values(dailyData).forEach(day => {
+            if (day.hourlyDistribution) {
+                day.hourlyDistribution.forEach((count, hour) => {
+                    hourlySuccess[hour].sent += count;
+                });
+            }
+        });
+
+        // Calculate success rate per hour and sort
+        const hourlyRates = hourlySuccess.map((data, hour) => {
+            const total = data.sent + data.failed;
+            const rate = total > 0 ? (data.sent / total) : 0;
+            return { hour, rate, count: data.sent };
+        });
+
+        // Filter out hours with no data and sort by rate
+        const validHours = hourlyRates
+            .filter(h => h.count > 0)
+            .sort((a, b) => b.rate - a.rate)
+            .slice(0, 5)
+            .map(h => h.hour);
+
+        return validHours.length > 0 ? validHours : [9, 12, 14, 18, 20]; // Default if no data
+    }
+
+    /**
+     * Calculate optimal interval based on success patterns
+     */
+    async calculateOptimalInterval() {
+        const logs = await this._getStorage(this.STORAGE_KEYS.LOGS) || [];
+
+        if (logs.length < 10) {
+            return { min: 60, max: 120, confidence: 'low' };
+        }
+
+        // Analyze intervals between successful sends
+        const sentEvents = logs.filter(e => e.type === 'message_sent');
+        const intervals = [];
+
+        for (let i = 1; i < sentEvents.length; i++) {
+            const interval = (sentEvents[i].timestamp - sentEvents[i - 1].timestamp) / 1000; // seconds
+            if (interval > 0 && interval < 600) { // Only consider intervals < 10 min
+                intervals.push(interval);
+            }
+        }
+
+        if (intervals.length === 0) {
+            return { min: 60, max: 120, confidence: 'low' };
+        }
+
+        // Calculate median and standard deviation
+        intervals.sort((a, b) => a - b);
+        const median = intervals[Math.floor(intervals.length / 2)];
+        const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+
+        // Suggest range around median
+        const min = Math.max(30, Math.floor(median * 0.8));
+        const max = Math.ceil(median * 1.2);
+
+        return {
+            min,
+            max,
+            median: Math.floor(median),
+            mean: Math.floor(mean),
+            confidence: intervals.length > 50 ? 'high' : intervals.length > 20 ? 'medium' : 'low'
+        };
+    }
+
+    /**
+     * Generate AI recommendations based on analytics
+     */
+    async generateRecommendations() {
+        const stats = await this.getStats('7d');
+        const bestTimes = await this.predictBestSendTimes();
+        const optimalInterval = await this.calculateOptimalInterval();
+        const recommendations = [];
+
+        // Success rate recommendation
+        if (stats.summary.successRate < 80) {
+            recommendations.push({
+                type: 'warning',
+                title: 'Low Success Rate',
+                message: `Your success rate is ${stats.summary.successRate}%. Consider adjusting your intervals or checking site selectors.`,
+                action: 'Review Settings'
+            });
+        } else if (stats.summary.successRate > 95) {
+            recommendations.push({
+                type: 'success',
+                title: 'Excellent Performance',
+                message: `Your success rate is ${stats.summary.successRate}%! Great job!`,
+                action: null
+            });
+        }
+
+        // Best times recommendation
+        if (bestTimes.length > 0) {
+            const timeStr = bestTimes.map(h => {
+                const d = new Date();
+                d.setHours(h);
+                return d.toLocaleTimeString([], { hour: 'numeric', hour12: true });
+            }).join(', ');
+
+            recommendations.push({
+                type: 'info',
+                title: 'Optimal Send Times',
+                message: `Based on your history, the best times to send are: ${timeStr}`,
+                action: 'Set Active Hours'
+            });
+        }
+
+        // Interval recommendation
+        if (optimalInterval.confidence !== 'low') {
+            recommendations.push({
+                type: 'info',
+                title: 'Suggested Interval',
+                message: `Optimal interval: ${optimalInterval.min}-${optimalInterval.max} seconds (${optimalInterval.confidence} confidence)`,
+                action: 'Update Intervals'
+            });
+        }
+
+        // Activity recommendation
+        if (stats.summary.activeDays < 3) {
+            recommendations.push({
+                type: 'tip',
+                title: 'Increase Activity',
+                message: 'You\'ve been active for only a few days. More data will improve recommendations.',
+                action: null
+            });
+        }
+
+        return recommendations;
+    }
+
+    /**
+     * Export analytics data as JSON
+     */
+    async exportJSON() {
+        const stats = await this.getStats('all');
+        const dailyData = await this._getStorage(this.STORAGE_KEYS.DAILY) || {};
+        const hourlyData = await this._getStorage(this.STORAGE_KEYS.HOURLY) || {};
+
+        return {
+            exportDate: new Date().toISOString(),
+            version: '5.0',
+            summary: stats.summary,
+            timeSeries: stats.timeSeries,
+            hourlyHeatmap: stats.hourlyHeatmap,
+            rawData: {
+                daily: dailyData,
+                hourly: hourlyData
+            }
+        };
+    }
+
+    /**
+     * Export analytics data as CSV
+     */
+    async exportCSV() {
+        const stats = await this.getStats('all');
+
+        let csv = 'Date,Messages Sent,Messages Failed,Success Rate\n';
+
+        stats.timeSeries.forEach(entry => {
+            const total = entry.sent + entry.failed;
+            const rate = total > 0 ? Math.round((entry.sent / total) * 100) : 0;
+            csv += `${entry.label},${entry.sent},${entry.failed},${rate}%\n`;
+        });
+
+        return csv;
+    }
+
+    /**
+     * Get chart-ready data for visualization
+     */
+    async getChartData(range = '7d') {
+        const stats = await this.getStats(range);
+
+        return {
+            // Line chart: Message trends
+            trendChart: {
+                labels: stats.timeSeries.map(d => d.label),
+                sent: stats.timeSeries.map(d => d.sent),
+                failed: stats.timeSeries.map(d => d.failed)
+            },
+            // Bar chart: Hourly distribution
+            hourlyChart: stats.hourlyHeatmap,
+            // Pie chart: Success vs Failure
+            successChart: {
+                labels: ['Successful', 'Failed'],
+                data: [stats.summary.totalSent, stats.summary.totalFailed],
+                colors: ['#10b981', '#ef4444']
+            }
+        };
+    }
+};
+
+// Export singleton - wrapped in IIFE
+(function () {
+    const analyticsService = new AnalyticsServiceClass();
+
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = analyticsService;
+    } else {
+        // Browser/Service Worker environment
+        const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
+        globalScope.AnalyticsService = analyticsService;
+    }
+})();

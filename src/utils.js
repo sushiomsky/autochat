@@ -8,7 +8,7 @@
  * @param {number} wait - Wait time in milliseconds
  * @returns {Function} - Debounced function
  */
-export function debounce(func, wait) {
+function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {
     const later = () => {
@@ -25,7 +25,7 @@ export function debounce(func, wait) {
  * @param {string} input - User input string
  * @returns {string} - Sanitized string
  */
-export function sanitizeInput(input) {
+function sanitizeInput(input) {
   const div = document.createElement('div');
   div.textContent = input;
   return div.innerHTML;
@@ -37,7 +37,7 @@ export function sanitizeInput(input) {
  * @param {Array<string>} requiredKeys - Required keys
  * @returns {boolean} - True if valid
  */
-export function validateSettings(data, requiredKeys = []) {
+function validateSettings(data, requiredKeys = []) {
   if (typeof data !== 'object' || data === null) return false;
   return requiredKeys.every(key => key in data);
 }
@@ -47,7 +47,7 @@ export function validateSettings(data, requiredKeys = []) {
  * @param {object} obj - Object to clone
  * @returns {object} - Cloned object
  */
-export function deepClone(obj) {
+function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
@@ -56,7 +56,7 @@ export function deepClone(obj) {
  * @param {number} num - Number to format
  * @returns {string} - Formatted number
  */
-export function formatNumber(num) {
+function formatNumber(num) {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
@@ -64,7 +64,7 @@ export function formatNumber(num) {
  * Get current timestamp in readable format
  * @returns {string} - Formatted timestamp
  */
-export function getTimestamp() {
+function getTimestamp() {
   return new Date().toLocaleString();
 }
 
@@ -74,7 +74,7 @@ export function getTimestamp() {
  * @param {number} days - Number of days
  * @returns {number} - Average per day
  */
-export function calculateAverage(total, days) {
+function calculateAverage(total, days) {
   return days > 0 ? Math.round(total / days) : 0;
 }
 
@@ -83,7 +83,7 @@ export function calculateAverage(total, days) {
  * @param {object} data - Data to export
  * @param {string} filename - Filename
  */
-export function exportJSON(data, filename) {
+function exportJSON(data, filename) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -97,19 +97,19 @@ export function exportJSON(data, filename) {
  * Import JSON file
  * @returns {Promise<object>} - Parsed JSON data
  */
-export function importJSON() {
+function importJSON() {
   return new Promise((resolve, reject) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    
+
     input.onchange = (e) => {
       const file = e.target.files[0];
       if (!file) {
         reject(new Error('No file selected'));
         return;
       }
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
@@ -122,7 +122,7 @@ export function importJSON() {
       reader.onerror = () => reject(new Error('Failed to read file'));
       reader.readAsText(file);
     };
-    
+
     input.click();
   });
 }
@@ -130,7 +130,7 @@ export function importJSON() {
 /**
  * Rate limiter class to prevent abuse
  */
-export class RateLimiter {
+class RateLimiter {
   constructor(maxAttempts = 5, windowMs = 60000) {
     this.maxAttempts = maxAttempts;
     this.windowMs = windowMs;
@@ -192,8 +192,23 @@ export class RateLimiter {
     const now = Date.now();
     const userAttempts = this.attempts.get(key) || [];
     if (userAttempts.length === 0) return 0;
-    
+
     const oldestAttempt = Math.min(...userAttempts);
     return Math.max(0, this.windowMs - (now - oldestAttempt));
   }
+}
+// Export for unit tests
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    debounce,
+    sanitizeInput,
+    validateSettings,
+    deepClone,
+    formatNumber,
+    getTimestamp,
+    calculateAverage,
+    exportJSON,
+    importJSON,
+    RateLimiter
+  };
 }

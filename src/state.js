@@ -3,7 +3,7 @@
  * Centralized state with reactivity
  */
 
-export class StateManager {
+class StateManager {
   constructor() {
     this.state = {};
     this.listeners = new Map();
@@ -21,12 +21,12 @@ export class StateManager {
       // Messages
       messageList: data.messageList || '',
       customPhrases: data.customPhrases || [],
-      
+
       // Basic settings
       sendMode: data.sendMode || 'random',
       minInterval: data.minInterval || 60,
       maxInterval: data.maxInterval || 120,
-      
+
       // Advanced settings
       dailyLimit: data.dailyLimit || 0,
       typingSimulation: data.typingSimulation !== false,
@@ -36,28 +36,28 @@ export class StateManager {
       activeHours: data.activeHours || false,
       activeHoursStart: data.activeHoursStart || 9,
       activeHoursEnd: data.activeHoursEnd || 22,
-      
+
       // Statistics
       messagesSentToday: data.messagesSentToday || 0,
       totalMessagesSent: data.totalMessagesSent || 0,
       lastResetDate: data.lastResetDate || new Date().toDateString(),
-      
+
       // UI state
       theme: data.theme || 'light',
       isAutoSendActive: false,
       isPaused: false,
-      
+
       // New features
       notificationsEnabled: data.notificationsEnabled !== false,
       notificationSound: data.notificationSound !== false,
       dryRunMode: data.dryRunMode || false,
       analyticsEnabled: data.analyticsEnabled !== false,
-      
+
       // Categories
       categories: data.categories || null,
       categorizedPhrases: data.categorizedPhrases || [],
       phraseTags: data.phraseTags || [],
-      
+
       // Recents
       recentCommands: data.recentCommands || [],
       recentEmojis: data.recentEmojis || [],
@@ -102,7 +102,7 @@ export class StateManager {
    */
   async setMultiple(updates, save = true) {
     const changes = [];
-    
+
     Object.entries(updates).forEach(([key, value]) => {
       const oldValue = this.state[key];
       this.state[key] = value;
@@ -142,7 +142,7 @@ export class StateManager {
     if (!this.listeners.has(key)) {
       this.listeners.set(key, new Set());
     }
-    
+
     this.listeners.get(key).add(callback);
 
     // Return unsubscribe function
@@ -225,4 +225,11 @@ export class StateManager {
 }
 
 // Singleton instance
-export const state = new StateManager();
+const state = new StateManager();
+const state_instance = state;
+if (typeof window !== 'undefined') window.state = state;
+if (typeof self !== 'undefined') self.state = state;
+// Export for unit tests
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { StateManager, state };
+}

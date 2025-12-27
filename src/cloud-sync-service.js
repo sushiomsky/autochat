@@ -2,7 +2,7 @@
  * CloudSyncService
  * Handles background synchronization of profiles and settings between local storage and a simulated cloud.
  */
-class CloudSyncService {
+const CloudSyncServiceClass = class {
     constructor() {
         this.status = 'idle'; // 'idle', 'syncing', 'error'
         this.lastSyncTime = null;
@@ -186,57 +186,62 @@ class CloudSyncService {
     }
 
     /**
-     * Basic "Last Write Wins" merge logic based on timestamps
+     * Stricter Last-Write-Wins (LWW) merge logic
      */
     _merge(local, cloud) {
         let changed = false;
         let conflict = false;
+        const merged = [];
 
         const localMap = new Map(local.map(p => [p.id, p]));
         const cloudMap = new Map(cloud.map(p => [p.id, p]));
-
-        // Check if global state has diverged significantly
-        // For simulation, if count of differences > 2, trigger conflict
-        let diffCount = 0;
         const allIds = new Set([...localMap.keys(), ...cloudMap.keys()]);
 
-        for (const id of allIds) {
-            const loc = localMap.get(id);
-            const cld = cloudMap.get(id);
-            if (loc && cld && (loc.lastActive || 0) !== (cld.lastActive || 0)) {
-                diffCount++;
-            }
-        }
+        // Detected significant divergence (e.g., both modified same profile differently)
+        let divergenceCount = 0;
 
-        if (diffCount > 1) {
-            conflict = true;
-            return { merged: local, changed: false, conflict: true };
-        }
-
-        const merged = [];
         for (const id of allIds) {
             const loc = localMap.get(id);
             const cld = cloudMap.get(id);
 
             if (!loc) {
+                // New profile from cloud
                 merged.push(cld);
                 changed = true;
             } else if (!cld) {
+                // Local profile not in cloud (keep local)
                 merged.push(loc);
+                changed = true; // Technically local is "pushed" to cloud later
             } else {
                 const locTime = loc.lastActive || loc.created || 0;
                 const cldTime = cld.lastActive || cld.created || 0;
 
-                if (cldTime > locTime) {
+                if (locTime === cldTime) {
+                    // Exactly same, no change
+                    merged.push(loc);
+                } else if (cldTime > locTime) {
+                    // Cloud is newer
                     merged.push(cld);
                     changed = true;
                 } else {
+                    // Local is newer
                     merged.push(loc);
+                    changed = true;
+                }
+
+                // If both were updated recently (within 1 min of each other but different content)
+                if (Math.abs(locTime - cldTime) < 60000 && JSON.stringify(loc) !== JSON.stringify(cld)) {
+                    divergenceCount++;
                 }
             }
         }
 
-        return { merged, changed, conflict: false };
+        // If more than 3 profiles have near-simultaneous different updates, trigger conflict
+        if (divergenceCount > 3) {
+            conflict = true;
+        }
+
+        return { merged, changed, conflict };
     }
 
     /**
@@ -275,14 +280,16 @@ class CloudSyncService {
             googleDriveEnabled: this.googleDriveEnabled
         };
     }
-}
+};
 
-// Export singleton
-const cloudSyncService = new CloudSyncService();
+// Export singleton - wrapped in IIFE
+(function () {
+    const cloudSyncService = new CloudSyncServiceClass();
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = cloudSyncService;
-} else {
-    const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
-    globalScope.CloudSyncService = cloudSyncService;
-}
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = cloudSyncService;
+    } else {
+        const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
+        globalScope.CloudSyncService = cloudSyncService;
+    }
+})();

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+echo "Testing if extension can be loaded..."
+echo ""
+echo "Please manually test the extension:"
+echo "1. Open Chrome"
+echo "2. Go to chrome://extensions"
+echo "3. Enable 'Developer mode'"
+echo "4. Click 'Load unpacked'"
+echo "5. Select the 'build' directory: $(pwd)/build"
+echo "6. Check if the extension loads without errors"
+echo "7. Open the extension popup and check the browser console for any errors"
+echo ""
+echo "If you see 'ProfileService.init is not a function' error, please report it."
+echo "Otherwise, the extension is working and the issue is only with Puppeteer E2E tests."

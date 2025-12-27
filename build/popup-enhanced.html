@@ -1,17 +1,51 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>AutoChat Enhanced</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
   <div class="container">
-    <h2>💬 AutoChat Enhanced</h2>
-    
+    <h2>
+      <span>💬 AutoChat Enhanced</span>
+      <div class="header-actions">
+        <button id="openNotificationCenter" class="header-btn" title="Notification Center"
+          aria-label="Open Notification Center">
+          🔔
+          <span id="notificationBadge" class="notification-count-badge" style="display: none;">0</span>
+        </button>
+        <button id="openDonation" class="header-btn" title="Support Development"
+          aria-label="Donate with Crypto">💝</button>
+        <button id="themeToggle" class="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+      </div>
+    </h2>
+
+    <!-- Language Selector -->
+    <div class="language-selector">
+      <select id="languageSelect">
+        <option value="en">English</option>
+        <option value="ur">اردو (Urdu)</option>
+        <option value="es">Español (Spanish)</option>
+      </select>
+    </div>
+
+    <!-- Account Profile Selector -->
+    <div class="account-selector">
+      <label>👤 Account Profile:</label>
+      <div class="account-controls">
+        <select id="accountSelect">
+          <option value="default">Default Account</option>
+        </select>
+        <button id="manageAccounts" class="btn-icon" title="Manage Accounts">⚙️</button>
+      </div>
+    </div>
+
     <!-- Notification -->
     <div id="notification" class="notification"></div>
-    
+
     <!-- Stats Bar -->
     <div class="stats-bar">
       <div class="stat-item">
@@ -26,26 +60,47 @@
         <div class="stat-label">Status</div>
         <div class="stat-value" id="autoSendStatus">⚪ Inactive</div>
       </div>
+      <div class="stat-item">
+        <div class="stat-label">Campaigns</div>
+        <div class="stat-value" id="activeCampaignsCount">0</div>
+      </div>
     </div>
-    
+
     <!-- Main Actions -->
     <button id="markInput" class="btn-primary">🎯 Mark Chat Input Field</button>
     <div id="inputStatus" class="status">No input field marked</div>
-    
+    <div class="btn-row">
+      <button id="markMessageContainer" class="btn-secondary">📌 Mark Message Container</button>
+      <div id="messageContainerStatus" class="status">No message container marked</div>
+    </div>
+
+    <label>Send Method:
+      <select id="sendMethod">
+        <option value="enter">⌨️ Press Enter key</option>
+        <option value="click">🖱️ Click a Send button</option>
+      </select>
+    </label>
+    <div class="btn-row">
+      <button id="markSendButton" class="btn-secondary" style="display: none;">📍 Mark Send Button</button>
+    </div>
+    <div id="sendButtonStatus" class="help"></div>
+
     <hr>
-    
+
     <!-- Messages -->
     <label>Messages (one per line):
-      <textarea id="messageList" placeholder="Hello!&#10;How are you?&#10;{time} - Nice to meet you&#10;Random number: {random_number}"></textarea>
+      <textarea id="messageList"
+        placeholder="Hello!&#10;How are you?&#10;{time} - Nice to meet you&#10;Random number: {random_number}"></textarea>
       <div class="help">Use {time}, {date}, {random_emoji}, {random_number} for variables</div>
     </label>
-    
+
     <div class="btn-row">
       <button id="loadDefaultPhrases" class="btn-secondary">📚 Load Phrases</button>
       <button id="managePhrases" class="btn-secondary">✏️ Manage</button>
       <button id="openSettings" class="btn-secondary">⚙️ Settings</button>
+      <button id="openHelp" class="btn-secondary">❓ Help</button>
     </div>
-    
+
     <!-- Basic Settings -->
     <label>Send Mode:
       <select id="sendMode">
@@ -53,78 +108,127 @@
         <option value="sequential">➡️ Sequential order</option>
       </select>
     </label>
-    
-    <label>Time Interval (seconds):</label>
+
+    <label>Time Interval (minutes):</label>
     <div class="input-row">
       <div class="input-group">
         <label>Min:
-          <input id="minInterval" type="number" min="1" max="3600" value="60">
+          <input id="minInterval" type="number" min="1" max="1440" value="1">
         </label>
       </div>
       <div class="input-group">
         <label>Max:
-          <input id="maxInterval" type="number" min="1" max="3600" value="120">
+          <input id="maxInterval" type="number" min="1" max="1440" value="2">
         </label>
       </div>
     </div>
-    <div class="help">Random interval between min and max seconds</div>
-    
+    <div class="help">Random interval between min and max minutes</div>
+
     <hr>
-    
+
     <!-- Control Buttons -->
     <button id="startAutoSend" class="btn-success">▶️ Start Auto-Send</button>
+    <button id="pauseAutoSend" class="btn-warning" style="display: none;">⏸️ Pause</button>
     <button id="stopAutoSend" class="btn-danger">⏹️ Stop Auto-Send</button>
-    <button id="sendOnce" class="btn-secondary">📤 Send Once</button>
-    <button id="openAnalytics" class="btn-secondary">📊 Analytics</button>
-    
+    <div class="btn-row">
+      <button id="sendOnce" class="btn-secondary">📤 Send Once</button>
+      <button id="previewMessage" class="btn-secondary">👁️ Preview</button>
+      <button id="openEmoji" class="btn-secondary">😊 Emoji</button>
+    </div>
+    <div class="btn-row">
+      <button id="openCategories" class="btn-secondary">📁 Categories</button>
+      <button id="openCategoryManager" class="btn-secondary">⚙️ Manage</button>
+      <button id="openAnalytics" class="btn-secondary">📊 Stats</button>
+    </div>
+    <div class="btn-row">
+      <button id="openPerformance" class="btn-secondary">⚡ Performance</button>
+      <button id="openChatLogs" class="btn-secondary">📖 Chat Logs</button>
+      <button id="openScheduler" class="btn-secondary">📅 Scheduler</button>
+      <button id="openTeam" class="btn-secondary">👥 Team</button>
+    </div>
+
+    <div class="shortcuts-info">
+      <strong>Keyboard Shortcuts:</strong>
+      <span class="shortcut-key">Ctrl+K</span> Commands
+      <span class="shortcut-key">Ctrl+S</span> Start
+      <span class="shortcut-key">Ctrl+X</span> Stop
+      <span class="shortcut-key">Ctrl+P</span> Pause
+    </div>
+
     <!-- Version -->
-    <div class="version">v4.0 Enhanced Edition</div>
+    <div class="version">v4.5 Integration Foundation</div>
   </div>
-  
+
   <!-- Settings Modal -->
   <div id="settingsModal" class="modal">
     <div class="modal-content">
       <h3>⚙️ Advanced Settings</h3>
-      
+
       <label>
         <input type="checkbox" id="typingSimulation" checked>
         🎹 Typing Simulation (40-80 WPM)
       </label>
       <div class="help">Simulates realistic human typing speed</div>
-      
+
       <label>
         <input type="checkbox" id="variableDelays" checked>
         ⏱️ Variable Delays (0.5-2s think time)
       </label>
       <div class="help">Random delays before typing to appear human</div>
-      
+
       <label>
         <input type="checkbox" id="antiRepetition" checked>
         🔄 Anti-Repetition
       </label>
       <div class="help">Avoid sending same message repeatedly</div>
-      
+
       <label>
         <input type="checkbox" id="templateVariables" checked>
         📝 Template Variables
       </label>
       <div class="help">Enable {time}, {date}, {random_emoji}, etc.</div>
-      
+
       <hr>
-      
+
+      <label>
+        <input type="checkbox" id="notificationsEnabled" checked>
+        🔔 Desktop Notifications
+      </label>
+      <div class="help">Show browser notifications for events</div>
+
+      <label>
+        <input type="checkbox" id="notificationSound" checked>
+        🔊 Notification Sound
+      </label>
+      <div class="help">Play sound with notifications</div>
+
+      <label>
+        <input type="checkbox" id="analyticsEnabled" checked>
+        📊 Usage Analytics
+      </label>
+      <div class="help">Track usage statistics (all data stays local)</div>
+
+      <hr>
+
       <label>
         Daily Message Limit:
         <input type="number" id="dailyLimit" min="0" max="10000" value="0" placeholder="0 = unlimited">
       </label>
       <div class="help">Automatically stop after X messages per day (0 = no limit)</div>
-      
+
       <hr>
-      
+
       <label>
         <input type="checkbox" id="activeHours">
         🕐 Active Hours Only
       </label>
-      
+
+      <label>
+        Send confirmation timeout (seconds):
+        <input type="number" id="sendConfirmTimeout" min="1" max="30" value="3">
+      </label>
+
+
       <div id="activeHoursInputs" class="input-row" style="display: none;">
         <div class="input-group">
           <label>Start (hour):
@@ -138,80 +242,791 @@
         </div>
       </div>
       <div class="help">Only send messages during specified hours (24h format)</div>
-      
+
       <hr>
-      
+
+      <h4>🎯 Mention Detection</h4>
+
+      <label>
+        <input type="checkbox" id="mentionDetectionEnabled">
+        👤 Auto-Reply to Mentions
+      </label>
+      <div class="help">Automatically reply when someone mentions you in chat</div>
+
+      <label>
+        <input type="checkbox" id="aiAutoRepliesEnabled">
+        ✨ AI Smart Replies
+      </label>
+      <div class="help">Use AI to generate contextual replies based on message sentiment</div>
+
+      <label>
+        Keywords to Watch (one per line):
+        <textarea id="mentionKeywords" rows="3" placeholder="@username&#10;your name&#10;hey you"></textarea>
+      </label>
+      <div class="help">Messages containing these keywords will trigger auto-reply</div>
+
+      <label>
+        Reply Messages (one per line):
+        <textarea id="mentionReplyMessages" rows="3"
+          placeholder="Thanks for mentioning me!&#10;Hello! I'm here.&#10;Hi! What's up?"></textarea>
+      </label>
+      <div class="help">Random reply will be selected from this list</div>
+
+      <hr>
+
+      <h4>📝 Chat Logging</h4>
+
+      <label>
+        <input type="checkbox" id="chatLoggingEnabled">
+        💾 Enable Chat Logging
+      </label>
+      <div class="help">Save all chat messages for later review</div>
+
+      <button id="viewChatLogs" class="btn-secondary">📖 View Chat Logs</button>
+
+      <hr>
+
+      <h4>🎮 Manual Message Detection</h4>
+
+      <label>
+        <input type="checkbox" id="manualDetectionEnabled">
+        👆 Detect Manual Messages
+      </label>
+      <div class="help">Reset timer when you manually send a message</div>
+
+      <div id="manualDetectionStatus" class="status" style="display: none;"></div>
+
+      <hr>
+
+      <h4>🎨 Pro Theme Customization</h4>
+      <label>Active Theme:
+        <select id="themeSelect" class="form-select"
+          style="width: 100%; margin-top: 5px; padding: 8px; border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color);">
+          <option value="light">☀️ Light Mode</option>
+          <option value="dark">🌙 Dark Mode</option>
+          <option value="cyberpunk">🌃 Cyberpunk (Neon)</option>
+          <option value="midnight-gold">🏆 Midnight Gold (Pro)</option>
+        </select>
+      </label>
+      <div class="help">Premium themes for a custom workspace experience.</div>
+
+      <hr>
+
+      <h4>🔗 Webhooks & Integrations</h4>
+
+      <label>
+        <input type="checkbox" id="webhooksEnabled" checked>
+        🌐 Enable Webhooks
+      </label>
+      <div class="help">Send HTTP requests when events occur (integrations with external services)</div>
+
+      <button id="manageWebhooks" class="btn-secondary">⚙️ Manage Webhooks</button>
+
+      <hr>
+
       <div class="btn-row">
         <button id="exportSettings" class="btn-secondary">📥 Export</button>
         <button id="importSettings" class="btn-secondary">📤 Import</button>
       </div>
-      
+
       <button class="close-modal btn-primary">Close</button>
     </div>
   </div>
-  
+
   <!-- Phrase Manager Modal -->
   <div id="phraseModal" class="modal">
     <div class="modal-content">
       <h3>📝 Manage Phrases</h3>
-      
+
       <div class="section">
         <label>Add New Phrase:
           <textarea id="newPhraseInput" placeholder="Type a new phrase here..." rows="3"></textarea>
         </label>
-        <button id="addNewPhrase" class="btn-success">➕ Add Phrase</button>
+        <div style="display: flex; gap: 10px; margin-top: 8px;">
+          <button id="addNewPhrase" class="btn-success" style="flex: 1;">➕ Add Phrase</button>
+          <button id="generateAiPhrasesBtn" class="btn-secondary"
+            style="flex: 1; background-color: #6C5CE7; color: white;">✨ AI Generate</button>
+        </div>
       </div>
-      
+
       <hr>
-      
+
       <div class="section">
         <strong>Custom Phrases:</strong> <span id="customPhrasesCount" class="badge">0</span>
         <div id="customPhrasesList" class="phrases-list"></div>
       </div>
-      
+
       <hr>
-      
+
       <div class="section">
         <strong>Default Phrases:</strong> <span id="defaultPhrasesCount" class="badge">0</span>
         <div class="help">From farming_phrases.txt</div>
         <div id="defaultPhrasesList" class="phrases-list"></div>
       </div>
-      
+
       <button class="close-modal btn-primary">Close</button>
     </div>
   </div>
-  
+
+  <!-- Team Collaboration Workspace Modal -->
+  <div id="teamModal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="team-header">
+        <h3>👥 Team Collaboration Workspace</h3>
+        <span class="badge badge-beta">BETA</span>
+        <div id="syncStatus" class="sync-status"></div>
+      </div>
+      <p class="help">Sync profiles, phrases, and schedules across your team. Collaborate in real-time.</p>
+
+      <div class="collaboration-grid">
+        <div class="col-section">
+          <h4>🛰️ Active Team Members</h4>
+          <div class="team-members" id="teamMembersList">
+            <div class="member-item">
+              <span class="status-indicator status-active"></span>
+              <strong>You (Admin)</strong>
+            </div>
+            <div class="help">Connect to a team server to see others.</div>
+          </div>
+        </div>
+
+        <div class="col-section">
+          <h4>☁️ Shared Cloud Profiles</h4>
+          <div id="cloudProfilesList" class="cloud-list">
+            <div class="empty-state" id="cloudProfilesEmptyState">
+              <p>No shared profiles found.</p>
+              <button id="connectCloudBtn" class="btn-primary-small">Simulate Sync</button>
+            </div>
+          </div>
+
+          <hr style="margin: 10px 0; border: 0; border-top: 1px solid var(--border-color); opacity: 0.3;">
+
+          <div id="googleDriveSection" class="section-small">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+              <span style="font-size: 0.85em; font-weight: bold;">Google Drive Sync</span>
+              <span id="googleDriveStatus" class="sync-status" style="font-size: 0.75em;">Disconnected</span>
+            </div>
+            <button id="connectGoogleDriveBtn" class="btn-secondary-small"
+              style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <img src="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png"
+                style="width: 16px; height: 16px;">
+              Connect Google Drive
+            </button>
+            <button id="disconnectGoogleDriveBtn" class="btn-danger-small" style="width: 100%; display: none;">
+              Unlink Google Account
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="team-goals section">
+        <h4>🏁 Team Performance Goals</h4>
+        <div class="goal-item">
+          <div class="goal-info">
+            <span>Daily Message Target</span>
+            <span id="teamGoalProgressText">1,240 / 5,000</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 25%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>📈 Team Activity Feed</h4>
+        <div class="activity-feed" id="teamActivityFeed">
+          <div class="activity-item">
+            <span class="time">Just now</span>
+            <span class="text">You initialized the team workspace.</span>
+          </div>
+          <div class="activity-item">
+            <span class="time">2m ago</span>
+            <span class="text">Profile "High Roller" synced to cloud.</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Smart Scheduler Modal -->
+  <div id="schedulerModal" class="modal">
+    <div class="modal-content modal-large">
+      <h3>📅 Smart Scheduling & Campaigns</h3>
+      <p class="help">Create automated drip campaigns and recurring schedules for your messages. Smart timing helps
+        avoid detection.</p>
+
+      <div class="section">
+        <h4>➕ Create New Campaign</h4>
+        <div class="campaign-form">
+          <label>Campaign Name: <input type="text" id="schedName" placeholder="Morning Farming"></label>
+          <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <label style="flex: 1;">Start Time: <input type="time" id="schedStart" value="09:00"></label>
+            <label style="flex: 1;">End Time: <input type="time" id="schedEnd" value="18:00"></label>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <label style="flex: 1;">Min Interval (s): <input type="number" id="schedMin" value="300"></label>
+            <label style="flex: 1;">Max Interval (s): <input type="number" id="schedMax" value="600"></label>
+          </div>
+          <button id="createScheduleBtn" class="btn-success" style="margin-top: 15px; width: 100%;">Create
+            Campaign</button>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <h4>📋 Active Campaigns</h4>
+        <div id="schedulesList" class="schedules-list">
+          <div class="help">No active campaigns scheduled.</div>
+        </div>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
   <!-- Analytics Modal -->
   <div id="analyticsModal" class="modal">
     <div class="modal-content">
       <h3>📊 Analytics & Statistics</h3>
-      
+
       <div class="analytics-grid">
         <div class="analytics-card">
           <div class="analytics-label">Messages Today</div>
           <div class="analytics-value" id="analyticsToday">0</div>
         </div>
-        
+
         <div class="analytics-card">
           <div class="analytics-label">Total Messages</div>
           <div class="analytics-value" id="analyticsTotal">0</div>
         </div>
-        
+
         <div class="analytics-card">
           <div class="analytics-label">Status</div>
           <div class="analytics-value" id="analyticsStatus">Inactive</div>
         </div>
       </div>
-      
+    </div>
+
+    <div class="chart-controls" style="margin: 16px 0; display: flex; justify-content: flex-end;">
+      <select id="analyticsTimeRange" style="width: auto;">
+        <option value="24h">Last 24 Hours</option>
+        <option value="7d" selected>Last 7 Days</option>
+        <option value="30d">Last 30 Days</option>
+      </select>
+    </div>
+
+    <div class="chart-container" style="position: relative; height: 200px; width: 100%; margin-bottom: 20px;">
+      <canvas id="mainChart"></canvas>
+    </div>
+
+    <div class="chart-container" style="position: relative; height: 150px; width: 100%;">
+      <canvas id="hourlyChart"></canvas>
+    </div>
+
+    <hr>
+
+    <div class="help">Statistics track all messages sent by AutoChat</div>
+
+    <hr>
+
+    <div class="help">Recent activity and errors will be logged here in future updates</div>
+
+    <button id="resetStats" class="btn-danger">🗑️ Reset Statistics</button>
+    <button class="close-modal btn-primary">Close</button>
+  </div>
+  </div>
+
+  <!-- Account Management Modal -->
+  <div id="accountModal" class="modal">
+    <div class="modal-content">
+      <h3>👥 Manage Account Profiles</h3>
+
+      <div class="section">
+        <label>Create New Profile:
+          <input type="text" id="newAccountName" placeholder="e.g., Casino Account 1" maxlength="50">
+        </label>
+        <label style="margin-top: 8px; display: block;">Linked Domains (comma separated):
+          <input type="text" id="newAccountDomains" placeholder="e.g., example.com, casino.com" style="width: 100%;">
+        </label>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button id="createAccount" class="btn-success" style="flex: 1;">➕ Create Profile</button>
+          <button id="importProfileBtn" class="btn-secondary" style="flex: 1;">📥 Import JSON</button>
+        </div>
+        <input type="file" id="importFileInput" accept=".json" style="display: none;">
+      </div>
+
       <hr>
-      
-      <div class="help">Statistics track all messages sent by AutoChat</div>
-      
-      <button id="resetStats" class="btn-danger">🗑️ Reset Statistics</button>
+
+      <div class="section">
+        <strong>Saved Profiles:</strong>
+        <div id="accountList" class="account-list"></div>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <p class="help">Each profile stores separate settings: messages, keywords, intervals, and preferences.</p>
+        <p class="help">Use profiles to manage multiple casino accounts or different automation scenarios.</p>
+      </div>
+
       <button class="close-modal btn-primary">Close</button>
     </div>
   </div>
-  
-  <script src="popup-enhanced.js"></script>
+
+  <!-- Command Palette -->
+  <div id="commandPalette" class="command-palette" style="display: none;">
+    <div class="command-palette-content">
+      <input type="text" id="commandSearch" placeholder="Type a command... (Ctrl+K)" autocomplete="off">
+      <div id="commandResults" class="command-results"></div>
+    </div>
+  </div>
+
+  <!-- Emoji Picker -->
+  <div id="emojiPicker" class="emoji-picker" style="display: none;">
+    <div class="emoji-picker-content">
+      <input type="text" id="emojiSearch" placeholder="Search emojis..." autocomplete="off">
+      <div class="emoji-tabs" id="emojiTabs"></div>
+      <div id="emojiContent" class="emoji-content"></div>
+    </div>
+  </div>
+
+  <!-- Preview Modal -->
+  <div id="previewModal" class="modal">
+    <div class="modal-content">
+      <h3>👁️ Message Preview</h3>
+      <div id="previewContent" class="preview-content"></div>
+      <label>
+        <input type="checkbox" id="dryRunMode">
+        🧪 Dry-run mode (test without sending)
+      </label>
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Categories Modal -->
+  <div id="categoriesModal" class="modal">
+    <div class="modal-content">
+      <h3>📁 Phrase Categories</h3>
+      <div id="categoriesContent" class="categories-content"></div>
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Onboarding Tutorial -->
+  <div id="onboardingModal" class="modal">
+    <div class="modal-content">
+      <h3>👋 Welcome to AutoChat Enhanced!</h3>
+      <div id="onboardingContent" class="onboarding-content">
+        <div class="onboarding-step" data-step="1">
+          <h4>Step 1: Mark Input Field</h4>
+          <p>Click "Mark Chat Input Field" and then click on the text input where you want messages sent.</p>
+        </div>
+        <div class="onboarding-step" data-step="2">
+          <h4>Step 2: Add Messages</h4>
+          <p>Enter your messages (one per line). Use variables like {time}, {date}, {random_emoji} for dynamic content.
+          </p>
+        </div>
+        <div class="onboarding-step" data-step="3">
+          <h4>Step 3: Configure Settings</h4>
+          <p>Set your send mode, time intervals, and enable advanced features like typing simulation.</p>
+        </div>
+        <div class="onboarding-step" data-step="4">
+          <h4>Step 4: Start Sending</h4>
+          <p>Click "Start Auto-Send" and watch AutoChat work its magic!</p>
+        </div>
+        <div class="onboarding-step" data-step="5">
+          <h4>Pro Tips</h4>
+          <ul>
+            <li>Press <kbd>Ctrl+K</kbd> for the command palette</li>
+            <li>Enable typing simulation to appear more human</li>
+            <li>Use active hours to send only during specific times</li>
+            <li>Check Analytics to track your messages</li>
+          </ul>
+        </div>
+      </div>
+      <div class="onboarding-nav">
+        <button id="onboardingPrev" class="btn-secondary">← Previous</button>
+        <span id="onboardingStep">1 / 5</span>
+        <button id="onboardingNext" class="btn-primary">Next →</button>
+      </div>
+      <label>
+        <input type="checkbox" id="dontShowAgain">
+        Don't show this again
+      </label>
+    </div>
+  </div>
+
+  <!-- Notification Center Modal -->
+  <div id="notificationCenterModal" class="modal">
+    <div class="modal-content">
+      <h3>🔔 Notification Center</h3>
+      <div class="notification-header">
+        <span id="unreadBadge" class="unread-badge">0 unread</span>
+        <div class="notification-actions">
+          <button id="markAllRead" class="btn-small">✓ Mark All Read</button>
+          <button id="clearNotifications" class="btn-small delete">🗑️ Clear All</button>
+        </div>
+      </div>
+      <div id="notificationList" class="notification-list">
+        <div class="help" style="text-align: center; padding: 20px;">No notifications yet</div>
+      </div>
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Category Manager Modal -->
+  <div id="categoryManagerModal" class="modal">
+    <div class="modal-content">
+      <h3>📁 Category Manager</h3>
+
+      <div class="section">
+        <label>Create New Category:</label>
+        <div class="input-row">
+          <input type="text" id="newCategoryName" placeholder="Category name" maxlength="30">
+          <input type="text" id="newCategoryIcon" placeholder="Icon (emoji)" maxlength="2" style="width: 60px;">
+        </div>
+        <input type="color" id="newCategoryColor" value="#667eea" style="width: 100%; height: 36px; margin-top: 8px;">
+        <button id="createCategory" class="btn-success">➕ Create Category</button>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <strong>Existing Categories:</strong>
+        <div id="categoryList" class="category-manager-list"></div>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <strong>Category Statistics:</strong>
+        <div id="categoryStats" class="category-stats"></div>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <h3>❓ Help & Documentation</h3>
+
+      <div class="help-section">
+        <h4>🎯 Getting Started</h4>
+        <p>1. Click "Mark Chat Input Field" and select the text input on the page</p>
+        <p>2. Add your messages in the textarea (one per line)</p>
+        <p>3. Set your preferred time interval</p>
+        <p>4. Click "Start Auto-Send"!</p>
+      </div>
+
+      <div class="help-section">
+        <h4>📝 Template Variables</h4>
+        <p>Use these in your messages for dynamic content:</p>
+        <ul>
+          <li><code>{time}</code> - Current time (e.g., 2:30 PM)</li>
+          <li><code>{date}</code> - Current date</li>
+          <li><code>{datetime}</code> - Date and time combined</li>
+          <li><code>{random_emoji}</code> - Random emoji</li>
+          <li><code>{random_number}</code> - Random number (0-99)</li>
+          <li><code>{day}</code> - Day of week</li>
+          <li><code>{month}</code> - Month name</li>
+          <li><code>{year}</code> - Current year</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h4>⌨️ Keyboard Shortcuts</h4>
+        <ul>
+          <li><kbd>Ctrl+K</kbd> - Open command palette</li>
+          <li><kbd>Ctrl+S</kbd> - Start auto-send</li>
+          <li><kbd>Ctrl+X</kbd> - Stop auto-send</li>
+          <li><kbd>Ctrl+P</kbd> - Pause/Resume</li>
+          <li><kbd>Escape</kbd> - Close modals</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h4>🔧 Advanced Features</h4>
+        <ul>
+          <li><strong>Typing Simulation</strong> - Types characters one by one for realism</li>
+          <li><strong>Variable Delays</strong> - Random pauses between messages</li>
+          <li><strong>Anti-Repetition</strong> - Avoids sending same message twice in a row</li>
+          <li><strong>Active Hours</strong> - Only sends during specified hours</li>
+          <li><strong>Mention Detection</strong> - Auto-reply when mentioned</li>
+        </ul>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Webhook Manager Modal -->
+  <div id="webhookModal" class="modal">
+    <div class="modal-content modal-large">
+      <h3>🔗 Webhook Management</h3>
+      <p class="help">Webhooks allow you to send HTTP requests when specific events occur. Connect AutoChat with
+        external services like Slack, Discord, Zapier, or your own custom endpoints.</p>
+
+      <div class="section">
+        <h4>➕ Add New Webhook</h4>
+        <form id="webhookForm">
+          <label>
+            Webhook Name:
+            <input type="text" id="webhookName" placeholder="My Webhook" required>
+          </label>
+
+          <label>
+            URL:
+            <input type="url" id="webhookUrl" placeholder="https://example.com/webhook" required>
+          </label>
+
+          <label>
+            HTTP Method:
+            <select id="webhookMethod">
+              <option value="POST">POST</option>
+              <option value="GET">GET</option>
+              <option value="PUT">PUT</option>
+              <option value="PATCH">PATCH</option>
+            </select>
+          </label>
+
+          <label>
+            Events (select one or more):
+            <div class="checkbox-group" id="webhookEvents">
+              <label><input type="checkbox" value="message_sent"> Message Sent</label>
+              <label><input type="checkbox" value="campaign_started"> Campaign Started</label>
+              <label><input type="checkbox" value="campaign_stopped"> Campaign Stopped</label>
+              <label><input type="checkbox" value="campaign_paused"> Campaign Paused</label>
+              <label><input type="checkbox" value="campaign_resumed"> Campaign Resumed</label>
+              <label><input type="checkbox" value="daily_limit_reached"> Daily Limit Reached</label>
+              <label><input type="checkbox" value="error"> Error</label>
+              <label><input type="checkbox" value="milestone"> Milestone</label>
+            </div>
+          </label>
+
+          <label>
+            Custom Headers (optional, JSON format):
+            <textarea id="webhookHeaders" rows="3"
+              placeholder='{"Authorization": "Bearer token123", "X-Custom": "value"}'></textarea>
+          </label>
+
+          <div class="btn-row">
+            <button type="submit" class="btn-success">➕ Add Webhook</button>
+            <button type="button" id="cancelWebhookForm" class="btn-secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <h4>📋 Configured Webhooks <span id="webhookCount" class="badge">0</span></h4>
+        <div id="webhookList" class="webhook-list"></div>
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <h4>📊 Statistics</h4>
+        <div class="webhook-stats">
+          <div class="stat-item">
+            <div class="stat-label">Total Webhooks</div>
+            <div class="stat-value" id="webhookStatsTotal">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Enabled</div>
+            <div class="stat-value" id="webhookStatsEnabled">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Total Triggers</div>
+            <div class="stat-value" id="webhookStatsTriggers">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Failures</div>
+            <div class="stat-value" id="webhookStatsFailures">0</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Donation Modal -->
+  <div id="donationModal" class="modal">
+    <div class="modal-content">
+      <h3>💝 Support AutoChat Development</h3>
+      <p>Help keep AutoChat free and open-source! Your support enables continued development and new features.</p>
+
+      <div class="donation-section">
+        <h4>🪙 Crypto Donations</h4>
+
+        <div class="crypto-address">
+          <label>Bitcoin (BTC)</label>
+          <div class="address-box">
+            <code id="btcAddress">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</code>
+            <button class="btn-copy" data-address="btcAddress" title="Copy address">📋</button>
+          </div>
+        </div>
+
+        <div class="crypto-address">
+          <label>Ethereum (ETH)</label>
+          <div class="address-box">
+            <code id="ethAddress">0x742d35Cc6634C0532925a3b844Bc454e4438f44e</code>
+            <button class="btn-copy" data-address="ethAddress" title="Copy address">📋</button>
+          </div>
+        </div>
+
+        <div class="crypto-address">
+          <label>USDT (TRC20)</label>
+          <div class="address-box">
+            <code id="usdtAddress">TYASr5UV6HEcXatwdFQfmLVUqQQQMUxHLS</code>
+            <button class="btn-copy" data-address="usdtAddress" title="Copy address">📋</button>
+          </div>
+        </div>
+
+        <div class="crypto-address">
+          <label>Litecoin (LTC)</label>
+          <div class="address-box">
+            <code id="ltcAddress">LTC1QW2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</code>
+            <button class="btn-copy" data-address="ltcAddress" title="Copy address">📋</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="donation-info">
+        <p>✨ <strong>Every contribution matters!</strong></p>
+        <p>Your donation helps with:</p>
+        <ul>
+          <li>Development of new features</li>
+          <li>Server and infrastructure costs</li>
+          <li>Bug fixes and improvements</li>
+          <li>Community support</li>
+        </ul>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Performance Monitor Modal -->
+  <div id="performanceModal" class="modal">
+    <div class="modal-content modal-large">
+      <h3>⚡ Performance Monitor</h3>
+      <p class="help">Real-time performance metrics and optimization recommendations</p>
+
+      <div class="section">
+        <h4>📊 Message Statistics</h4>
+        <div class="perf-stats-grid">
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Total Sent</div>
+            <div class="perf-stat-value" id="perfTotalMessages">0</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Success Rate</div>
+            <div class="perf-stat-value" id="perfSuccessRate">0%</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Avg Duration</div>
+            <div class="perf-stat-value" id="perfAvgDuration">0ms</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Failed</div>
+            <div class="perf-stat-value error" id="perfFailed">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>⌨️ Typing Performance</h4>
+        <div class="perf-stats-grid">
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Avg Speed</div>
+            <div class="perf-stat-value" id="perfTypingSpeed">0 WPM</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Samples</div>
+            <div class="perf-stat-value" id="perfTypingSamples">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>💾 System Resources</h4>
+        <div class="perf-stats-grid">
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Memory Used</div>
+            <div class="perf-stat-value" id="perfMemoryUsed">N/A</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Memory %</div>
+            <div class="perf-stat-value" id="perfMemoryPercent">N/A</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Uptime</div>
+            <div class="perf-stat-value" id="perfUptime">0s</div>
+          </div>
+          <div class="perf-stat-card">
+            <div class="perf-stat-label">Errors</div>
+            <div class="perf-stat-value error" id="perfErrors">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>💡 Recommendations</h4>
+        <div id="perfRecommendations" class="perf-recommendations"></div>
+      </div>
+
+      <div class="section">
+        <div class="btn-row">
+          <button id="refreshPerformance" class="btn-secondary">🔄 Refresh</button>
+          <button id="exportPerformance" class="btn-secondary">📥 Export</button>
+          <button id="clearPerformance" class="btn-secondary">🗑️ Clear</button>
+        </div>
+      </div>
+
+      <button class="close-modal btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading...</div>
+  </div>
+
+  <script src="libs/chart.js"></script>
+  <script src="src/analytics-service.js"></script>
+  <script src="src/popup-i18n.js"></script>
+  <script type="module" src="popup-enhanced.js"></script>
+  <!-- Conflict Resolution Modal -->
+  <div id="conflictModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeConflictModal">&times;</span>
+      <h3>⚠️ Sync Conflict Detected</h3>
+      <p>Multi-user changes detected. How would you like to resolve this?</p>
+      <div class="conflict-options">
+        <div class="conflict-option" id="resolveLocal">
+          <h4>Keep My Data</h4>
+          <p>Overwrites cloud version with your local changes.</p>
+          <button class="btn-primary">Use Local</button>
+        </div>
+        <div class="conflict-divider">OR</div>
+        <div class="conflict-option" id="resolveCloud">
+          <h4>Take Cloud Version</h4>
+          <p>Discards your local edits and uses the teamu0027s version.</p>
+          <button class="btn-secondary">Use Cloud</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
+
 </html>

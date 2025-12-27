@@ -1750,8 +1750,6 @@ window.addEventListener('beforeunload', () => {
 });
 updateAccountSelect();
 updateAccountList();
-  }
-}
 
 function getCurrentSettings() {
   const mentionKeywords = elements.mentionKeywords.value
