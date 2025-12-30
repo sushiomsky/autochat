@@ -70,6 +70,10 @@ chrome.tabs.onRemoved.addListener((tabId) => {
   console.log(`[Background] Tab ${tabId} closed, cleaning up.`);
 });
 
+// Initialize background script
+console.log('%c AutoChat Background Script Started', 'color: #00ff00; font-weight: bold; font-size: 16px;');
+console.log('Background script location:', self.location.href);
+
 // Initialize stats from storage
 chrome.storage.local.get(['totalMessagesSent', 'messagesSentToday', 'lastResetDate'], (data) => {
   totalMessagesSent = data.totalMessagesSent || 0;

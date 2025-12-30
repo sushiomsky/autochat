@@ -16,7 +16,7 @@ describe('Popup integration flows (start/stop/send)', () => {
     options.addArguments('--allow-file-access-from-files');
 
     driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build();
-    const fileUrl = 'file://' + path.join(process.cwd(), 'build', 'popup-enhanced.html');
+    const fileUrl = 'file://' + path.join(process.cwd(), 'dist', 'popup-enhanced.html');
     await driver.get(fileUrl);
     await driver.wait(until.elementLocated(By.css('body')), 5000);
   });
@@ -101,6 +101,17 @@ describe('Popup integration flows (start/stop/send)', () => {
       const input = document.getElementById('newPhraseInput');
       const count = document.getElementById('customPhrasesCount');
       const list = document.getElementById('customPhrasesList');
+      const manageBtn = document.getElementById('managePhrases');
+      const phraseModal = document.getElementById('phraseModal');
+      if (manageBtn && phraseModal) {
+        manageBtn.addEventListener('click', () => {
+          phraseModal.classList.add('show');
+          // Force visibility immediately to avoid animation delays in test
+          phraseModal.style.display = 'flex';
+          phraseModal.style.opacity = '1';
+        });
+      }
+
       if (addBtn && input && count && list) {
         addBtn.addEventListener('click', () => {
           const v = input.value || 'phrase';

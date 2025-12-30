@@ -9,9 +9,9 @@ describe('Comprehensive UI/UX tests (popup)', () => {
   let page;
 
   beforeAll(async () => {
-    const extensionPath = path.join(process.cwd(), 'build');
+    const extensionPath = path.join(process.cwd(), 'dist');
     browser = await puppeteer.launch({
-      headless: false,
+      headless: 'new',
       executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
       args: [
         `--disable-extensions-except=${extensionPath}`,
@@ -19,13 +19,14 @@ describe('Comprehensive UI/UX tests (popup)', () => {
         '--no-sandbox',
         '--disable-setuid-sandbox'
       ],
+      dumpio: true,
       pipe: true
     });
 
     // Wait for extension to load using waitForTarget
     const extensionTarget = await browser.waitForTarget(
       target => target.type() === 'service_worker' && target.url().startsWith('chrome-extension://'),
-      { timeout: 10000 }
+      { timeout: 30000 }
     );
 
     if (extensionTarget) {

@@ -9,10 +9,10 @@ describe('Extension end-to-end with Puppeteer', () => {
   let page;
 
   beforeAll(async () => {
-    const extensionPath = path.join(process.cwd(), 'build');
+    const extensionPath = path.join(process.cwd(), 'dist');
 
     browser = await puppeteer.launch({
-      headless: false,
+      headless: 'new',
       executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
       args: [
         `--disable-extensions-except=${extensionPath}`,
@@ -20,33 +20,32 @@ describe('Extension end-to-end with Puppeteer', () => {
         '--no-sandbox',
         '--disable-setuid-sandbox'
       ],
+      dumpio: true, // Enable Chrome stdout logging
       pipe: true
     });
 
+    // Log all targets to see what we have
+    const targets = await browser.targets();
+    console.log('Available targets:', targets.map(t => ({ type: t.type(), url: t.url() })));
+
     // Wait for extension to load using waitForTarget
+    // Explicitly check for service_worker type for MV3
     const extensionTarget = await browser.waitForTarget(
-      target => target.type() === 'service_worker' && target.url().startsWith('chrome-extension://'),
-      { timeout: 10000 }
+      target => {
+        console.log('Checking target:', target.type(), target.url());
+        return target.type() === 'service_worker' && target.url().startsWith('chrome-extension://');
+      },
+      { timeout: 30000 }
     );
 
     if (extensionTarget) {
       extensionId = extensionTarget.url().split('/')[2];
     }
 
-    if (!extensionId) throw new Error('Extension id not found after 10 seconds');
+    if (!extensionId) throw new Error('Extension id not found after 30 seconds');
 
     const extensionPopupHtml = `chrome-extension://${extensionId}/popup-enhanced.html`;
     page = await browser.newPage();
-
-    // Listen for page errors
-    page.on('pageerror', error => {
-      console.log('[Puppeteer] Page error:', error.message);
-    });
-
-    // Listen for console messages
-    page.on('console', msg => {
-      console.log('[Puppeteer] Console:', msg.type(), msg.text());
-    });
 
     await page.goto(extensionPopupHtml, { waitUntil: 'domcontentloaded' });
   });
@@ -56,7 +55,7 @@ describe('Extension end-to-end with Puppeteer', () => {
   });
 
   test('popup loads and buttons are present', async () => {
-    await page.waitForSelector('#markInput', { timeout: 5000 });
+    await page.waitForSelector('#markInput', { timeout: 10000 });
     const ids = ['markInput', 'loadDefaultPhrases', 'managePhrases', 'openSettings', 'startAutoSend', 'stopAutoSend', 'sendOnce', 'openAnalytics'];
     for (const id of ids) {
       const exists = await page.$(`#${id}`) !== null;

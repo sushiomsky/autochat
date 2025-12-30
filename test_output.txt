@@ -1,0 +1,921 @@
+
+> autochat-enhanced@4.5.4 test
+> jest
+
+FAIL tests/integration/selenium/popup.integration.test.js (6.339 s)
+  ● Popup integration flows (start/stop/send) › phrase manager add new phrase updates count
+
+    ElementNotInteractableError: element not interactable
+      (Session info: chrome=143.0.7499.170)
+
+      117 |     // ensure textarea and button exist
+      118 |     const input = await driver.findElement(By.id('newPhraseInput'));
+    > 119 |     await input.sendKeys('Hello integration');
+          |     ^
+      120 |     await driver.findElement(By.id('addNewPhrase')).click();
+      121 |     await driver.wait(async () => {
+      122 |       const cnt = await driver.findElement(By.id('customPhrasesCount')).getText();
+
+      at Object.throwDecodedError (node_modules/selenium-webdriver/lib/error.js:523:15)
+      at parseHttpResponse (node_modules/selenium-webdriver/lib/http.js:524:13)
+      at Executor.execute (node_modules/selenium-webdriver/lib/http.js:456:28)
+      at Driver.execute (node_modules/selenium-webdriver/lib/webdriver.js:745:17)
+      at Object.<anonymous> (tests/integration/selenium/popup.integration.test.js:119:5)
+
+PASS tests/unit/webhooks.test.js
+  ● Console
+
+    console.log
+      [Webhooks] Triggering 1 webhook(s) for event: message_sent
+
+      at WebhookManager.log [as trigger] (tests/unit/webhooks.test.js:127:17)
+
+    console.log
+      [Webhooks] Successfully sent to Test Webhook
+
+      at WebhookManager.log [as sendWebhook] (tests/unit/webhooks.test.js:172:21)
+          at async Promise.allSettled (index 0)
+
+    console.log
+      [Webhooks] Webhooks disabled, skipping trigger
+
+      at WebhookManager.log [as trigger] (tests/unit/webhooks.test.js:115:19)
+
+    console.log
+      [Webhooks] Triggering 1 webhook(s) for event: message_sent
+
+      at WebhookManager.log [as trigger] (tests/unit/webhooks.test.js:127:17)
+
+    console.log
+      [Webhooks] Successfully sent to Test Webhook
+
+      at WebhookManager.log [as sendWebhook] (tests/unit/webhooks.test.js:172:21)
+          at async Promise.allSettled (index 0)
+
+    console.log
+      [Webhooks] Triggering 1 webhook(s) for event: message_sent
+
+      at WebhookManager.log [as trigger] (tests/unit/webhooks.test.js:127:17)
+
+    console.log
+      [Webhooks] Successfully sent to Test Webhook
+
+      at WebhookManager.log [as sendWebhook] (tests/unit/webhooks.test.js:172:21)
+          at async Promise.allSettled (index 0)
+
+    console.log
+      [Webhooks] Triggering 1 webhook(s) for event: message_sent
+
+      at WebhookManager.log [as trigger] (tests/unit/webhooks.test.js:127:17)
+
+    console.warn
+      [Webhooks] Attempt 1/3 failed for Test Webhook: Network error
+
+      175 |           } catch (error) {
+      176 |             lastError = error;
+    > 177 |             console.warn(`[Webhooks] Attempt ${attempt}/${this.retryAttempts} failed for ${webhook.name}:`, error.message);
+          |                     ^
+      178 |
+      179 |             if (attempt < this.retryAttempts) {
+      180 |               await this.sleep(this.retryDelay * attempt);
+
+      at WebhookManager.warn [as sendWebhook] (tests/unit/webhooks.test.js:177:21)
+          at async Promise.allSettled (index 0)
+      at WebhookManager.trigger (tests/unit/webhooks.test.js:133:9)
+      at Object.<anonymous> (tests/unit/webhooks.test.js:546:7)
+
+    console.warn
+      [Webhooks] Attempt 2/3 failed for Test Webhook: Network error
+
+      175 |           } catch (error) {
+      176 |             lastError = error;
+    > 177 |             console.warn(`[Webhooks] Attempt ${attempt}/${this.retryAttempts} failed for ${webhook.name}:`, error.message);
+          |                     ^
+      178 |
+      179 |             if (attempt < this.retryAttempts) {
+      180 |               await this.sleep(this.retryDelay * attempt);
+
+      at WebhookManager.warn [as sendWebhook] (tests/unit/webhooks.test.js:177:21)
+          at async Promise.allSettled (index 0)
+      at WebhookManager.trigger (tests/unit/webhooks.test.js:133:9)
+      at Object.<anonymous> (tests/unit/webhooks.test.js:546:7)
+
+    console.log
+      [Webhooks] Successfully sent to Test Webhook
+
+      at WebhookManager.log [as sendWebhook] (tests/unit/webhooks.test.js:172:21)
+          at async Promise.allSettled (index 0)
+
+    console.log
+      [Webhooks] Triggering 1 webhook(s) for event: message_sent
+
+      at WebhookManager.log [as trigger] (tests/unit/webhooks.test.js:127:17)
+
+    console.warn
+      [Webhooks] Attempt 1/2 failed for Test Webhook: Network error
+
+      175 |           } catch (error) {
+      176 |             lastError = error;
+    > 177 |             console.warn(`[Webhooks] Attempt ${attempt}/${this.retryAttempts} failed for ${webhook.name}:`, error.message);
+          |                     ^
+      178 |
+      179 |             if (attempt < this.retryAttempts) {
+      180 |               await this.sleep(this.retryDelay * attempt);
+
+      at WebhookManager.warn [as sendWebhook] (tests/unit/webhooks.test.js:177:21)
+          at async Promise.allSettled (index 0)
+      at WebhookManager.trigger (tests/unit/webhooks.test.js:133:9)
+      at Object.<anonymous> (tests/unit/webhooks.test.js:561:7)
+
+    console.warn
+      [Webhooks] Attempt 2/2 failed for Test Webhook: Network error
+
+      175 |           } catch (error) {
+      176 |             lastError = error;
+    > 177 |             console.warn(`[Webhooks] Attempt ${attempt}/${this.retryAttempts} failed for ${webhook.name}:`, error.message);
+          |                     ^
+      178 |
+      179 |             if (attempt < this.retryAttempts) {
+      180 |               await this.sleep(this.retryDelay * attempt);
+
+      at WebhookManager.warn [as sendWebhook] (tests/unit/webhooks.test.js:177:21)
+          at async Promise.allSettled (index 0)
+      at WebhookManager.trigger (tests/unit/webhooks.test.js:133:9)
+      at Object.<anonymous> (tests/unit/webhooks.test.js:561:7)
+
+    console.error
+      [Webhooks] Failed to send webhook Test Webhook after 2 attempts: Error: Network error
+          at Object.<anonymous> (/Users/tempor/Documents/autochat-2/tests/unit/webhooks.test.js:552:35)
+          at Promise.then.completed (/Users/tempor/Documents/autochat-2/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Users/tempor/Documents/autochat-2/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/Users/tempor/Documents/autochat-2/node_modules/jest-circus/build/run.js:316:40)
+          at _runTest (/Users/tempor/Documents/autochat-2/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/Users/tempor/Documents/autochat-2/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/Users/tempor/Documents/autochat-2/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/Users/tempor/Documents/autochat-2/node_modules/jest-circus/build/run.js:121:9)
+          at run (/Users/tempor/Documents/autochat-2/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/Users/tempor/Documents/autochat-2/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/Users/tempor/Documents/autochat-2/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/Users/tempor/Documents/autochat-2/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/Users/tempor/Documents/autochat-2/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/Users/tempor/Documents/autochat-2/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      186 |         await this.saveWebhooks();
+      187 |
+    > 188 |         console.error(`[Webhooks] Failed to send webhook ${webhook.name} after ${this.retryAttempts} attempts:`, lastError);
+          |                 ^
+      189 |         return { success: false, webhook: webhook.name, error: lastError.message };
+      190 |       }
+      191 |
+
+      at WebhookManager.error [as sendWebhook] (tests/unit/webhooks.test.js:188:17)
+          at async Promise.allSettled (index 0)
+      at WebhookManager.trigger (tests/unit/webhooks.test.js:133:9)
+      at Object.<anonymous> (tests/unit/webhooks.test.js:561:7)
+
+    console.log
+      [Webhooks] Triggering 2 webhook(s) for event: message_sent
+
+      at WebhookManager.log [as trigger] (tests/unit/webhooks.test.js:127:17)
+
+    console.log
+      [Webhooks] Successfully sent to Webhook 1
+
+      at WebhookManager.log [as sendWebhook] (tests/unit/webhooks.test.js:172:21)
+          at async Promise.allSettled (index 0)
+
+    console.log
+      [Webhooks] Successfully sent to Webhook 2
+
+      at WebhookManager.log [as sendWebhook] (tests/unit/webhooks.test.js:172:21)
+          at async Promise.allSettled (index 1)
+
+    console.log
+      [Webhooks] Triggering 1 webhook(s) for event: message_sent
+
+      at WebhookManager.log [as trigger] (tests/unit/webhooks.test.js:127:17)
+
+    console.log
+      [Webhooks] Successfully sent to Test Webhook
+
+      at WebhookManager.log [as sendWebhook] (tests/unit/webhooks.test.js:172:21)
+          at async Promise.allSettled (index 0)
+
+    console.log
+      [Webhooks] Successfully sent to Test Webhook
+
+      at WebhookManager.log [as sendWebhook] (tests/unit/webhooks.test.js:172:21)
+
+    console.log
+      [Webhooks] Triggering 1 webhook(s) for event: message_sent
+
+      at WebhookManager.log [as trigger] (tests/unit/webhooks.test.js:127:17)
+
+    console.log
+      [Webhooks] Successfully sent to Test Webhook
+
+      at WebhookManager.log [as sendWebhook] (tests/unit/webhooks.test.js:172:21)
+          at async Promise.allSettled (index 0)
+
+    console.log
+      [Webhooks] Triggering 2 webhook(s) for event: message_sent
+
+      at WebhookManager.log [as trigger] (tests/unit/webhooks.test.js:127:17)
+
+    console.log
+      [Webhooks] Successfully sent to Webhook 1
+
+      at WebhookManager.log [as sendWebhook] (tests/unit/webhooks.test.js:172:21)
+          at async Promise.allSettled (index 0)
+
+    console.log
+      [Webhooks] Successfully sent to Webhook 2
+
+      at WebhookManager.log [as sendWebhook] (tests/unit/webhooks.test.js:172:21)
+          at async Promise.allSettled (index 1)
+
+PASS tests/integration/selenium/popup.buttons.test.js
+FAIL tests/integration/puppeteer/extension.e2e.test.js (14.407 s)
+  ● Extension end-to-end with Puppeteer › popup loads and buttons are present
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Extension end-to-end with Puppeteer › sendOnce alters counters
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Extension end-to-end with Puppeteer › start/stop flow toggles status and auto-increments
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+FAIL tests/integration/puppeteer/ui_ux.e2e.test.js (14.61 s)
+  ● Comprehensive UI/UX tests (popup) › all primary UI elements present
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Comprehensive UI/UX tests (popup) › select chat input and container simulation
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Comprehensive UI/UX tests (popup) › message list edit and save simulation
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Comprehensive UI/UX tests (popup) › load default phrases populates list and updates count
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Comprehensive UI/UX tests (popup) › open settings and toggle options
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Comprehensive UI/UX tests (popup) › export/import settings simulation
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Comprehensive UI/UX tests (popup) › phrase manager add and count
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Comprehensive UI/UX tests (popup) › analytics reset clears counters
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+PASS tests/ai-service.test.js
+PASS tests/analytics-service.test.js
+PASS tests/scheduler-service.test.js
+  ● Console
+
+    console.log
+      [SchedulerService] Registered alarm: schedule_sched_1766886078812 (every 1m)
+
+      at SchedulerServiceClass.log [as registerAlarm] (src/scheduler-service.js:83:17)
+
+    console.log
+      [SchedulerService] Registered alarm: schedule_sched_1766886078848 (every 5m)
+
+      at SchedulerServiceClass.log [as registerAlarm] (src/scheduler-service.js:83:17)
+
+    console.log
+      [SchedulerService] Registered alarm: schedule_sched_1766886078852 (every 5m)
+
+      at SchedulerServiceClass.log [as registerAlarm] (src/scheduler-service.js:83:17)
+
+PASS tests/socket-service.test.js
+  ● Console
+
+    console.log
+      [SocketService] Connecting to Team Pulse server (Simulated)...
+
+      at SocketServiceClass.log [as connect] (src/socket-service.js:77:17)
+
+    console.log
+      [SocketService] Simulated Pulse: {
+        type: 'team_pulse',
+        timestamp: 1766886079051,
+        payload: { user: 'Alex (Pro)', text: 'pushed a new profile "CryptoFarming"' }
+      }
+
+      at log (src/socket-service.js:122:21)
+
+    console.log
+      [SocketService] Connecting to Team Pulse server (Simulated)...
+
+      at SocketServiceClass.log [as connect] (src/socket-service.js:77:17)
+
+    console.log
+      [SocketService] Simulated Pulse: {
+        type: 'team_pulse',
+        timestamp: 1766886079056,
+        payload: { user: 'Mike (Team)', text: 'is now active' }
+      }
+
+      at log (src/socket-service.js:122:21)
+
+PASS tests/unit/manual-detection.test.js
+  ● Console
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log [as stopMonitoring] (src/manual-detection.js:111:13)
+
+    console.warn
+      [ManualDetector] Input element not found: #nonexistent
+
+      26 |     const inputElement = document.querySelector(inputSelector);
+      27 |     if (!inputElement) {
+    > 28 |       console.warn('[ManualDetector] Input element not found:', inputSelector);
+         |               ^
+      29 |       return;
+      30 |     }
+      31 |
+
+      at ManualMessageDetector.warn [as startMonitoring] (src/manual-detection.js:28:15)
+      at Object.startMonitoring (tests/unit/manual-detection.test.js:41:16)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Already monitoring
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:22:15)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log [as stopMonitoring] (src/manual-detection.js:111:13)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log [as stopMonitoring] (src/manual-detection.js:111:13)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log [as stopMonitoring] (src/manual-detection.js:111:13)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log [as stopMonitoring] (src/manual-detection.js:111:13)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Manual send detected: Hello World
+
+      at ManualMessageDetector.log [as checkForManualSend] (src/manual-detection.js:141:17)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log [as stopMonitoring] (src/manual-detection.js:111:13)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log [as stopMonitoring] (src/manual-detection.js:111:13)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log [as stopMonitoring] (src/manual-detection.js:111:13)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log [as stopMonitoring] (src/manual-detection.js:111:13)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log [as stopMonitoring] (src/manual-detection.js:111:13)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log (src/manual-detection.js:111:13)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log (src/manual-detection.js:111:13)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Manual send detected: Test message
+
+      at ManualMessageDetector.log [as checkForManualSend] (src/manual-detection.js:141:17)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log [as stopMonitoring] (src/manual-detection.js:111:13)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log [as stopMonitoring] (src/manual-detection.js:111:13)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log [as stopMonitoring] (src/manual-detection.js:111:13)
+
+    console.log
+      [ManualDetector] Started monitoring for manual sends
+
+      at ManualMessageDetector.log [as startMonitoring] (src/manual-detection.js:84:13)
+
+    console.log
+      [ManualDetector] Stopped monitoring
+
+      at ManualMessageDetector.log [as stopMonitoring] (src/manual-detection.js:111:13)
+
+PASS tests/unit/categories.test.js
+PASS tests/unit/chat-logger.test.js
+  ● Console
+
+    console.log
+      [ChatLogger] Started logging messages
+
+      at ChatLogger.log [as startLogging] (src/chat-logger.js:62:13)
+
+    console.log
+      [ChatLogger] Stopped logging messages
+
+      at ChatLogger.log [as stopLogging] (src/chat-logger.js:85:13)
+
+    console.warn
+      [ChatLogger] Message container not found: #nonexistent
+
+      28 |     const container = document.querySelector(containerSelector);
+      29 |     if (!container) {
+    > 30 |       console.warn('[ChatLogger] Message container not found:', containerSelector);
+         |               ^
+      31 |       return;
+      32 |     }
+      33 |
+
+      at ChatLogger.warn [as startLogging] (src/chat-logger.js:30:15)
+      at Object.startLogging (tests/unit/chat-logger.test.js:43:20)
+
+    console.log
+      [ChatLogger] Started logging messages
+
+      at ChatLogger.log [as startLogging] (src/chat-logger.js:62:13)
+
+    console.log
+      [ChatLogger] Already logging
+
+      at ChatLogger.log [as startLogging] (src/chat-logger.js:24:15)
+
+    console.log
+      [ChatLogger] Stopped logging messages
+
+      at ChatLogger.log [as stopLogging] (src/chat-logger.js:85:13)
+
+    console.log
+      [ChatLogger] Started logging messages
+
+      at ChatLogger.log [as startLogging] (src/chat-logger.js:62:13)
+
+    console.log
+      [ChatLogger] Stopped logging messages
+
+      at ChatLogger.log [as stopLogging] (src/chat-logger.js:85:13)
+
+    console.log
+      [ChatLogger] Cleared all logs
+
+      at log (src/chat-logger.js:502:19)
+
+PASS tests/profile-service.test.js
+PASS tests/google-drive-service.test.js
+PASS tests/cloud-sync-service.test.js
+PASS tests/unit/mention-detection.test.js
+PASS tests/integration/storage.test.js
+PASS tests/unit/rate-limiter.test.js
+PASS tests/unit/template-variables.test.js
+PASS tests/unit/state.test.js
+PASS tests/unit/preview.test.js
+PASS tests/unit/notifications.test.js
+PASS tests/unit/notification-settings.test.js
+PASS tests/unit/confirmMessage.test.js
+PASS tests/unit/language-phrases.test.js
+PASS tests/unit/rateLimiter.test.js
+PASS tests/unit/multi-account.test.js
+PASS tests/unit/command-palette.test.js
+  ● Console
+
+    console.log
+      Start
+
+      at Object.log [as action] (tests/unit/command-palette.test.js:31:35)
+
+    console.log
+      Start
+
+      at Object.log [as action] (tests/unit/command-palette.test.js:31:35)
+
+    console.log
+      Stop
+
+      at Object.log [as action] (tests/unit/command-palette.test.js:40:35)
+
+    console.log
+      Settings
+
+      at Object.log [as action] (tests/unit/command-palette.test.js:49:35)
+
+PASS tests/unit/active-hours.test.js
+PASS tests/role-service.test.js
+PASS tests/unit/anti-repetition.test.js
+PASS tests/unit/utils.test.js
+
+Summary of all failing tests
+FAIL tests/integration/selenium/popup.integration.test.js (6.339 s)
+  ● Popup integration flows (start/stop/send) › phrase manager add new phrase updates count
+
+    ElementNotInteractableError: element not interactable
+      (Session info: chrome=143.0.7499.170)
+
+      117 |     // ensure textarea and button exist
+      118 |     const input = await driver.findElement(By.id('newPhraseInput'));
+    > 119 |     await input.sendKeys('Hello integration');
+          |     ^
+      120 |     await driver.findElement(By.id('addNewPhrase')).click();
+      121 |     await driver.wait(async () => {
+      122 |       const cnt = await driver.findElement(By.id('customPhrasesCount')).getText();
+
+      at Object.throwDecodedError (node_modules/selenium-webdriver/lib/error.js:523:15)
+      at parseHttpResponse (node_modules/selenium-webdriver/lib/http.js:524:13)
+      at Executor.execute (node_modules/selenium-webdriver/lib/http.js:456:28)
+      at Driver.execute (node_modules/selenium-webdriver/lib/webdriver.js:745:17)
+      at Object.<anonymous> (tests/integration/selenium/popup.integration.test.js:119:5)
+
+FAIL tests/integration/puppeteer/extension.e2e.test.js (14.407 s)
+  ● Extension end-to-end with Puppeteer › popup loads and buttons are present
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Extension end-to-end with Puppeteer › sendOnce alters counters
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Extension end-to-end with Puppeteer › start/stop flow toggles status and auto-increments
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+FAIL tests/integration/puppeteer/ui_ux.e2e.test.js (14.61 s)
+  ● Comprehensive UI/UX tests (popup) › all primary UI elements present
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Comprehensive UI/UX tests (popup) › select chat input and container simulation
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Comprehensive UI/UX tests (popup) › message list edit and save simulation
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Comprehensive UI/UX tests (popup) › load default phrases populates list and updates count
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Comprehensive UI/UX tests (popup) › open settings and toggle options
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Comprehensive UI/UX tests (popup) › export/import settings simulation
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Comprehensive UI/UX tests (popup) › phrase manager add and count
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+  ● Comprehensive UI/UX tests (popup) › analytics reset clears counters
+
+    TimeoutError: Timed out after waiting 10000ms
+
+      at node_modules/puppeteer-core/src/common/util.ts:322:17
+      at node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:3986:35
+      at OperatorSubscriber2._this._next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1055:13)
+      at OperatorSubscriber2.Subscriber2.next (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:678:16)
+      at AsyncAction2.<anonymous> (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:4863:24)
+      at AsyncAction2._execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1974:16)
+      at AsyncAction2.execute (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:1963:26)
+      at AsyncScheduler2.flush (node_modules/puppeteer-core/lib/cjs/third_party/rxjs/rxjs.js:2235:30)
+      at Timeout.task (node_modules/jsdom/lib/jsdom/browser/Window.js:520:19)
+
+
+Test Suites: 3 failed, 29 passed, 32 total
+Tests:       12 failed, 261 passed, 273 total
+Snapshots:   0 total
+Time:        19.142 s
+Ran all test suites.
