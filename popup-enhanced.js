@@ -86,6 +86,7 @@ const elements = {
   dailyLimit: document.getElementById('dailyLimit'),
   typingSimulation: document.getElementById('typingSimulation'),
   variableDelays: document.getElementById('variableDelays'),
+  delayAfterTyping: document.getElementById('delayAfterTyping'),
   antiRepetition: document.getElementById('antiRepetition'),
   templateVariables: document.getElementById('templateVariables'),
   activeHours: document.getElementById('activeHours'),
@@ -195,6 +196,42 @@ function showNotification(message, isSuccess = true) {
     notification.classList.remove('show');
   }, 3000);
 }
+
+function openModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = 'block';
+  } else {
+    console.warn(`Modal not found: ${modalId}`);
+  }
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Close modals when clicking outside or on close button
+window.onclick = function (event) {
+  if (event.target.classList.contains('modal')) {
+    event.target.style.display = 'none';
+  }
+};
+
+// Initialize close buttons
+document.addEventListener('DOMContentLoaded', () => {
+  const closeButtons = document.querySelectorAll('.close-modal');
+  closeButtons.forEach(btn => {
+    btn.onclick = function () {
+      const modal = this.closest('.modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+  });
+});
 
 // ===== UPDATE FUNCTIONS =====
 
@@ -524,7 +561,9 @@ document.getElementById('startAutoSend')?.addEventListener('click', async () => 
     maxInterval,
     dailyLimit: parseInt(elements.dailyLimit.value) || 0,
     enableTypingSimulation: elements.typingSimulation.checked,
+    enableTypingSimulation: elements.typingSimulation.checked,
     enableVariableDelays: elements.variableDelays.checked,
+    delayAfterTyping: parseInt(elements.delayAfterTyping.value) || 500,
     enableAntiRepetition: elements.antiRepetition.checked,
     templateVariablesEnabled: elements.templateVariables.checked,
     activeHoursEnabled: elements.activeHours.checked,
@@ -1696,12 +1735,12 @@ function updateAccountList() {
     const autoStartInput = document.createElement('input');
     autoStartInput.type = 'checkbox';
     // Check if daemonEnabled in profile settings
-    autoStartInput.checked = profile.settings && profile.settings.daemonEnabled === true;
+    autoStartInput.checked = account.settings && account.settings.daemonEnabled === true;
 
     autoStartInput.onchange = async (e) => {
       const enabled = e.target.checked;
       // Update profile settings
-      const currentSettings = profile.settings || {};
+      const currentSettings = account.settings || {};
       currentSettings.daemonEnabled = enabled;
 
       await new Promise(resolve => {
@@ -1712,7 +1751,7 @@ function updateAccountList() {
         }, resolve);
       });
 
-      showNotification(enabled ? `Auto-Start enabled for ${profile.name}` : `Auto-Start disabled for ${profile.name}`, true);
+      showNotification(enabled ? `Auto-Start enabled for ${account.name}` : `Auto-Start disabled for ${account.name}`, true);
     };
 
     const autoStartSpan = document.createElement('span');
@@ -1829,6 +1868,7 @@ function getCurrentSettings() {
     dailyLimit: elements.dailyLimit.value,
     typingSimulation: elements.typingSimulation.checked,
     variableDelays: elements.variableDelays.checked,
+    delayAfterTyping: elements.delayAfterTyping ? elements.delayAfterTyping.value : 500,
     antiRepetition: elements.antiRepetition.checked,
     templateVariables: elements.templateVariables.checked,
     activeHours: elements.activeHours.checked,
@@ -2016,6 +2056,7 @@ function loadSettings() {
     'dailyLimit',
     'typingSimulation',
     'variableDelays',
+    'delayAfterTyping',
     'antiRepetition',
     'templateVariables',
     'activeHours',
@@ -2040,6 +2081,7 @@ function loadSettings() {
 
     elements.typingSimulation.checked = data.typingSimulation !== false;
     elements.variableDelays.checked = data.variableDelays !== false;
+    if (data.delayAfterTyping) elements.delayAfterTyping.value = data.delayAfterTyping;
     elements.antiRepetition.checked = data.antiRepetition !== false;
     elements.templateVariables.checked = data.templateVariables !== false;
     elements.activeHours.checked = data.activeHours || false;
@@ -2140,6 +2182,7 @@ elements.maxInterval.addEventListener('change', saveSettings);
 elements.dailyLimit?.addEventListener('change', saveSettings);
 elements.typingSimulation?.addEventListener('change', saveSettings);
 elements.variableDelays?.addEventListener('change', saveSettings);
+elements.delayAfterTyping?.addEventListener('change', saveSettings);
 elements.antiRepetition?.addEventListener('change', saveSettings);
 elements.templateVariables?.addEventListener('change', saveSettings);
 elements.activeHours?.addEventListener('change', saveSettings);

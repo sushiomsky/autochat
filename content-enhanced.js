@@ -21,6 +21,7 @@ let totalMessagesSent = 0;
 let dailyLimit = 0; // 0 = no limit
 let enableTypingSimulation = true;
 let enableVariableDelays = true;
+let delayAfterTyping = 500;
 let enableAntiRepetition = true;
 let activeHoursEnabled = false;
 let activeHoursStart = 9;
@@ -1053,8 +1054,8 @@ async function sendMessage(text, retries = 3) {
       }
     }
 
-    // Small delay before sending
-    await new Promise(r => setTimeout(r, 200 + Math.random() * 300));
+    // Customizable delay before sending
+    await new Promise(r => setTimeout(r, delayAfterTyping));
 
     // Try to send the message according to selected method
     let sent = false;
@@ -1308,6 +1309,7 @@ function startAutoSend(messages, config = {}) {
   dailyLimit = config.dailyLimit || 0;
   enableTypingSimulation = config.enableTypingSimulation !== false;
   enableVariableDelays = config.enableVariableDelays !== false;
+  delayAfterTyping = typeof config.delayAfterTyping === 'number' ? config.delayAfterTyping : 500;
   enableAntiRepetition = config.enableAntiRepetition !== false;
   activeHoursEnabled = config.activeHoursEnabled || false;
   activeHoursStart = config.activeHoursStart || 9;
