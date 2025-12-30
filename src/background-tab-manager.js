@@ -32,7 +32,7 @@ class BackgroundTabManager {
       }
     });
 
-    console.log('[BackgroundTabManager] Initialized');
+
   }
 
   /**
@@ -97,7 +97,7 @@ class BackgroundTabManager {
    */
   async registerTab(tabId, config = {}) {
     const tab = await chrome.tabs.get(tabId);
-    
+
     const tabState = {
       tabId,
       url: tab.url,
@@ -111,7 +111,7 @@ class BackgroundTabManager {
     this.activeTabs.set(tabId, tabState);
     await this.saveState();
 
-    console.log('[BackgroundTabManager] Registered tab:', tabId);
+
     return tabState;
   }
 
@@ -121,7 +121,7 @@ class BackgroundTabManager {
   async unregisterTab(tabId) {
     this.activeTabs.delete(tabId);
     await this.saveState();
-    console.log('[BackgroundTabManager] Unregistered tab:', tabId);
+
   }
 
   /**
@@ -185,7 +185,7 @@ class BackgroundTabManager {
   async removeTab(tabId) {
     this.activeTabs.delete(tabId);
     await this.saveState();
-    console.log('[BackgroundTabManager] Removed tab:', tabId);
+
   }
 
   /**
@@ -205,7 +205,7 @@ class BackgroundTabManager {
   async sendMessageToTab(tabId, message) {
     try {
       await chrome.tabs.sendMessage(tabId, message);
-      console.log('[BackgroundTabManager] Sent message to tab:', tabId);
+      // console.log('[BackgroundTabManager] Sent message to tab:', tabId);
     } catch (error) {
       console.error('[BackgroundTabManager] Failed to send message to tab:', tabId, error);
       // Tab might be closed or unresponsive, remove it
@@ -236,7 +236,7 @@ class BackgroundTabManager {
             return [parseInt(key, 10), value];
           });
           this.activeTabs = new Map(entries);
-          console.log('[BackgroundTabManager] Loaded state:', this.activeTabs.size, 'tabs');
+
         }
         resolve();
       });
@@ -264,7 +264,7 @@ class BackgroundTabManager {
    */
   async cleanupInactiveTabs() {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    
+
     for (const [tabId, state] of this.activeTabs.entries()) {
       const lastActivity = new Date(state.lastActivity);
       if (lastActivity < oneDayAgo) {

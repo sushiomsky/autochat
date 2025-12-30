@@ -80,7 +80,7 @@ const SchedulerServiceClass = class {
             delayInMinutes: periodInMinutes,
             periodInMinutes: periodInMinutes
         });
-        console.log(`[SchedulerService] Registered alarm: ${name} (every ${periodInMinutes}m)`);
+
     }
 
     unregisterAlarm(id) {

@@ -148,6 +148,96 @@ const ProfileServiceClass = class {
     }
 
     /**
+     * Export profiles for Cloud Sync (returns Array)
+     * Includes cookies for linked domains
+     */
+    async exportProfilesForSync() {
+        if (!this.profiles) await this._loadFromStorage();
+        const profilesList = Object.values(this.profiles);
+
+        // Enhance with cookies
+        const enhancedProfiles = await Promise.all(profilesList.map(async (p) => {
+            const copy = { ...p };
+            if (p.domains && Array.isArray(p.domains) && p.domains.length > 0) {
+                copy.cookies = [];
+                for (const domain of p.domains) {
+                    try {
+                        const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '').trim();
+                        if (!cleanDomain) continue;
+
+                        const cookies = await chrome.cookies.getAll({ domain: cleanDomain });
+                        if (cookies && cookies.length > 0) {
+                            copy.cookies = [...copy.cookies, ...cookies];
+                        }
+                    } catch (e) {
+                        console.warn('[ProfileService] Failed to export cookies for', domain, e);
+                    }
+                }
+            }
+            return copy;
+        }));
+
+        return enhancedProfiles;
+    }
+
+    /**
+     * Import profiles from Cloud Sync (accepts Array)
+     * Replaces local cache with provided profiles and restores cookies
+     */
+    async importProfilesFromSync(profilesArray) {
+        if (!Array.isArray(profilesArray)) {
+            throw new Error('Invalid input: details must be an array');
+        }
+
+        // 1. Restore Cookies
+        for (const p of profilesArray) {
+            if (p.cookies && Array.isArray(p.cookies)) {
+                for (const c of p.cookies) {
+                    try {
+                        const protocol = c.secure ? 'https' : 'http';
+                        const domainClean = c.domain.replace(/^\./, '');
+                        const url = `${protocol}://${domainClean}${c.path}`;
+
+                        const details = {
+                            url: url,
+                            name: c.name,
+                            value: c.value,
+                            domain: c.domain,
+                            path: c.path,
+                            secure: c.secure,
+                            httpOnly: c.httpOnly,
+                            expirationDate: c.expirationDate,
+                        };
+
+                        Object.keys(details).forEach(key => details[key] === undefined && delete details[key]);
+
+                        await chrome.cookies.set(details);
+                    } catch (e) {
+                        console.warn('[ProfileService] Failed to restore cookie', c.name, e);
+                    }
+                }
+            }
+        }
+
+        // 2. Convert Array -> Object Map
+        const newProfiles = {};
+        profilesArray.forEach(p => {
+            if (p && p.id) {
+                newProfiles[p.id] = p;
+            }
+        });
+
+        this.profiles = newProfiles;
+        await this._saveToStorage();
+
+        if (typeof chrome !== 'undefined' && chrome.runtime) {
+            chrome.runtime.sendMessage({ type: 'profiles_updated' }).catch(() => { });
+        }
+
+        return true;
+    }
+
+    /**
      * Export a profile
      */
     async exportProfile(id) {
@@ -218,7 +308,7 @@ const ProfileServiceClass = class {
             // Attempt to migrate from legacy 'accounts'
             const legacy = await chrome.storage.local.get(['accounts']);
             if (legacy.accounts) {
-                console.log('[ProfileService] Migrating legacy accounts...');
+
                 this.profiles = legacy.accounts;
                 // Add missing fields to legacy profiles
                 Object.values(this.profiles).forEach(p => {

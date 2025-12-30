@@ -72,15 +72,66 @@ const AIServiceClass = class {
     }
 
     /**
-     * Set last prompt for context
+     * Set last prompt for context and generate phrases
      */
     async generatePhrases(prompt, count = 5) {
         this.lastPrompt = prompt;
-        if (this.provider === 'simulation') {
-            return this._generateMockPhrases(count);
+
+        // Ensure settings are loaded
+        if (!this.provider) await this.init();
+
+        if (this.provider === 'openai' && this.apiKey) {
+            try {
+                return await this._callOpenAI(prompt, count);
+            } catch (error) {
+                console.error('[AIService] OpenAI call failed, falling back to simulation:', error);
+                return this._generateMockPhrases(count);
+            }
         } else {
-            console.warn('[AIService] External provider not implemented yet, using simulation.');
             return this._generateMockPhrases(count);
+        }
+    }
+
+    /**
+     * Call OpenAI API
+     */
+    async _callOpenAI(prompt, count) {
+        if (!this.apiKey) throw new Error('No API Key');
+
+        const systemPrompt = `You are a casual user in an online chat room. 
+Generate ${count} short, natural, and friendly chat messages based on the context: "${prompt}".
+Return ONLY a JSON array of strings, like ["Message 1", "Message 2"]. Do not include markdown formatting.`;
+
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.apiKey}`
+            },
+            body: JSON.stringify({
+                model: 'gpt-3.5-turbo',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: 'Generate messages.' }
+                ],
+                temperature: 0.8,
+                max_tokens: 150
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`OpenAI API Error: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const content = data.choices[0].message.content.trim();
+
+        try {
+            // Attempt to parse JSON array
+            return JSON.parse(content);
+        } catch (e) {
+            // Fallback if not pure JSON: split by lines
+            return content.split('\n').filter(line => line.length > 0);
         }
     }
 

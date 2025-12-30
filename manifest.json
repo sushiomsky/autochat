@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "4.5.4",
+  "version": "5.0.0",
   "description": "__MSG_extDescription__",
   "default_locale": "en",
   "permissions": [
@@ -9,7 +9,8 @@
     "activeTab",
     "scripting",
     "alarms",
-    "identity"
+    "identity",
+    "cookies"
   ],
   "oauth2": {
     "client_id": "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",

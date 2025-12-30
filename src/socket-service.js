@@ -21,7 +21,7 @@ const SocketServiceClass = class {
     }
 
     async init() {
-        console.log('[SocketService] Initializing...');
+
         return Promise.resolve();
     }
 
@@ -41,7 +41,7 @@ const SocketServiceClass = class {
         };
 
         this.currentLocks.set(profileId, userId);
-        console.log(`[SocketService] User ${userId} locked profile ${profileId}`);
+
         this._broadcast(message);
     }
 
@@ -62,19 +62,19 @@ const SocketServiceClass = class {
 
         const userId = this.currentLocks.get(profileId);
         this.currentLocks.delete(profileId);
-        console.log(`[SocketService] Profile ${profileId} unlocked (previously locked by ${userId})`);
+
         this._broadcast(message);
     }
 
     _broadcast(message) {
-        console.log('[SocketService] Broadcasting:', message);
+
         this.handlers.forEach(h => h(message));
     }
 
     connect() {
         if (this.isConnected) return;
 
-        console.log('[SocketService] Connecting to Team Pulse server (Simulated)...');
+
         this.isConnected = true;
 
         // Start simulation loop
@@ -119,7 +119,7 @@ const SocketServiceClass = class {
                 }
             };
 
-            console.log('[SocketService] Simulated Pulse:', message);
+
             this.handlers.forEach(h => h(message));
 
             // Schedule next pulse

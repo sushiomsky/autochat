@@ -421,14 +421,23 @@ const AnalyticsServiceClass = class {
      */
     async exportCSV() {
         const stats = await this.getStats('all');
+        const logs = await this._getStorage(this.STORAGE_KEYS.LOGS) || [];
 
         let csv = 'Date,Messages Sent,Messages Failed,Success Rate\n';
-
         stats.timeSeries.forEach(entry => {
             const total = entry.sent + entry.failed;
             const rate = total > 0 ? Math.round((entry.sent / total) * 100) : 0;
             csv += `${entry.label},${entry.sent},${entry.failed},${rate}%\n`;
         });
+
+        if (logs.length > 0) {
+            csv += '\nTimestamp,Type,Details\n';
+            logs.forEach(l => {
+                const date = new Date(l.timestamp).toISOString();
+                const details = l.data ? JSON.stringify(l.data).replace(/,/g, ';') : '';
+                csv += `${date},${l.type},${details}\n`;
+            });
+        }
 
         return csv;
     }
@@ -447,7 +456,7 @@ const AnalyticsServiceClass = class {
                 failed: stats.timeSeries.map(d => d.failed)
             },
             // Bar chart: Hourly distribution
-            hourlyChart: stats.hourlyHeatmap,
+            hourlyChart: stats.hourlyHeatmap, // Array(24)
             // Pie chart: Success vs Failure
             successChart: {
                 labels: ['Successful', 'Failed'],
@@ -456,17 +465,74 @@ const AnalyticsServiceClass = class {
             }
         };
     }
+
+    /**
+     * Generate smart recommendations
+     */
+    async generateRecommendations() {
+        const stats = await this.getStats('7d');
+        const recs = [];
+
+        // 1. High Failure Rate
+        if (stats.summary.totalSent > 50 && stats.summary.successRate < 80) {
+            recs.push({
+                type: 'warning',
+                title: 'High Failure Rate Detected',
+                message: `Your success rate is only ${stats.summary.successRate}%. Consider increasing message intervals.`,
+                action: 'Adjust Interval'
+            });
+        }
+
+        // 2. Optimal Time
+        const peakHour = stats.hourlyHeatmap.indexOf(Math.max(...stats.hourlyHeatmap));
+        recs.push({
+            type: 'tip',
+            title: 'Peak Performance Time',
+            message: `Your most active hour is ${peakHour}:00. Scheduling during this time matches your behavior.`
+        });
+
+        // 3. Success Milestone
+        if (stats.summary.totalSent > 1000) {
+            recs.push({
+                type: 'success',
+                title: 'Automation Master',
+                message: 'You have sent over 1,000 messages! Your setup is running smoothly.'
+            });
+        }
+
+        return recs;
+    }
+
+    // --- Helpers ---
+
+    _generateId() {
+        return Math.random().toString(36).substr(2, 9);
+    }
+
+    _formatTime(ts) {
+        const date = new Date(ts);
+        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    }
+
+    // --- Storage Wrappers ---
+
+    async _getStorage(key) {
+        const res = await chrome.storage.local.get([key]);
+        return res[key];
+    }
+
+    async _setStorage(key, value) {
+        await chrome.storage.local.set({ [key]: value });
+    }
 };
 
 // Export singleton - wrapped in IIFE
 (function () {
     const analyticsService = new AnalyticsServiceClass();
+    const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
+    globalScope.AnalyticsService = analyticsService;
 
     if (typeof module !== 'undefined' && module.exports) {
         module.exports = analyticsService;
-    } else {
-        // Browser/Service Worker environment
-        const globalScope = typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this);
-        globalScope.AnalyticsService = analyticsService;
     }
 })();

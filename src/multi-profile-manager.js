@@ -10,7 +10,7 @@ class MultiProfileManager {
     }
 
     async init() {
-        console.log('[MultiProfileManager] Initializing...');
+
 
         // Initialize profile service
         if (typeof ProfileService !== 'undefined') {
@@ -46,14 +46,14 @@ class MultiProfileManager {
             const profile = await this.profileService.getProfileByUrl(url);
 
             if (profile) {
-                console.log(`[MultiProfileManager] Auto-detected profile: ${profile.name} for ${url}`);
+
                 await this.loadProfileForTab(tabId, profile.id);
                 this.activeProfiles.set(tabId, profile.id);
 
                 // Update badge
                 this.updateBadge();
             } else {
-                console.log(`[MultiProfileManager] No profile found for ${url}`);
+
                 // Optionally suggest creating a new profile
                 if (this.shouldSuggestProfile(url)) {
                     this.suggestProfileCreation(tabId, url);
@@ -80,7 +80,7 @@ class MultiProfileManager {
                 profile: profileData
             });
 
-            console.log(`[MultiProfileManager] Loaded profile ${profileData.name} for tab ${tabId}`);
+
         } catch (error) {
             console.error('[MultiProfileManager] Error loading profile:', error);
         }
@@ -126,14 +126,14 @@ class MultiProfileManager {
     onTabActivated(tabId) {
         const profileId = this.activeProfiles.get(tabId);
         if (profileId) {
-            console.log(`[MultiProfileManager] Tab ${tabId} activated with profile ${profileId}`);
+
             // Optionally update UI or perform other actions
         }
     }
 
     onTabClosed(tabId) {
         if (this.activeProfiles.has(tabId)) {
-            console.log(`[MultiProfileManager] Tab ${tabId} closed, removing profile association`);
+
             this.activeProfiles.delete(tabId);
             this.updateBadge();
         }

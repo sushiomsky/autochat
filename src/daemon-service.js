@@ -13,7 +13,7 @@ const DaemonServiceClass = class {
     }
 
     async init() {
-        console.log('[Daemon] Initializing...');
+
 
         // Load configuration
         const settings = await chrome.storage.local.get([this.STORAGE_KEY]);
@@ -21,7 +21,7 @@ const DaemonServiceClass = class {
 
         // Auto-start if enabled
         if (this.config.autoStartOnBrowserLaunch) {
-            console.log('[Daemon] Auto-start enabled, starting daemon...');
+
             await this.start();
         }
     }
@@ -52,11 +52,11 @@ const DaemonServiceClass = class {
 
     async start() {
         if (this.isRunning) {
-            console.log('[Daemon] Already running');
+
             return;
         }
 
-        console.log('[Daemon] Starting daemon mode...');
+
         this.isRunning = true;
 
         // Load all enabled profiles
@@ -65,7 +65,7 @@ const DaemonServiceClass = class {
             p.settings?.daemonEnabled === true
         );
 
-        console.log(`[Daemon] Found ${enabledProfiles.length} enabled profiles`);
+
 
         // Start automation for each profile (up to max concurrent)
         const profilesToStart = enabledProfiles.slice(0, this.config.maxConcurrentProfiles);
@@ -79,7 +79,7 @@ const DaemonServiceClass = class {
         // Save running state
         await this.saveConfig({ ...this.config, enabled: true });
 
-        console.log(`[Daemon] Started with ${this.activeAutomations.size} profiles`);
+
 
         // Notify user
         chrome.notifications.create({
@@ -92,11 +92,11 @@ const DaemonServiceClass = class {
 
     async stop() {
         if (!this.isRunning) {
-            console.log('[Daemon] Not running');
+
             return;
         }
 
-        console.log('[Daemon] Stopping daemon mode...');
+
         this.isRunning = false;
 
         // Stop all automations
@@ -114,7 +114,7 @@ const DaemonServiceClass = class {
         // Save stopped state
         await this.saveConfig({ ...this.config, enabled: false });
 
-        console.log('[Daemon] Stopped');
+
 
         // Notify user
         chrome.notifications.create({
@@ -154,7 +154,7 @@ const DaemonServiceClass = class {
             automation.status = 'active';
             this.activeAutomations.set(profile.id, automation);
 
-            console.log(`[Daemon] Started automation for profile: ${profile.name}`);
+
         } catch (error) {
             automation.status = 'failed';
             automation.lastError = error.message;
@@ -168,7 +168,7 @@ const DaemonServiceClass = class {
     async stopProfileAutomation(profileId) {
         const automation = this.activeAutomations.get(profileId);
         if (!automation) {
-            console.log(`[Daemon] No active automation for profile ${profileId}`);
+
             return;
         }
 
@@ -180,7 +180,7 @@ const DaemonServiceClass = class {
             }
 
             this.activeAutomations.delete(profileId);
-            console.log(`[Daemon] Stopped automation for profile: ${automation.profileName}`);
+
         } catch (error) {
             console.error(`[Daemon] Error stopping automation:`, error);
             // Force remove even if error
@@ -195,12 +195,12 @@ const DaemonServiceClass = class {
             const tabs = await chrome.tabs.query({ url: `*://${domain}/*` });
 
             if (tabs.length > 0) {
-                console.log(`[Daemon] Found existing tab for ${domain}`);
+
                 return tabs[0];
             }
 
             // Create new tab
-            console.log(`[Daemon] Creating new tab for ${domain}`);
+
             return await chrome.tabs.create({
                 url: `https://${domain}`,
                 active: false
@@ -255,7 +255,7 @@ const DaemonServiceClass = class {
                     message: `Profile "${automation.profileName}" stopped after ${automation.errors} errors`
                 });
             } else if (this.config.errorRecovery.enabled) {
-                console.log(`[Daemon] Scheduling recovery for ${automation.profileName}...`);
+
                 setTimeout(async () => {
                     const profiles = await ProfileService.getAll();
                     const profile = profiles[profileId];

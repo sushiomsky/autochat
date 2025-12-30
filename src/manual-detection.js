@@ -19,7 +19,7 @@ class ManualMessageDetector {
    */
   startMonitoring(inputSelector, onManualSend) {
     if (this.isMonitoring) {
-      console.log('[ManualDetector] Already monitoring');
+
       return;
     }
 
@@ -40,8 +40,8 @@ class ManualMessageDetector {
     });
 
     // Observe the input element
-    if (inputElement.contentEditable === 'true' || 
-        inputElement.getAttribute('contenteditable') === 'true') {
+    if (inputElement.contentEditable === 'true' ||
+      inputElement.getAttribute('contenteditable') === 'true') {
       // ContentEditable element
       this.inputObserver.observe(inputElement, {
         childList: true,
@@ -81,7 +81,7 @@ class ManualMessageDetector {
     inputElement.addEventListener('keydown', this.keydownHandler);
     document.addEventListener('click', this.clickHandler, true);
 
-    console.log('[ManualDetector] Started monitoring for manual sends');
+
   }
 
   /**
@@ -108,7 +108,7 @@ class ManualMessageDetector {
     document.removeEventListener('click', this.clickHandler, true);
 
     this.isMonitoring = false;
-    console.log('[ManualDetector] Stopped monitoring');
+
   }
 
   /**
@@ -138,8 +138,8 @@ class ManualMessageDetector {
     if (previousValue.length > 0 && currentValue.length === 0) {
       // Check if this was NOT an automated message
       if (!this.recentAutomatedMessages.has(previousValue.trim())) {
-        console.log('[ManualDetector] Manual send detected:', previousValue);
-        
+
+
         if (this.onManualSendCallback) {
           this.onManualSendCallback({
             text: previousValue,
@@ -162,8 +162,8 @@ class ManualMessageDetector {
       return element.value || '';
     }
 
-    if (element.contentEditable === 'true' || 
-        element.getAttribute('contenteditable') === 'true') {
+    if (element.contentEditable === 'true' ||
+      element.getAttribute('contenteditable') === 'true') {
       return element.textContent || '';
     }
 

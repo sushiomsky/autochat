@@ -21,7 +21,7 @@ class ChatLogger {
    */
   async startLogging(containerSelector, options = {}) {
     if (this.isLogging) {
-      console.log('[ChatLogger] Already logging');
+
       return;
     }
 
@@ -59,7 +59,7 @@ class ChatLogger {
       this.flushQueue();
     }, 5000);
 
-    console.log('[ChatLogger] Started logging messages');
+
   }
 
   /**
@@ -82,7 +82,7 @@ class ChatLogger {
     this.flushQueue();
 
     this.isLogging = false;
-    console.log('[ChatLogger] Stopped logging messages');
+
   }
 
   /**
@@ -130,11 +130,11 @@ class ChatLogger {
    */
   extractMessagesFromContainer(container) {
     const messages = [];
-    
+
     // Common message selectors for various chat platforms
     const selectors = [
       '.message', '.msg', '.message-text', '.bubble', '.chat-message',
-      '.text', '.reply', '.chat__message', '[role="article"]', 
+      '.text', '.reply', '.chat__message', '[role="article"]',
       '[class*="message"]', '[class*="msg"]', '[data-message-id]'
     ];
 
@@ -159,7 +159,7 @@ class ChatLogger {
    */
   extractMessagesFromElement(element) {
     const messages = [];
-    
+
     // Check if element itself is a message
     const message = this.extractMessageFromElement(element);
     if (message) {
@@ -217,9 +217,9 @@ class ChatLogger {
     for (const selector of timeSelectors) {
       const timeEl = element.querySelector(selector) || element.closest(selector);
       if (timeEl) {
-        const timestamp = timeEl.getAttribute('data-timestamp') || 
-                         timeEl.getAttribute('datetime') ||
-                         timeEl.textContent;
+        const timestamp = timeEl.getAttribute('data-timestamp') ||
+          timeEl.getAttribute('datetime') ||
+          timeEl.textContent;
         if (timestamp) {
           const parsed = new Date(timestamp);
           if (!isNaN(parsed.getTime())) {
@@ -246,8 +246,8 @@ class ChatLogger {
       const senderEl = element.querySelector(selector) || element.closest(selector);
       if (senderEl) {
         const sender = senderEl.getAttribute('data-sender') ||
-                      senderEl.getAttribute('data-author') ||
-                      senderEl.textContent?.trim();
+          senderEl.getAttribute('data-author') ||
+          senderEl.textContent?.trim();
         if (sender && sender.length > 0 && sender.length < 100) {
           return sender;
         }
@@ -263,16 +263,16 @@ class ChatLogger {
   detectMessageDirection(element) {
     const classes = element.className || '';
     const id = element.id || '';
-    
+
     // Common patterns for outgoing messages
     if (classes.match(/\b(me|self|own|sent|outgoing|right)\b/i) ||
-        id.match(/\b(me|self|own|sent|outgoing)\b/i)) {
+      id.match(/\b(me|self|own|sent|outgoing)\b/i)) {
       return 'outgoing';
     }
 
     // Common patterns for incoming messages
     if (classes.match(/\b(them|other|received|incoming|left)\b/i) ||
-        id.match(/\b(them|other|received|incoming)\b/i)) {
+      id.match(/\b(them|other|received|incoming)\b/i)) {
       return 'incoming';
     }
 
@@ -313,8 +313,8 @@ class ChatLogger {
    */
   queueMessage(message) {
     // Check for duplicates in queue
-    const isDuplicate = this.messageQueue.some(m => 
-      m.text === message.text && 
+    const isDuplicate = this.messageQueue.some(m =>
+      m.text === message.text &&
       Math.abs(new Date(m.timestamp) - new Date(message.timestamp)) < 1000
     );
 
@@ -334,7 +334,7 @@ class ChatLogger {
 
     try {
       await this.saveMessages(messages);
-      console.log(`[ChatLogger] Saved ${messages.length} messages`);
+
     } catch (error) {
       console.error('[ChatLogger] Failed to save messages:', error);
       // Re-queue on failure
@@ -397,7 +397,7 @@ class ChatLogger {
         // Apply filters
         if (options.search) {
           const searchLower = options.search.toLowerCase();
-          messages = messages.filter(m => 
+          messages = messages.filter(m =>
             m.text.toLowerCase().includes(searchLower) ||
             m.sender.toLowerCase().includes(searchLower)
           );
@@ -414,7 +414,7 @@ class ChatLogger {
         }
 
         if (options.sender) {
-          messages = messages.filter(m => 
+          messages = messages.filter(m =>
             m.sender.toLowerCase().includes(options.sender.toLowerCase())
           );
         }
@@ -499,7 +499,7 @@ class ChatLogger {
           reject(chrome.runtime.lastError);
         } else {
           this.messageQueue = [];
-          console.log('[ChatLogger] Cleared all logs');
+
           resolve();
         }
       });
@@ -512,7 +512,7 @@ class ChatLogger {
   async exportToJSON() {
     const messages = await this.getMessages();
     const stats = await this.getStats();
-    
+
     return JSON.stringify({
       exportDate: new Date().toISOString(),
       stats: stats,
@@ -525,7 +525,7 @@ class ChatLogger {
    */
   async exportToCSV() {
     const messages = await this.getMessages();
-    
+
     const headers = ['ID', 'Timestamp', 'Sender', 'Direction', 'Platform', 'Text'];
     const rows = [headers];
 

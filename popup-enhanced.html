@@ -259,6 +259,25 @@
       </label>
       <div class="help">Use AI to generate contextual replies based on message sentiment</div>
 
+      <div id="aiSettingsContainer" class="sub-settings"
+        style="margin-top: 10px; padding-left: 20px; border-left: 2px solid var(--border-color, #e2e8f0);">
+        <label style="display: block; margin-bottom: 8px;">
+          Provider:
+          <select id="aiProvider" style="width: 100%; margin-top: 4px;">
+            <option value="simulation">Simulation (Mock)</option>
+            <option value="openai">OpenAI (GPT-3.5/4)</option>
+          </select>
+        </label>
+
+        <div id="aiApiKeyField" style="display: none;">
+          <label style="display: block; margin-bottom: 8px;">
+            API Key:
+            <input type="password" id="aiApiKey" placeholder="sk-..." style="width: 100%; margin-top: 4px;">
+          </label>
+          <div class="help">Key is stored locally in your browser.</div>
+        </div>
+      </div>
+
       <label>
         Keywords to Watch (one per line):
         <textarea id="mentionKeywords" rows="3" placeholder="@username&#10;your name&#10;hey you"></textarea>
@@ -401,6 +420,30 @@
 
           <hr style="margin: 10px 0; border: 0; border-top: 1px solid var(--border-color); opacity: 0.3;">
 
+          <div id="cloudSyncControls" class="section-small">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+              <span style="font-size: 0.85em; font-weight: bold;">Cloud Sync</span>
+              <label class="switch-small">
+                <input type="checkbox" id="cloudSyncEnabled">
+                <span class="slider round"></span>
+              </label>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
+              <span id="cloudSyncStatus" style="font-size: 0.75em; color: var(--text-muted);">Status: Idle</span>
+              <button id="manualSyncBtn" class="btn-primary-small" style="font-size: 0.75em; padding: 2px 8px;">
+                🔄 Sync Now
+              </button>
+            </div>
+
+            <div id="syncConflictAlert" class="alert-warning-small"
+              style="display: none; margin-top: 8px; font-size: 0.75em;">
+              ⚠️ Conflict detected! <a href="#" id="resolveConflictLink">Resolve</a>
+            </div>
+          </div>
+
+          <hr style="margin: 10px 0; border: 0; border-top: 1px solid var(--border-color); opacity: 0.3;">
+
           <div id="googleDriveSection" class="section-small">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
               <span style="font-size: 0.85em; font-weight: bold;">Google Drive Sync</span>
@@ -489,56 +532,85 @@
     </div>
   </div>
 
-  <!-- Analytics Modal -->
-  <div id="analyticsModal" class="modal">
-    <div class="modal-content">
-      <h3>📊 Analytics & Statistics</h3>
-
-      <div class="analytics-grid">
-        <div class="analytics-card">
-          <div class="analytics-label">Messages Today</div>
-          <div class="analytics-value" id="analyticsToday">0</div>
-        </div>
-
-        <div class="analytics-card">
-          <div class="analytics-label">Total Messages</div>
-          <div class="analytics-value" id="analyticsTotal">0</div>
-        </div>
-
-        <div class="analytics-card">
-          <div class="analytics-label">Status</div>
-          <div class="analytics-value" id="analyticsStatus">Inactive</div>
+  <!-- Advanced Analytics Modal -->
+  <div id="advancedAnalyticsModal" class="modal">
+    <div class="modal-content large-modal">
+      <div class="modal-header">
+        <h3>📊 Advanced Analytics</h3>
+        <div class="header-controls">
+          <select id="analytics-timerange" class="select-small">
+            <option value="24h">Last 24 Hours</option>
+            <option value="7d" selected>Last 7 Days</option>
+            <option value="30d">Last 30 Days</option>
+          </select>
+          <button id="refresh-analytics" class="btn-icon">🔄</button>
         </div>
       </div>
+
+      <!-- Key Metrics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="total-messages-stat">0</div>
+          <div class="stat-label">Total Messages</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="success-rate-stat">0%</div>
+          <div class="stat-label">Success Rate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="peak-hour-stat">--:--</div>
+          <div class="stat-label">Peak Hour</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="avg-duration-stat">--</div>
+          <div class="stat-label">Avg. Duration</div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="charts-layout">
+        <!-- Main Trend Chart -->
+        <div class="chart-box full-width">
+          <h4>Message Volume Trend</h4>
+          <div class="chart-wrapper">
+            <canvas id="trend-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Secondary Charts -->
+        <div class="chart-row">
+          <div class="chart-box half-width">
+            <h4>Hourly Activity</h4>
+            <div class="chart-wrapper">
+              <canvas id="distribution-chart"></canvas>
+            </div>
+          </div>
+          <div class="chart-box half-width">
+            <h4>Success Ratio</h4>
+            <div class="chart-wrapper">
+              <canvas id="success-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="recommendations-section">
+        <h4>💡 Insights & Recommendations</h4>
+        <ul id="recommendations-list" class="recommendations-list">
+          <!-- Populated by JS -->
+          <li class="help">Loading insights...</li>
+        </ul>
+      </div>
+
+      <div class="modal-footer">
+        <div class="export-controls">
+          <button id="export-analytics-csv" class="btn-secondary">📄 Export CSV</button>
+          <button id="export-analytics-json" class="btn-secondary">DATA Export JSON</button>
+        </div>
+        <button class="close-modal btn-primary">Close</button>
+      </div>
     </div>
-
-    <div class="chart-controls" style="margin: 16px 0; display: flex; justify-content: flex-end;">
-      <select id="analyticsTimeRange" style="width: auto;">
-        <option value="24h">Last 24 Hours</option>
-        <option value="7d" selected>Last 7 Days</option>
-        <option value="30d">Last 30 Days</option>
-      </select>
-    </div>
-
-    <div class="chart-container" style="position: relative; height: 200px; width: 100%; margin-bottom: 20px;">
-      <canvas id="mainChart"></canvas>
-    </div>
-
-    <div class="chart-container" style="position: relative; height: 150px; width: 100%;">
-      <canvas id="hourlyChart"></canvas>
-    </div>
-
-    <hr>
-
-    <div class="help">Statistics track all messages sent by AutoChat</div>
-
-    <hr>
-
-    <div class="help">Recent activity and errors will be logged here in future updates</div>
-
-    <button id="resetStats" class="btn-danger">🗑️ Reset Statistics</button>
-    <button class="close-modal btn-primary">Close</button>
-  </div>
   </div>
 
   <!-- Account Management Modal -->

@@ -29,6 +29,22 @@ const CloudSyncServiceClass = class {
         if (this.isEnabled) {
             this.startSyncTimer();
         }
+
+        // Listen for messages from Popup
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            if (request.action === 'triggerCloudSync') {
+                this.performSync().then(result => sendResponse(result));
+                return true; // async response
+            }
+            if (request.action === 'setCloudSyncEnabled') {
+                this.setEnabled(request.enabled).then(() => sendResponse({ success: true }));
+                return true;
+            }
+            if (request.action === 'resolveCloudSyncConflict') {
+                this.resolveConflict(request.choice).then(res => sendResponse({ success: !!res }));
+                return true;
+            }
+        });
     }
 
     /**
@@ -97,16 +113,18 @@ const CloudSyncServiceClass = class {
     async performSync() {
         if (!this.isEnabled || this.status === 'syncing') return;
 
-        console.log('[CloudSync] Starting sync cycle...');
+
         this.status = 'syncing';
 
         try {
             // 1. Pull changes from "Cloud"
             const cloudData = await this._fetchFromCloud();
 
-            // 2. Get Local Data
-            const localProfilesResult = await chrome.storage.local.get(['profiles_v5']);
-            let localProfiles = localProfilesResult.profiles_v5 || [];
+            // 2. Get Local Data via ProfileService (Array format)
+            if (typeof ProfileService === 'undefined') {
+                throw new Error('ProfileService not available');
+            }
+            const localProfiles = await ProfileService.exportProfilesForSync();
 
             // 3. Resolve Conflicts & Merge
             const { merged, changed, conflict } = this._merge(localProfiles, cloudData.profiles);
@@ -120,8 +138,9 @@ const CloudSyncServiceClass = class {
             }
 
             if (changed) {
-                console.log('[CloudSync] Local data updated from cloud.');
-                await chrome.storage.local.set({ profiles_v5: merged });
+
+                // Update local via ProfileService
+                await ProfileService.importProfilesFromSync(merged);
             }
 
             // 4. Push local changes back to cloud
@@ -133,7 +152,7 @@ const CloudSyncServiceClass = class {
             });
 
             this.status = 'idle';
-            console.log('[CloudSync] Sync complete.');
+
             return true;
         } catch (error) {
             console.error('[CloudSync] Sync failed:', error);
@@ -252,8 +271,10 @@ const CloudSyncServiceClass = class {
 
         const data = choice === 'local' ? this.pendingConflict.local : this.pendingConflict.cloud;
 
-        // 1. Update local
-        await chrome.storage.local.set({ profiles_v5: data });
+        // 1. Update local via ProfileService
+        if (typeof ProfileService !== 'undefined') {
+            await ProfileService.importProfilesFromSync(data);
+        }
 
         // 2. Push to cloud
         await this._pushToCloud(data);

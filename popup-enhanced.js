@@ -113,6 +113,13 @@ const elements = {
   notificationSound: document.getElementById('notificationSound'),
   themeSelect: document.getElementById('themeSelect'),
 
+  // Cloud Sync
+  cloudSyncEnabled: document.getElementById('cloudSyncEnabled'),
+  cloudSyncStatus: document.getElementById('cloudSyncStatus'),
+  manualSyncBtn: document.getElementById('manualSyncBtn'),
+  syncConflictAlert: document.getElementById('syncConflictAlert'),
+  resolveConflictLink: document.getElementById('resolveConflictLink'),
+
   // Account Management
   accountSelect: document.getElementById('accountSelect'),
   manageAccounts: document.getElementById('manageAccounts'),
@@ -134,6 +141,23 @@ const elements = {
   webhookModal: document.getElementById('webhookModal'),
   donationModal: document.getElementById('donationModal'),
   performanceModal: document.getElementById('performanceModal'),
+  activeHoursModal: document.getElementById('activeHoursModal'),
+  previewModal: document.getElementById('previewModal'),
+  welcomeModal: document.getElementById('welcomeModal'),
+  advancedAnalyticsModal: document.getElementById('advancedAnalyticsModal'),
+
+  // Buttons
+  openActiveHoursBtn: document.getElementById('openActiveHoursBtn'),
+  openPreviewBtn: document.getElementById('openPreviewBtn'),
+  openAccountManagerBtn: document.getElementById('openAccountManagerBtn'),
+  openAnalyticsBtn: document.getElementById('openAnalyticsBtn'),
+
+  // Analytics
+  refreshAnalyticsBtn: document.getElementById('refresh-analytics'),
+
+  // AI
+  aiProvider: document.getElementById('aiProvider'),
+  aiApiKey: document.getElementById('aiApiKey'),
 
   // Phrase management
   customPhrasesList: document.getElementById('customPhrasesList'),
@@ -1663,6 +1687,41 @@ function updateAccountList() {
     const actions = document.createElement('div');
     actions.className = 'account-item-actions';
 
+    // Auto-Start Toggle
+    const autoStartLabel = document.createElement('label');
+    autoStartLabel.className = 'switch-small';
+    autoStartLabel.style.marginRight = '8px';
+    autoStartLabel.title = 'Auto-Start Chatting (Daemon Type)';
+
+    const autoStartInput = document.createElement('input');
+    autoStartInput.type = 'checkbox';
+    // Check if daemonEnabled in profile settings
+    autoStartInput.checked = profile.settings && profile.settings.daemonEnabled === true;
+
+    autoStartInput.onchange = async (e) => {
+      const enabled = e.target.checked;
+      // Update profile settings
+      const currentSettings = profile.settings || {};
+      currentSettings.daemonEnabled = enabled;
+
+      await new Promise(resolve => {
+        chrome.runtime.sendMessage({
+          action: 'updateProfile',
+          id: accountId,
+          updates: { settings: currentSettings }
+        }, resolve);
+      });
+
+      showNotification(enabled ? `Auto-Start enabled for ${profile.name}` : `Auto-Start disabled for ${profile.name}`, true);
+    };
+
+    const autoStartSpan = document.createElement('span');
+    autoStartSpan.className = 'slider round';
+
+    autoStartLabel.appendChild(autoStartInput);
+    autoStartLabel.appendChild(autoStartSpan);
+    actions.appendChild(autoStartLabel); // Add before switch button
+
     if (!isActive && !isLocked) {
       const switchBtn = document.createElement('button');
       switchBtn.textContent = '🔄 Switch';
@@ -1778,6 +1837,10 @@ function getCurrentSettings() {
     sendConfirmTimeout: elements.sendConfirmTimeout ? elements.sendConfirmTimeout.value : 3,
     mentionDetectionEnabled: elements.mentionDetectionEnabled.checked,
     aiAutoRepliesEnabled: elements.aiAutoRepliesEnabled.checked,
+    aiSettings: {
+      provider: elements.aiProvider?.value || 'simulation',
+      apiKey: elements.aiApiKey?.value || ''
+    },
     mentionKeywords: mentionKeywords,
     mentionReplyMessages: mentionReplyMessages,
     chatLoggingEnabled: elements.chatLoggingEnabled?.checked || false,
@@ -1988,6 +2051,32 @@ function loadSettings() {
     // Mention detection settings
     elements.mentionDetectionEnabled.checked = data.mentionDetectionEnabled || false;
     elements.aiAutoRepliesEnabled.checked = data.aiAutoRepliesEnabled || false;
+
+    // AI Settings
+    if (elements.aiProvider) {
+      elements.aiProvider.value = data.aiSettings?.provider || 'simulation';
+      if (elements.aiApiKey) elements.aiApiKey.value = data.aiSettings?.apiKey || '';
+
+      // Initial visibility check
+      const apiKeyField = document.getElementById('aiApiKeyField');
+      if (apiKeyField) {
+        apiKeyField.style.display = elements.aiProvider.value === 'openai' ? 'block' : 'none';
+      }
+
+      // Event listener for provider change
+      elements.aiProvider.onchange = (e) => {
+        if (apiKeyField) {
+          apiKeyField.style.display = e.target.value === 'openai' ? 'block' : 'none';
+        }
+        saveSettings(); // Save immediately
+      };
+
+      // Event listener for key change
+      if (elements.aiApiKey) {
+        elements.aiApiKey.onchange = saveSettings;
+      }
+    }
+
     if (data.mentionKeywords && Array.isArray(data.mentionKeywords)) {
       elements.mentionKeywords.value = data.mentionKeywords.join('\n');
     }
@@ -2018,6 +2107,16 @@ function loadSettings() {
     const hoursInputs = document.getElementById('activeHoursInputs');
     if (hoursInputs) {
       hoursInputs.style.display = elements.activeHours.checked ? 'flex' : 'none';
+    }
+
+    // Cloud Sync
+    if (elements.cloudSyncEnabled) {
+      elements.cloudSyncEnabled.checked = !!data.cloudSyncEnabled;
+      const lastSync = data.cloudSyncSettings?.lastSyncTime;
+      if (lastSync) {
+        const timeStr = new Date(lastSync).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        elements.cloudSyncStatus.textContent = `Last synced: ${timeStr}`;
+      }
     }
   });
 }
@@ -2116,6 +2215,62 @@ elements.aiAutoRepliesEnabled?.addEventListener('change', () => {
 
 elements.mentionKeywords?.addEventListener('input', saveSettings);
 elements.mentionReplyMessages?.addEventListener('input', saveSettings);
+
+// Cloud Sync Listeners
+elements.cloudSyncEnabled?.addEventListener('change', async () => {
+  const enabled = elements.cloudSyncEnabled.checked;
+  // Update local immediately for responsiveness
+  chrome.storage.local.set({ cloudSyncEnabled: enabled });
+
+  // Notify background
+  await chrome.runtime.sendMessage({
+    action: 'setCloudSyncEnabled',
+    enabled: enabled
+  }).catch(err => console.log('Bg missing?', err));
+
+  showNotification(enabled ? 'Cloud Sync Enabled' : 'Cloud Sync Disabled', true);
+});
+
+elements.manualSyncBtn?.addEventListener('click', async () => {
+  elements.manualSyncBtn.disabled = true;
+  elements.manualSyncBtn.textContent = '⏳ Syncing...';
+
+  try {
+    const result = await chrome.runtime.sendMessage({ action: 'triggerCloudSync' });
+    if (result && result.success) {
+      showNotification('Sync Completed Successfully', true);
+      elements.cloudSyncStatus.textContent = 'Last synced: Just now';
+    } else if (result && result.conflict) {
+      showNotification('Sync Conflict Detected', false);
+      elements.syncConflictAlert.style.display = 'block';
+    } else {
+      showNotification('Sync Failed', false);
+    }
+  } catch (err) {
+    console.error('Sync error:', err);
+    showNotification('Sync failed to start', false);
+  } finally {
+    elements.manualSyncBtn.disabled = false;
+    elements.manualSyncBtn.textContent = '🔄 Sync Now';
+  }
+});
+
+elements.resolveConflictLink?.addEventListener('click', async (e) => {
+  e.preventDefault();
+  // Simple resolution for MVP
+  const choice = confirm('Conflict detected!\n\nClick OK to keep LOCAL version.\nClick Cancel to overwrite with CLOUD version.') ? 'local' : 'cloud';
+
+  await chrome.runtime.sendMessage({
+    action: 'resolveCloudSyncConflict',
+    choice: choice
+  });
+
+  elements.syncConflictAlert.style.display = 'none';
+  showNotification(`Resolved using ${choice.toUpperCase()} version`, true);
+
+  // Refresh
+  setTimeout(() => window.location.reload(), 1000);
+});
 
 // ===== LOCALIZATION =====
 

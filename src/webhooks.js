@@ -32,7 +32,7 @@ export class WebhookManager {
    */
   async saveWebhooks() {
     return new Promise((resolve) => {
-      chrome.storage.local.set({ 
+      chrome.storage.local.set({
         webhooks: this.webhooks,
         webhooksEnabled: this.enabled
       }, () => resolve());
@@ -139,7 +139,7 @@ export class WebhookManager {
    */
   async trigger(eventType, data) {
     if (!this.enabled) {
-      console.log('[Webhooks] Webhooks disabled, skipping trigger');
+
       return;
     }
 
@@ -151,9 +151,9 @@ export class WebhookManager {
       return;
     }
 
-    console.log(`[Webhooks] Triggering ${activeWebhooks.length} webhook(s) for event: ${eventType}`);
 
-    const promises = activeWebhooks.map(webhook => 
+
+    const promises = activeWebhooks.map(webhook =>
       this.sendWebhook(webhook, eventType, data)
     );
 
@@ -203,7 +203,7 @@ export class WebhookManager {
         webhook.triggerCount++;
         await this.saveWebhooks();
 
-        console.log(`[Webhooks] Successfully sent to ${webhook.name}`);
+
         return { success: true, webhook: webhook.name };
 
       } catch (error) {
