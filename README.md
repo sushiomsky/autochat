@@ -52,7 +52,7 @@ A powerful browser extension that automatically sends messages to chat applicati
 
 ### Requirements
 
-- Node.js >= 20.19 (Node 22 LTS recommended via `.nvmrc`)
+- Node.js >= 22.11 (Node 22 LTS recommended via `.nvmrc`)
 - npm 9+
 
 ### Quick Start for Development

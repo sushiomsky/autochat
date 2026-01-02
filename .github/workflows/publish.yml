@@ -34,10 +34,13 @@ jobs:
       - name: Package artifact
         run: |
           npm run package
+          npm run package:firefox
           mkdir -p release
-          if [ -d dist ]; then
-            zip -r release/autochat-${{ github.ref_name }}.zip dist
-          fi
+          for artifact in autochat-*.zip; do
+            if [ -f "$artifact" ]; then
+              mv "$artifact" release/
+            fi
+          done
 
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
@@ -48,6 +51,6 @@ jobs:
       - name: Attach assets to release
         uses: softprops/action-gh-release@v2
         with:
-          files: release/autochat-${{ github.ref_name }}.zip
+          files: release/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

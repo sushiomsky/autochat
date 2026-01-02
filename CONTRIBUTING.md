@@ -2,7 +2,7 @@
 
 ## Environment
 
-- Node.js >= 20.19 (Node 22 LTS recommended; `.nvmrc` provided)
+- Node.js >= 22.11 (Node 22 LTS pinned; `.nvmrc` provided)
 - npm 9+ with `--legacy-peer-deps` (handled by `.npmrc` and `Makefile`)
 - Chrome/Firefox only needed when running browser integration tests locally.
 

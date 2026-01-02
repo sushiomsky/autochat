@@ -75,4 +75,5 @@ jobs:
       - name: Run gitleaks
         uses: gitleaks/gitleaks-action@v2
         with:
+          version: latest
           args: detect --source=. --no-banner --redact

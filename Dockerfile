@@ -21,6 +21,7 @@ ENV NODE_ENV=production
 RUN useradd -m -u 10001 appuser
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/manifest.json ./manifest.json
+COPY --from=builder /app/manifest_firefox.json ./manifest_firefox.json
 USER appuser
 
 CMD ["bash", "-c", "ls dist && echo \"Artifacts available at /app/dist\""]
