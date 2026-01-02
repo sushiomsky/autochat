@@ -21,7 +21,8 @@
     "test:selenium": "jest tests/integration/selenium --runInBand",
     "test:puppeteer": "jest tests/integration/puppeteer --runInBand",
     "package:firefox": "npm run build:firefox:prod && cd dist-firefox && zip -r ../autochat-firefox-v4.5.2.zip *",
-    "clean": "rm -rf dist dist-firefox build coverage"
+    "clean": "rm -rf dist dist-firefox build coverage",
+    "prepare": "husky install || true"
   },
   "keywords": [
     "chrome-extension",
@@ -36,22 +37,28 @@
     "type": "git",
     "url": "https://github.com/sushiomsky/autochat"
   },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.23.0",
     "@babel/preset-env": "^7.23.0",
     "babel-jest": "^29.7.0",
+    "chromedriver": "^143.0.0",
     "copy-webpack-plugin": "^11.0.0",
     "eslint": "^8.50.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-jest": "^27.4.0",
+    "http-server": "^14.1.1",
+    "husky": "^9.1.7",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-webextension-mock": "^3.9.0",
-    "selenium-webdriver": "^4.10.0",
-    "chromedriver": "^143.0.0",
-    "http-server": "^14.1.1",
-    "puppeteer-core": "^22.0.0",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.0.3",
+    "puppeteer-core": "^22.0.0",
+    "selenium-webdriver": "^4.10.0",
     "terser-webpack-plugin": "^5.3.9",
     "webpack": "^5.88.0",
     "webpack-cli": "^5.1.4",
@@ -83,5 +90,14 @@
   },
   "dependencies": {
     "chart.js": "^4.5.1"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,html,css}": [
+      "prettier --write"
+    ]
   }
 }

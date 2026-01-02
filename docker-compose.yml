@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # Development service - hot reload enabled
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    container_name: autochat-dev
+    volumes:
+      # Mount source code for live development
+      - .:/app
+      - /app/node_modules  # Prevent overwriting node_modules
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    command: npm run watch
+    ports:
+      - "8080:8080"
+    networks:
+      - autochat-network
+    healthcheck:
+      test: ["CMD", "test", "-f", "/app/dist/manifest.json"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Production build service
+  build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: autochat-build
+    networks:
+      - autochat-network
+    volumes:
+      # Extract built artifacts to host
+      - ./output:/output
+    command: sh -c "cp -r /app/dist /output/ && cp -r /app/dist-firefox /output/ && cp /app/*.zip /output/ 2>/dev/null || true"
+    
+  # Test runner service
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    container_name: autochat-test
+    environment:
+      - NODE_ENV=test
+      - CI=true
+    command: npm test -- --testPathIgnorePatterns="tests/integration"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./coverage:/app/coverage
+    networks:
+      - autochat-network
+
+  # HTTP server for testing extension locally
+  serve:
+    image: node:20-alpine
+    container_name: autochat-serve
+    working_dir: /app
+    volumes:
+      - ./dist:/app
+    command: npx http-server . -p 8080 -c-1
+    ports:
+      - "8080:8080"
+    networks:
+      - autochat-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  autochat-network:
+    driver: bridge
+
+volumes:
+  node_modules:

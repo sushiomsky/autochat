@@ -1,0 +1,50 @@
+{
+  "name": "AutoChat Development",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "orta.vscode-jest",
+        "ms-azuretools.vscode-docker",
+        "eamodio.gitlens",
+        "GitHub.copilot",
+        "GitHub.vscode-pull-request-github"
+      ],
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "eslint.validate": [
+          "javascript",
+          "javascriptreact"
+        ],
+        "files.eol": "\n",
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true
+      }
+    }
+  },
+
+  "postCreateCommand": "npm install --legacy-peer-deps",
+
+  "forwardPorts": [8080],
+
+  "portsAttributes": {
+    "8080": {
+      "label": "Development Server",
+      "onAutoForward": "notify"
+    }
+  },
+
+  "remoteUser": "node"
+}
