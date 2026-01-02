@@ -1,0 +1,68 @@
+# Docker ignore file for AutoChat
+# Exclude unnecessary files from Docker build context
+
+# Git
+.git
+.gitignore
+.github
+
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist
+dist-firefox
+build
+coverage
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test files
+tests
+*.test.js
+
+# Documentation (keep README and LICENSE)
+docs
+TODO.md
+ROADMAP_v5.0.md
+FEATURE_SUGGESTIONS_v5.0.md
+FEATURE_PRIORITY_MATRIX.md
+CHANGELOG.md
+LEGACY_FILES.md
+COMMIT_MESSAGE.txt
+
+# Scripts (we copy source, not scripts)
+scripts/*.md
+
+# Extension packages
+*.crx
+*.pem
+*.zip
+*.tar.gz
+
+# Temporary files
+*.tmp
+*.temp
+.cache
+
+# Husky
+.husky

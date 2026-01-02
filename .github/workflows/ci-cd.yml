@@ -1,0 +1,383 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+# Cancel in-progress runs for the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20.x'
+  CACHE_VERSION: v1
+
+jobs:
+  # Job 1: Lint and Format Check
+  lint:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+        
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: false
+        
+      - name: Check code formatting
+        run: npm run format:check
+        continue-on-error: false
+
+  # Job 2: Security Scanning
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+        
+      - name: Run npm audit
+        run: |
+          npm audit --audit-level=moderate || true
+          npm audit --audit-level=high
+          
+      - name: Check for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+
+  # Job 3: Unit Tests with Coverage
+  test:
+    name: Test (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20.x, 22.x]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+        
+      - name: Run unit tests
+        run: |
+          npm test -- --testPathIgnorePatterns="tests/integration" --coverage
+        env:
+          CI: true
+          
+      - name: Upload coverage to Codecov
+        if: matrix.node-version == '20.x'
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-unit
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+          
+      - name: Upload coverage artifact
+        if: matrix.node-version == '20.x'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+
+  # Job 4: Build Extension
+  build:
+    name: Build Extension
+    runs-on: ubuntu-latest
+    needs: [lint, security, test]
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+        
+      - name: Build Chrome extension (production)
+        run: npm run build:prod
+        
+      - name: Build Firefox extension (production)
+        run: npm run build:firefox:prod
+        
+      - name: Verify build outputs
+        run: |
+          echo "Chrome build contents:"
+          ls -lah dist/
+          echo -e "\nFirefox build contents:"
+          ls -lah dist-firefox/
+          
+      - name: Upload Chrome build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-extension
+          path: dist/
+          retention-days: 30
+          
+      - name: Upload Firefox build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-extension
+          path: dist-firefox/
+          retention-days: 30
+
+  # Job 5: CodeQL Security Analysis
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+          queries: security-and-quality
+          
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+        
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript"
+
+  # Job 6: Package & Release (only on tags)
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [build, codeql]
+    if: startsWith(github.ref, 'refs/tags/v')
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+        
+      - name: Download Chrome build
+        uses: actions/download-artifact@v4
+        with:
+          name: chrome-extension
+          path: dist/
+          
+      - name: Download Firefox build
+        uses: actions/download-artifact@v4
+        with:
+          name: firefox-extension
+          path: dist-firefox/
+          
+      - name: Get version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          
+      - name: Package Chrome extension
+        run: |
+          cd dist
+          zip -r ../autochat-chrome-${{ steps.version.outputs.version }}.zip ./*
+          cd ..
+          
+      - name: Package Firefox extension
+        run: |
+          cd dist-firefox
+          zip -r ../autochat-firefox-${{ steps.version.outputs.version }}.zip ./*
+          cd ..
+          
+      - name: Generate changelog
+        id: changelog
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            # Extract version-specific changelog
+            sed -n "/## \[${{ steps.version.outputs.version }}\]/,/## \[/p" CHANGELOG.md | sed '$d' > /tmp/release-notes.md
+            if [ ! -s /tmp/release-notes.md ]; then
+              echo "Release ${{ steps.version.outputs.version }}" > /tmp/release-notes.md
+              echo "" >> /tmp/release-notes.md
+              echo "See CHANGELOG.md for details." >> /tmp/release-notes.md
+            fi
+          else
+            echo "Release ${{ steps.version.outputs.version }}" > /tmp/release-notes.md
+          fi
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            autochat-chrome-${{ steps.version.outputs.version }}.zip
+            autochat-firefox-${{ steps.version.outputs.version }}.zip
+          body_path: /tmp/release-notes.md
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'alpha') }}
+          generate_release_notes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Job 7: Smoke Tests (smoke test build outputs)
+  smoke-test:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Download Chrome build
+        uses: actions/download-artifact@v4
+        with:
+          name: chrome-extension
+          path: dist/
+          
+      - name: Verify Chrome manifest
+        run: |
+          if [ ! -f dist/manifest.json ]; then
+            echo "❌ Chrome manifest.json not found!"
+            exit 1
+          fi
+          echo "✅ Chrome manifest.json found"
+          cat dist/manifest.json | jq -r '.version'
+          
+      - name: Verify critical files exist
+        run: |
+          required_files=(
+            "dist/background.js"
+            "dist/content-enhanced.js"
+            "dist/popup-enhanced.js"
+            "dist/popup-enhanced.html"
+            "dist/styles.css"
+          )
+          
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Required file missing: $file"
+              exit 1
+            fi
+            echo "✅ Found: $file"
+          done
+          
+      - name: Download Firefox build
+        uses: actions/download-artifact@v4
+        with:
+          name: firefox-extension
+          path: dist-firefox/
+          
+      - name: Verify Firefox manifest
+        run: |
+          if [ ! -f dist-firefox/manifest.json ]; then
+            echo "❌ Firefox manifest.json not found!"
+            exit 1
+          fi
+          echo "✅ Firefox manifest.json found"
+
+  # Job 8: Dependency Review (PRs only)
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          deny-licenses: GPL-2.0, GPL-3.0
+
+  # Summary job
+  ci-success:
+    name: CI Success
+    runs-on: ubuntu-latest
+    needs: [lint, security, test, build, codeql, smoke-test]
+    if: always()
+    
+    steps:
+      - name: Check job results
+        run: |
+          if [[ "${{ needs.lint.result }}" != "success" ]] || \
+             [[ "${{ needs.security.result }}" != "success" ]] || \
+             [[ "${{ needs.test.result }}" != "success" ]] || \
+             [[ "${{ needs.build.result }}" != "success" ]] || \
+             [[ "${{ needs.codeql.result }}" != "success" ]] || \
+             [[ "${{ needs.smoke-test.result }}" != "success" ]]; then
+            echo "❌ One or more CI jobs failed!"
+            exit 1
+          fi
+          echo "✅ All CI jobs passed!"
