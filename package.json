@@ -9,6 +9,8 @@
     "test:coverage": "jest --coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "lint:ci": "npm run lint -- --max-warnings=0",
+    "lint-staged": "lint-staged",
     "format": "prettier --write \"**/*.{js,json,md,html,css}\"",
     "format:check": "prettier --check \"**/*.{js,json,md,html,css}\"",
     "build": "node scripts/build.js",
@@ -20,8 +22,13 @@
     "serve:build": "http-server ./build -p 8080 -c-1",
     "test:selenium": "jest tests/integration/selenium --runInBand",
     "test:puppeteer": "jest tests/integration/puppeteer --runInBand",
+    "test:ci": "npm test -- --runInBand --coverage",
     "package:firefox": "npm run build:firefox:prod && cd dist-firefox && zip -r ../autochat-firefox-v4.5.2.zip *",
-    "clean": "rm -rf dist dist-firefox build coverage"
+    "clean": "rm -rf dist dist-firefox build coverage",
+    "verify": "npm run lint:ci && npm run format:check && npm run test:ci && npm run build:prod",
+    "audit": "npm audit --omit=dev",
+    "audit:ci": "npm audit --omit=dev --audit-level=moderate",
+    "prepare": "husky install"
   },
   "keywords": [
     "chrome-extension",
@@ -32,6 +39,9 @@
   ],
   "author": "AutoChat Team",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/sushiomsky/autochat"
@@ -48,8 +58,9 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-webextension-mock": "^3.9.0",
     "selenium-webdriver": "^4.10.0",
-    "chromedriver": "^143.0.0",
     "http-server": "^14.1.1",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
     "puppeteer-core": "^22.0.0",
     "prettier": "^3.0.3",
     "terser-webpack-plugin": "^5.3.9",
@@ -83,5 +94,17 @@
   },
   "dependencies": {
     "chart.js": "^4.5.1"
+  },
+  "optionalDependencies": {
+    "chromedriver": "^143.0.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "eslint --max-warnings=0",
+      "prettier --write"
+    ],
+    "*.{json,md,html,css}": [
+      "prettier --write"
+    ]
   }
 }

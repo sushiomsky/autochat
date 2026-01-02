@@ -1,0 +1,12 @@
+.git
+.github
+node_modules
+npm-debug.log*
+dist
+dist-firefox
+build
+coverage
+.husky/_/husky.sh
+*.log
+.vscode
+.DS_Store

@@ -7,6 +7,7 @@ A powerful browser extension that automatically sends messages to chat applicati
 ## Features
 
 ### Core Features
+
 - 🎯 **Easy Setup**: Click to mark any text input field on any website
 - 📝 **Multiple Messages**: Enter a list of messages to rotate through
 - 🔀 **Two Send Modes**:
@@ -19,6 +20,7 @@ A powerful browser extension that automatically sends messages to chat applicati
 - 📚 **Language-Specific Phrases**: 300-671 farming phrases in each supported language
 
 ### Advanced Features (v4.0+)
+
 - ⌨️ **Typing Simulation**: Realistic typing speed (40-80 WPM) with character-by-character animation
 - 🎭 **Anti-Detection**: Variable delays, anti-repetition, and human-like behavior patterns
 - 📊 **Analytics Dashboard**: Track messages sent today, total messages, and activity status
@@ -37,6 +39,7 @@ A powerful browser extension that automatically sends messages to chat applicati
 - 👥 **Multi-Account Support**: Manage multiple profiles with separate settings
 
 ### New in v4.4 (UI Polish Edition) ✨
+
 - 🔔 **Notification Center**: In-app notification history with full management (view, mark as read, delete)
 - 📁 **Category Manager**: Create and manage custom message categories with icons and colors
 - ⌨️ **Command Palette**: Quick access to all features with Ctrl+K keyboard shortcut
@@ -46,6 +49,26 @@ A powerful browser extension that automatically sends messages to chat applicati
 - 🎨 **Enhanced UI**: Improved button layouts, notification badges, and visual polish
 
 ## Installation
+
+### Requirements
+
+- Node.js >= 20.19 (Node 22 LTS recommended via `.nvmrc`)
+- npm 9+
+
+### Quick Start for Development
+
+1. Install dependencies with offline-friendly defaults (skips browser binary downloads):
+   ```bash
+   make setup
+   ```
+2. Run the full local quality gate:
+   ```bash
+   npm run verify
+   ```
+3. Pre-commit hooks run automatically. You can trigger the staged checks manually:
+   ```bash
+   npm run lint-staged
+   ```
 
 ### Chrome
 
@@ -65,6 +88,29 @@ A powerful browser extension that automatically sends messages to chat applicati
 
 For detailed Firefox installation and development guide, see [FIREFOX.md](FIREFOX.md).
 
+### Containers & Dev Containers
+
+- Build and verify inside Docker:
+  ```bash
+  docker build -t autochat:dev .
+  ```
+- Open the project in VS Code Dev Containers using `.devcontainer/devcontainer.json` for a pre-provisioned Node 22 environment.
+
+### CI/CD Overview
+
+- **ci.yml**: Lints, checks formatting, runs tests with coverage, audits dependencies, builds artifacts, and uploads coverage/build artifacts with caching on Node 22 for PRs and main branches.
+- **codeql.yml**: GitHub CodeQL SAST on push/PR and weekly schedule.
+- **release-please.yml**: Automates versioning/changelogs and release PRs from `main`.
+- **publish.yml**: Packages artifacts on releases and attaches zips to GitHub Releases.
+
+## Architecture Overview
+
+- `background.js`: Extension service worker for badge state, messaging, and scheduling.
+- `content-enhanced.js`: Page automation (typing simulation, template variables, send methods).
+- `popup-enhanced.js`: Popup UI controller and commands.
+- `src/`: Shared utilities/services (state, analytics, notifications, etc.).
+- `scripts/build*.js`: Lightweight build/packaging scripts that copy/minify assets into `dist/`.
+
 ## Usage
 
 ### Initial Setup
@@ -78,6 +124,7 @@ For detailed Firefox installation and development guide, see [FIREFOX.md](FIREFO
 ### Configure Messages
 
 1. **Enter your messages** in the textarea (one per line)
+
    ```
    Hello!
    How are you?
@@ -131,6 +178,7 @@ Each profile stores completely separate settings. See [MULTI_ACCOUNT_FEATURE.md]
 ### Using v4.4 UI Features
 
 #### Notification Center 🔔
+
 1. **Click the bell icon** (🔔) in the header
 2. **View notification history** - see all past messages, errors, and achievements
 3. **Mark as read** - individual notifications or mark all read
@@ -138,30 +186,35 @@ Each profile stores completely separate settings. See [MULTI_ACCOUNT_FEATURE.md]
 5. **Unread badge** - shows count of unread notifications
 
 #### Command Palette ⌨️
+
 1. **Press Ctrl+K** or click the keyboard icon
 2. **Type to search** commands (e.g., "start", "stop", "settings")
 3. **Arrow keys** to navigate, **Enter** to execute
 4. **Quick access** to all major features without clicking through menus
 
 #### Emoji Picker 😊
+
 1. **Click the emoji button** (😊)
 2. **Browse categories** - Smileys, Hearts, Animals, Food, Sports, Objects, Symbols
 3. **Search emojis** with the search bar
 4. **Click to insert** - adds emoji to your message list
 
 #### Preview Mode 👁️
+
 1. **Click Preview button** before sending
 2. **See rendered messages** with all template variables replaced
 3. **Check first 10 messages** to verify they look correct
 4. **Test variables** like {time}, {date}, {random_emoji} before going live
 
 #### Category Manager 📁
+
 1. **Open Categories** from the main interface
 2. **Create custom categories** with name, icon (emoji), and color
 3. **View category statistics** - see how many phrases in each category
 4. **Organize messages** by category for better management
 
 #### Help Documentation ❓
+
 1. **Click Help button** (❓) for in-app assistance
 2. **Getting Started guide** - step-by-step setup instructions
 3. **Template Variables reference** - all available variables explained
@@ -171,6 +224,7 @@ Each profile stores completely separate settings. See [MULTI_ACCOUNT_FEATURE.md]
 ## Settings Persistence
 
 All settings are automatically saved:
+
 - Marked input field selector
 - Message list
 - Send mode (random/sequential)
@@ -185,6 +239,7 @@ AutoChat now includes language-specific farming phrase libraries:
 - **Spanish (es)**: 300+ Spanish translations with relevant humor
 
 The extension automatically loads phrases in your preferred language:
+
 1. Select your language from the dropdown in the extension
 2. Phrases load automatically based on your selection
 3. Falls back to English if your language isn't available yet
@@ -227,6 +282,7 @@ For more details, see [MULTI_LANGUAGE_PHRASES.md](MULTI_LANGUAGE_PHRASES.md).
 ## Version
 
 **v4.4.0 UI Polish Edition** - Current release with:
+
 - 🔔 **Notification Center**: Complete notification history management
 - 📁 **Category Manager**: Create and organize custom message categories
 - ⌨️ **Command Palette**: Quick access to all features (Ctrl+K)
@@ -236,8 +292,9 @@ For more details, see [MULTI_LANGUAGE_PHRASES.md](MULTI_LANGUAGE_PHRASES.md).
 - 🎨 **UI Enhancements**: Improved layouts, badges, and polish
 
 **Previous releases:**
+
 - **v4.3**: Multi-language support with English, Urdu (اردو), and Spanish (Español)
-- **v4.2**: Enhanced features and stability improvements  
+- **v4.2**: Enhanced features and stability improvements
 - **v4.1**: Dark mode, keyboard shortcuts, pause/resume
 - **v4.0**: Typing simulation, anti-detection, analytics dashboard
 
@@ -246,6 +303,7 @@ For detailed release notes, see [CHANGELOG.md](CHANGELOG.md)
 ## Roadmap
 
 ### v4.5 (Completed - December 2025) ✅
+
 - ✅ Firefox port (WebExtensions)
 - ✅ Webhook integration
 - ✅ Performance monitoring dashboard
@@ -259,11 +317,13 @@ See [CHANGELOG.md](CHANGELOG.md) for complete v4.5 features and updates.
 **🚀 Next major release with comprehensive feature proposals!**
 
 See detailed planning documents:
+
 - **[Roadmap](ROADMAP_v5.0.md)** - Complete timeline and milestones
 - **[Feature Suggestions](FEATURE_SUGGESTIONS_v5.0.md)** - 15 detailed feature proposals
 - **[Priority Matrix](FEATURE_PRIORITY_MATRIX.md)** - Prioritization analysis
 
 **Top 7 Features Planned**:
+
 1. 🤖 **AI-Powered Message Generation** - Smart compose with local models
 2. 📊 **Advanced Analytics Dashboard** - Visual insights & predictive analytics
 3. 📅 **Smart Scheduling & Campaigns** - Drip sequences with AI optimization
@@ -273,6 +333,7 @@ See detailed planning documents:
 7. 🤖 **AI Farming Phrase Generation** - Personalized phrase generation to avoid detection patterns
 
 **🎰 Casino Automation Enhancements**:
+
 - **Multi-Tab Support**: Run multiple profiles simultaneously across different casino sites
 - **Auto-Profile Detection**: Automatically load correct profile based on active site
 - **Daemon Mode**: Background operation with auto-start on browser launch
@@ -294,6 +355,7 @@ MIT License - Feel free to use and modify. See [LICENSE](LICENSE) for details.
 ## Keyboard Shortcuts
 
 Quick access to common actions:
+
 - **Ctrl+K**: Open Command Palette (NEW!)
 - **Ctrl+S**: Save Settings
 - **Ctrl+X**: Toggle Auto-Send (Start/Stop)
@@ -307,11 +369,13 @@ For complete keyboard shortcut reference, see [KEYBOARD_SHORTCUTS.md](KEYBOARD_S
 ## Configuration Options
 
 ### Basic Settings
+
 - **Send Mode**: Random or Sequential
 - **Time Interval**: Min/Max seconds between messages
 - **Messages**: One per line, supports template variables
 
 ### Advanced Settings
+
 - **Typing Simulation**: Enable/disable realistic typing animation
 - **Variable Delays**: Random "thinking time" before typing
 - **Anti-Repetition**: Prevent sending same message repeatedly
@@ -320,6 +384,7 @@ For complete keyboard shortcut reference, see [KEYBOARD_SHORTCUTS.md](KEYBOARD_S
 - **Active Hours**: Only send during specified time range
 
 ### Template Variables
+
 - `{time}` - Current time (e.g., "2:30:45 PM")
 - `{date}` - Current date (e.g., "10/18/2025")
 - `{random_emoji}` - Random emoji from preset list
@@ -327,11 +392,13 @@ For complete keyboard shortcut reference, see [KEYBOARD_SHORTCUTS.md](KEYBOARD_S
 - `{timestamp}` - Unix timestamp
 
 ### Theme
+
 - **Light Mode**: Default clean interface
 - **Dark Mode**: Eye-friendly dark theme (click 🌙 icon)
 - **Auto-Persist**: Theme preference saved across sessions
 
 ### Analytics
+
 - Messages sent today (resets at midnight)
 - Total messages sent (all-time)
 - Auto-send status indicator
@@ -340,6 +407,7 @@ For complete keyboard shortcut reference, see [KEYBOARD_SHORTCUTS.md](KEYBOARD_S
 ## Troubleshooting
 
 Having issues? See our comprehensive [TROUBLESHOOTING.md](TROUBLESHOOTING.md) guide covering:
+
 - Installation problems
 - Input field detection
 - Message sending issues
@@ -352,6 +420,7 @@ Having issues? See our comprehensive [TROUBLESHOOTING.md](TROUBLESHOOTING.md) gu
 ⚠️ **Important**: Use this extension responsibly. Automated messaging may violate terms of service on some platforms. This tool is intended for personal use, testing, and controlled environments only.
 
 ### Best Practices for Avoiding Detection
+
 1. Enable typing simulation for realistic appearance
 2. Use variable delays to mimic human behavior
 3. Set reasonable time intervals (60-180 seconds recommended)
@@ -363,6 +432,7 @@ Having issues? See our comprehensive [TROUBLESHOOTING.md](TROUBLESHOOTING.md) gu
 ## Development
 
 ### Setup
+
 ```bash
 git clone https://github.com/sushiomsky/autochat.git
 cd autochat
@@ -370,6 +440,7 @@ npm install
 ```
 
 ### Commands
+
 ```bash
 npm test              # Run tests
 npm run lint          # Check code style
@@ -381,6 +452,7 @@ npm run package       # Create .zip for store
 ```
 
 ### Testing
+
 ```bash
 npm test              # Run all tests
 npm run test:watch    # Watch mode
@@ -388,9 +460,11 @@ npm run test:coverage # With coverage report
 ```
 
 ### Contributing
+
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### File Structure
+
 ```
 autochat/
 ├── src/                    # Source utilities
@@ -420,24 +494,28 @@ Want to add your language? See [docs/development/LOCALIZATION.md](docs/developme
 ### Quick Links
 
 #### For Users
+
 - 🚀 **[Quick Start Guide](docs/user-guides/QUICKSTART.md)** - Get started in 5 minutes
 - ⌨️ **[Keyboard Shortcuts](docs/user-guides/KEYBOARD_SHORTCUTS.md)** - Hotkey reference
 - 🔧 **[Troubleshooting](docs/user-guides/TROUBLESHOOTING.md)** - Common issues and solutions
 - 📈 **[Upgrade Guide](docs/user-guides/UPGRADE_GUIDE.md)** - Version migration help
 
 #### Feature Guides
+
 - 👥 **[Multi-Account Support](docs/features/MULTI_ACCOUNT_FEATURE.md)** - Manage multiple profiles
 - 💬 **[Mention Detection](docs/features/MENTION_DETECTION_FEATURE.md)** - Auto-reply to mentions
 - 🌍 **[Multi-Language Phrases](docs/features/MULTI_LANGUAGE_PHRASES.md)** - Language-specific messaging
 - 🔗 **[Webhook Integration](docs/features/WEBHOOK_GUIDE.md)** - External integrations
 
 #### For Developers
+
 - 🤝 **[Contributing Guide](docs/development/CONTRIBUTING.md)** - How to contribute
 - 🌐 **[Localization Guide](docs/development/LOCALIZATION.md)** - Add translations
 - 🦊 **[Firefox Development](docs/development/FIREFOX.md)** - Firefox-specific guide
 - 🔍 **[CI Debugging](docs/development/CI_DEBUGGING_GUIDE.md)** - CI/CD troubleshooting
 
 #### Project Info
+
 - 📝 **[Changelog](CHANGELOG.md)** - Complete version history
 - 🗺️ **[Roadmap](ROADMAP_v5.0.md)** - Future development plans
 - 📋 **[TODO](TODO.md)** - Current task list
@@ -446,6 +524,7 @@ Want to add your language? See [docs/development/LOCALIZATION.md](docs/developme
 ## Support
 
 For issues or questions:
+
 - **Issues**: [GitHub Issues](https://github.com/sushiomsky/autochat/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/sushiomsky/autochat/discussions)
 - **Contributing**: See [docs/development/CONTRIBUTING.md](docs/development/CONTRIBUTING.md)

@@ -1,0 +1,23 @@
+{
+  "name": "AutoChat Dev",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": "..",
+    "target": "base"
+  },
+  "runArgs": [
+    "--env",
+    "CHROMEDRIVER_SKIP_DOWNLOAD=1",
+    "--env",
+    "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1"
+  ],
+  "postCreateCommand": "npm ci --legacy-peer-deps",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": true
+      },
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+    }
+  }
+}
