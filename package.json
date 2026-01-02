@@ -23,7 +23,7 @@
     "test:selenium": "jest tests/integration/selenium --runInBand",
     "test:puppeteer": "jest tests/integration/puppeteer --runInBand",
     "test:ci": "npm test -- --runInBand --coverage",
-    "package:firefox": "npm run build:firefox:prod && cd dist-firefox && zip -r ../autochat-firefox-v$(node -p \"require('../manifest_firefox.json').version\").zip *",
+    "package:firefox": "npm run build:firefox:prod && VERSION=$(node -p \"require('./manifest_firefox.json').version\") && cd dist-firefox && zip -r ../autochat-firefox-v${VERSION}.zip *",
     "clean": "rm -rf dist dist-firefox build coverage",
     "verify": "npm run lint:ci && npm run format:check && npm run test:ci && npm run build:prod",
     "audit": "npm audit --omit=dev",
