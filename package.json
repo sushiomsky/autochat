@@ -40,7 +40,7 @@
   "author": "AutoChat Team",
   "license": "MIT",
   "engines": {
-    "node": ">=22.11.0 <24.0.0"
+    "node": ">=22.11.0"
   },
   "repository": {
     "type": "git",
@@ -88,6 +88,14 @@
       "lcov",
       "html"
     ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 5,
+        "functions": 5,
+        "lines": 5,
+        "statements": 5
+      }
+    },
     "testMatch": [
       "**/tests/**/*.test.js"
     ]

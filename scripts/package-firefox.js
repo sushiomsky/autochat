@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 
 const rootDir = path.join(__dirname, '..');
 const distDir = path.join(rootDir, 'dist-firefox');
@@ -17,7 +17,10 @@ if (!fs.existsSync(distDir)) {
 }
 
 try {
-  execSync(`cd dist-firefox && zip -r ../${outputName} *`, { stdio: 'inherit' });
+  execFileSync('zip', ['-r', path.join('..', outputName), '.'], {
+    cwd: distDir,
+    stdio: 'inherit',
+  });
   console.log(`\n✅ Package created: ${outputName}`);
   console.log(
     `📊 Size: ${(fs.statSync(path.join(rootDir, outputName)).size / 1024).toFixed(2)} KB`
