@@ -5,6 +5,7 @@
 describe('Notification System', () => {
   let showNotification;
   let notificationElement;
+  let hideTimeout;
 
   beforeEach(() => {
     // Setup DOM
@@ -13,16 +14,22 @@ describe('Notification System', () => {
     `;
 
     notificationElement = document.getElementById('notification');
+    hideTimeout = null;
 
     // Define showNotification function (from popup-enhanced.js)
-    showNotification = function(message, isSuccess = true) {
+    showNotification = function (message, isSuccess = true) {
       const notification = document.getElementById('notification');
       if (notification) {
         notification.textContent = message;
-        notification.className = 'notification ' + (isSuccess ? 'success' : 'error');
+        notification.className = 'notification';
+        notification.classList.add(isSuccess ? 'success' : 'error');
+        notification.classList.add('show');
         notification.style.display = 'block';
-        
-        setTimeout(() => {
+        if (hideTimeout) {
+          clearTimeout(hideTimeout);
+        }
+        hideTimeout = setTimeout(() => {
+          notification.classList.remove('show');
           notification.style.display = 'none';
         }, 3000);
       }
@@ -37,23 +44,23 @@ describe('Notification System', () => {
   describe('Success Notifications', () => {
     test('should display success notification', () => {
       showNotification('Operation completed successfully', true);
-      
+
       expect(notificationElement.textContent).toBe('Operation completed successfully');
       expect(notificationElement.classList.contains('success')).toBe(true);
-      expect(notificationElement.style.display).toBe('block');
+      expect(notificationElement.classList.contains('show')).toBe(true);
     });
 
     test('should use success class by default', () => {
       showNotification('Default notification');
-      
+
       expect(notificationElement.classList.contains('success')).toBe(true);
       expect(notificationElement.classList.contains('error')).toBe(false);
     });
 
     test('should display multiple success messages', () => {
       const messages = ['First success', 'Second success', 'Third success'];
-      
-      messages.forEach(message => {
+
+      messages.forEach((message) => {
         showNotification(message, true);
         expect(notificationElement.textContent).toBe(message);
       });
@@ -63,17 +70,17 @@ describe('Notification System', () => {
   describe('Error Notifications', () => {
     test('should display error notification', () => {
       showNotification('An error occurred', false);
-      
+
       expect(notificationElement.textContent).toBe('An error occurred');
       expect(notificationElement.classList.contains('error')).toBe(true);
       expect(notificationElement.classList.contains('success')).toBe(false);
-      expect(notificationElement.style.display).toBe('block');
+      expect(notificationElement.classList.contains('show')).toBe(true);
     });
 
     test('should switch from success to error', () => {
       showNotification('Success message', true);
       expect(notificationElement.classList.contains('success')).toBe(true);
-      
+
       showNotification('Error message', false);
       expect(notificationElement.classList.contains('error')).toBe(true);
       expect(notificationElement.classList.contains('success')).toBe(false);
@@ -91,33 +98,33 @@ describe('Notification System', () => {
 
     test('should hide notification after 3 seconds', () => {
       showNotification('Temporary message');
-      expect(notificationElement.style.display).toBe('block');
-      
+      expect(notificationElement.classList.contains('show')).toBe(true);
+
       jest.advanceTimersByTime(3000);
-      expect(notificationElement.style.display).toBe('none');
+      expect(notificationElement.classList.contains('show')).toBe(false);
     });
 
     test('should not hide before timeout', () => {
       showNotification('Temporary message');
-      expect(notificationElement.style.display).toBe('block');
-      
+      expect(notificationElement.classList.contains('show')).toBe(true);
+
       jest.advanceTimersByTime(2000);
-      expect(notificationElement.style.display).toBe('block');
+      expect(notificationElement.classList.contains('show')).toBe(true);
     });
 
     test('should reset timeout when new notification is shown', () => {
       showNotification('First message');
       jest.advanceTimersByTime(2000);
-      
+
       showNotification('Second message');
       expect(notificationElement.textContent).toBe('Second message');
-      expect(notificationElement.style.display).toBe('block');
-      
+      expect(notificationElement.classList.contains('show')).toBe(true);
+
       jest.advanceTimersByTime(2000);
-      expect(notificationElement.style.display).toBe('block');
-      
+      expect(notificationElement.classList.contains('show')).toBe(true);
+
       jest.advanceTimersByTime(1000);
-      expect(notificationElement.style.display).toBe('none');
+      expect(notificationElement.classList.contains('show')).toBe(false);
     });
   });
 
@@ -129,13 +136,15 @@ describe('Notification System', () => {
     });
 
     test('should handle long message', () => {
-      const longMessage = 'This is a very long notification message that contains a lot of text to test how the notification system handles lengthy content.';
+      const longMessage =
+        'This is a very long notification message that contains a lot of text to test how the notification system handles lengthy content.';
       showNotification(longMessage);
       expect(notificationElement.textContent).toBe(longMessage);
     });
 
     test('should handle special characters', () => {
-      const specialMessage = 'Success! 🎉 Operation completed @ 100% <script>alert("test")</script>';
+      const specialMessage =
+        'Success! 🎉 Operation completed @ 100% <script>alert("test")</script>';
       showNotification(specialMessage);
       expect(notificationElement.textContent).toBe(specialMessage);
     });
@@ -150,7 +159,7 @@ describe('Notification System', () => {
   describe('Notification Element Missing', () => {
     test('should handle missing notification element gracefully', () => {
       document.body.innerHTML = '';
-      
+
       expect(() => {
         showNotification('Test message');
       }).not.toThrow();
@@ -165,10 +174,12 @@ describe('Notification System', () => {
 
     test('should update classes when showing new notification', () => {
       showNotification('Success', true);
-      expect(notificationElement.className).toBe('notification success');
-      
+      expect(notificationElement.classList.contains('success')).toBe(true);
+      expect(notificationElement.classList.contains('show')).toBe(true);
+
       showNotification('Error', false);
-      expect(notificationElement.className).toBe('notification error');
+      expect(notificationElement.classList.contains('error')).toBe(true);
+      expect(notificationElement.classList.contains('show')).toBe(true);
     });
   });
 
@@ -185,7 +196,7 @@ describe('Notification System', () => {
       for (let i = 0; i < 10; i++) {
         showNotification(`Message ${i}`);
       }
-      
+
       expect(notificationElement.textContent).toBe('Message 9');
       expect(notificationElement.style.display).toBe('block');
     });
@@ -194,7 +205,7 @@ describe('Notification System', () => {
       showNotification('First', true);
       showNotification('Second', false);
       showNotification('Third', true);
-      
+
       expect(notificationElement.textContent).toBe('Third');
       expect(notificationElement.classList.contains('success')).toBe(true);
     });
@@ -214,7 +225,7 @@ describe('Notification System', () => {
       jest.useFakeTimers();
       showNotification('Test');
       expect(notificationElement.style.display).toBe('block');
-      
+
       jest.advanceTimersByTime(3000);
       expect(notificationElement.style.display).toBe('none');
       jest.useRealTimers();

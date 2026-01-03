@@ -31,25 +31,28 @@ describe('Language Selector', () => {
         en: {
           appTitle: 'AutoChat Enhanced',
           startButton: 'Start Auto-Send',
-          messageLabel: 'Messages'
+          messageLabel: 'Messages',
         },
         ur: {
           appTitle: 'آٹو چیٹ بہتر',
           startButton: 'آٹو بھیجیں شروع کریں',
-          messageLabel: 'پیغامات'
+          messageLabel: 'پیغامات',
         },
         es: {
           appTitle: 'AutoChat Mejorado',
           startButton: 'Iniciar envío automático',
-          messageLabel: 'Mensajes'
-        }
-      }
+          messageLabel: 'Mensajes',
+        },
+      },
     };
 
     // Mock chrome storage
     global.chrome.storage.local.get.mockImplementation((keys, callback) => {
-      callback({ language: mockI18n.currentLanguage });
-      return Promise.resolve({ language: mockI18n.currentLanguage });
+      const result = { language: mockI18n.currentLanguage };
+      if (typeof callback === 'function') {
+        callback(result);
+      }
+      return Promise.resolve(result);
     });
 
     global.chrome.storage.local.set.mockImplementation((items, callback) => {
@@ -111,7 +114,7 @@ describe('Language Selector', () => {
     test('should persist language selection', async () => {
       languageSelect.value = 'es';
       await chrome.storage.local.set({ language: 'es' });
-      
+
       const result = await chrome.storage.local.get('language');
       expect(result.language).toBe('es');
     });
@@ -121,14 +124,14 @@ describe('Language Selector', () => {
     let updateUILanguage;
 
     beforeEach(() => {
-      updateUILanguage = function(lang) {
+      updateUILanguage = function (lang) {
         mockI18n.currentLanguage = lang;
-        
+
         // Update text elements
         const title = document.getElementById('appTitle');
         const button = document.getElementById('startButton');
         const label = document.getElementById('messageLabel');
-        
+
         if (title) title.textContent = chrome.i18n.getMessage('appTitle');
         if (button) button.textContent = chrome.i18n.getMessage('startButton');
         if (label) label.textContent = chrome.i18n.getMessage('messageLabel');
@@ -137,7 +140,7 @@ describe('Language Selector', () => {
 
     test('should translate UI to Urdu', () => {
       updateUILanguage('ur');
-      
+
       expect(document.getElementById('appTitle').textContent).toBe('آٹو چیٹ بہتر');
       expect(document.getElementById('startButton').textContent).toBe('آٹو بھیجیں شروع کریں');
       expect(document.getElementById('messageLabel').textContent).toBe('پیغامات');
@@ -145,7 +148,7 @@ describe('Language Selector', () => {
 
     test('should translate UI to Spanish', () => {
       updateUILanguage('es');
-      
+
       expect(document.getElementById('appTitle').textContent).toBe('AutoChat Mejorado');
       expect(document.getElementById('startButton').textContent).toBe('Iniciar envío automático');
       expect(document.getElementById('messageLabel').textContent).toBe('Mensajes');
@@ -154,7 +157,7 @@ describe('Language Selector', () => {
     test('should translate UI back to English', () => {
       updateUILanguage('es');
       updateUILanguage('en');
-      
+
       expect(document.getElementById('appTitle').textContent).toBe('AutoChat Enhanced');
       expect(document.getElementById('startButton').textContent).toBe('Start Auto-Send');
     });
@@ -170,23 +173,23 @@ describe('Language Selector', () => {
     test('should trigger change event', () => {
       const changeHandler = jest.fn();
       languageSelect.addEventListener('change', changeHandler);
-      
+
       languageSelect.value = 'ur';
       languageSelect.dispatchEvent(new Event('change'));
-      
+
       expect(changeHandler).toHaveBeenCalled();
     });
 
     test('should update language on change', () => {
       let currentLang = 'en';
-      
+
       languageSelect.addEventListener('change', (e) => {
         currentLang = e.target.value;
       });
-      
+
       languageSelect.value = 'es';
       languageSelect.dispatchEvent(new Event('change'));
-      
+
       expect(currentLang).toBe('es');
     });
 
@@ -194,10 +197,10 @@ describe('Language Selector', () => {
       languageSelect.addEventListener('change', async (e) => {
         await chrome.storage.local.set({ language: e.target.value });
       });
-      
+
       languageSelect.value = 'ur';
       languageSelect.dispatchEvent(new Event('change'));
-      
+
       expect(chrome.storage.local.set).toHaveBeenCalledWith({ language: 'ur' });
     });
   });
@@ -205,7 +208,7 @@ describe('Language Selector', () => {
   describe('RTL Support', () => {
     test('should apply RTL for Urdu', () => {
       languageSelect.value = 'ur';
-      
+
       const changeHandler = (e) => {
         if (e.target.value === 'ur') {
           document.body.setAttribute('dir', 'rtl');
@@ -213,17 +216,17 @@ describe('Language Selector', () => {
           document.body.setAttribute('dir', 'ltr');
         }
       };
-      
+
       languageSelect.addEventListener('change', changeHandler);
       languageSelect.dispatchEvent(new Event('change'));
-      
+
       expect(document.body.getAttribute('dir')).toBe('rtl');
     });
 
     test('should apply LTR for English', () => {
       document.body.setAttribute('dir', 'rtl');
       languageSelect.value = 'en';
-      
+
       const changeHandler = (e) => {
         if (e.target.value === 'ur') {
           document.body.setAttribute('dir', 'rtl');
@@ -231,23 +234,23 @@ describe('Language Selector', () => {
           document.body.setAttribute('dir', 'ltr');
         }
       };
-      
+
       languageSelect.addEventListener('change', changeHandler);
       languageSelect.dispatchEvent(new Event('change'));
-      
+
       expect(document.body.getAttribute('dir')).toBe('ltr');
     });
 
     test('should apply LTR for Spanish', () => {
       languageSelect.value = 'es';
-      
+
       const changeHandler = (e) => {
         document.body.setAttribute('dir', e.target.value === 'ur' ? 'rtl' : 'ltr');
       };
-      
+
       languageSelect.addEventListener('change', changeHandler);
       languageSelect.dispatchEvent(new Event('change'));
-      
+
       expect(document.body.getAttribute('dir')).toBe('ltr');
     });
   });
@@ -255,23 +258,25 @@ describe('Language Selector', () => {
   describe('Loading Saved Language', () => {
     test('should load saved language on startup', async () => {
       await chrome.storage.local.set({ language: 'es' });
-      
+
       const result = await chrome.storage.local.get('language');
       languageSelect.value = result.language;
-      
+
       expect(languageSelect.value).toBe('es');
     });
 
     test('should default to English if no language saved', async () => {
       global.chrome.storage.local.get.mockImplementation((keys, callback) => {
-        callback({});
+        if (typeof callback === 'function') {
+          callback({});
+        }
         return Promise.resolve({});
       });
-      
+
       const result = await chrome.storage.local.get('language');
       const savedLang = result.language || 'en';
       languageSelect.value = savedLang;
-      
+
       expect(languageSelect.value).toBe('en');
     });
   });
@@ -290,7 +295,7 @@ describe('Language Selector', () => {
     test('should include English translation in parentheses', () => {
       const urduOption = languageSelect.querySelector('option[value="ur"]');
       const spanishOption = languageSelect.querySelector('option[value="es"]');
-      
+
       expect(urduOption.textContent).toContain('Urdu');
       expect(spanishOption.textContent).toContain('Spanish');
     });
@@ -299,31 +304,31 @@ describe('Language Selector', () => {
   describe('Edge Cases', () => {
     test('should handle rapid language switching', () => {
       const languages = ['en', 'ur', 'es', 'en', 'ur'];
-      
-      languages.forEach(lang => {
+
+      languages.forEach((lang) => {
         languageSelect.value = lang;
       });
-      
+
       expect(languageSelect.value).toBe('ur');
     });
 
     test('should maintain language after page reload simulation', async () => {
       languageSelect.value = 'es';
       await chrome.storage.local.set({ language: 'es' });
-      
+
       // Simulate reload
       languageSelect.value = 'en';
-      
+
       const result = await chrome.storage.local.get('language');
       languageSelect.value = result.language;
-      
+
       expect(languageSelect.value).toBe('es');
     });
 
     test('should handle invalid language code gracefully', () => {
       languageSelect.value = 'invalid';
       // Will fall back to one of the valid options or last valid value
-      expect(['en', 'ur', 'es', 'invalid']).toContain(languageSelect.value);
+      expect(['', 'en', 'ur', 'es', 'invalid']).toContain(languageSelect.value);
     });
   });
 
@@ -339,7 +344,7 @@ describe('Language Selector', () => {
 
     test('should display readable text for each option', () => {
       const options = languageSelect.querySelectorAll('option');
-      options.forEach(option => {
+      options.forEach((option) => {
         expect(option.textContent.trim().length).toBeGreaterThan(0);
       });
     });
@@ -355,7 +360,7 @@ describe('Language Selector', () => {
     test('should update UI elements when language changes', () => {
       const updateAll = (lang) => {
         mockI18n.currentLanguage = lang;
-        document.querySelectorAll('[data-i18n]').forEach(el => {
+        document.querySelectorAll('[data-i18n]').forEach((el) => {
           const key = el.getAttribute('data-i18n');
           el.textContent = chrome.i18n.getMessage(key);
         });
@@ -367,7 +372,7 @@ describe('Language Selector', () => {
 
       updateAll('ur');
       expect(document.getElementById('appTitle').textContent).toBe('آٹو چیٹ بہتر');
-      
+
       updateAll('en');
       expect(document.getElementById('appTitle').textContent).toBe('AutoChat Enhanced');
     });

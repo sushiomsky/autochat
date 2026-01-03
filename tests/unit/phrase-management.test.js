@@ -9,6 +9,7 @@ describe('Phrase Management', () => {
   let renderPhrasesList;
   let saveCustomPhrases;
   let loadCustomPhrases;
+  let storedCustomPhrases;
 
   beforeEach(() => {
     // Setup DOM
@@ -36,50 +37,54 @@ describe('Phrase Management', () => {
 
     // Initialize state
     customPhrases = [];
+    storedCustomPhrases = [];
 
     // Mock chrome storage
     global.chrome.storage.local.get.mockImplementation((keys, callback) => {
-      const result = { customPhrases: customPhrases };
-      callback(result);
+      const result = { customPhrases: storedCustomPhrases };
+      if (typeof callback === 'function') {
+        callback(result);
+      }
       return Promise.resolve(result);
     });
 
     global.chrome.storage.local.set.mockImplementation((items, callback) => {
       if (items.customPhrases) {
         customPhrases = items.customPhrases;
+        storedCustomPhrases = items.customPhrases.slice();
       }
       if (callback) callback();
       return Promise.resolve();
     });
 
     // Define phrase management functions
-    addCustomPhrase = function(phrase) {
+    addCustomPhrase = function (phrase) {
       if (!phrase || phrase.trim() === '') {
         return { success: false, error: 'Phrase cannot be empty' };
       }
-      
+
       if (customPhrases.includes(phrase.trim())) {
         return { success: false, error: 'Phrase already exists' };
       }
-      
+
       customPhrases.push(phrase.trim());
       return { success: true };
     };
 
-    deleteCustomPhrase = function(index) {
+    deleteCustomPhrase = function (index) {
       if (index < 0 || index >= customPhrases.length) {
         return { success: false, error: 'Invalid phrase index' };
       }
-      
+
       customPhrases.splice(index, 1);
       return { success: true };
     };
 
-    saveCustomPhrases = async function() {
+    saveCustomPhrases = async function () {
       await chrome.storage.local.set({ customPhrases });
     };
 
-    loadCustomPhrases = async function() {
+    loadCustomPhrases = async function () {
       const result = await chrome.storage.local.get('customPhrases');
       if (result.customPhrases) {
         customPhrases = result.customPhrases;
@@ -87,14 +92,14 @@ describe('Phrase Management', () => {
       return customPhrases;
     };
 
-    renderPhrasesList = function() {
+    renderPhrasesList = function () {
       const container = document.getElementById('phrasesList');
       const countElement = document.getElementById('phraseCount');
-      
+
       if (!container) return;
-      
+
       container.innerHTML = '';
-      
+
       customPhrases.forEach((phrase, index) => {
         const item = document.createElement('div');
         item.className = 'phrase-item';
@@ -104,7 +109,7 @@ describe('Phrase Management', () => {
         `;
         container.appendChild(item);
       });
-      
+
       if (countElement) {
         countElement.textContent = customPhrases.length;
       }
@@ -127,7 +132,7 @@ describe('Phrase Management', () => {
       addCustomPhrase('First phrase');
       addCustomPhrase('Second phrase');
       addCustomPhrase('Third phrase');
-      
+
       expect(customPhrases.length).toBe(3);
       expect(customPhrases).toEqual(['First phrase', 'Second phrase', 'Third phrase']);
     });
@@ -154,7 +159,7 @@ describe('Phrase Management', () => {
     test('should reject duplicate phrase', () => {
       addCustomPhrase('Duplicate phrase');
       const result = addCustomPhrase('Duplicate phrase');
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Phrase already exists');
       expect(customPhrases.length).toBe(1);
@@ -163,7 +168,7 @@ describe('Phrase Management', () => {
     test('should handle phrases with special characters', () => {
       const specialPhrase = 'Hello! 🎉 {time} - Nice to meet you';
       const result = addCustomPhrase(specialPhrase);
-      
+
       expect(result.success).toBe(true);
       expect(customPhrases).toContain(specialPhrase);
     });
@@ -171,7 +176,7 @@ describe('Phrase Management', () => {
     test('should handle long phrases', () => {
       const longPhrase = 'a'.repeat(500);
       const result = addCustomPhrase(longPhrase);
-      
+
       expect(result.success).toBe(true);
       expect(customPhrases[0].length).toBe(500);
     });
@@ -215,7 +220,7 @@ describe('Phrase Management', () => {
       deleteCustomPhrase(0);
       deleteCustomPhrase(0);
       deleteCustomPhrase(0);
-      
+
       expect(customPhrases.length).toBe(0);
     });
 
@@ -230,7 +235,7 @@ describe('Phrase Management', () => {
     test('should render empty list', () => {
       customPhrases = [];
       renderPhrasesList();
-      
+
       const container = document.getElementById('phrasesList');
       expect(container.children.length).toBe(0);
     });
@@ -238,7 +243,7 @@ describe('Phrase Management', () => {
     test('should render single phrase', () => {
       customPhrases = ['Test phrase'];
       renderPhrasesList();
-      
+
       const container = document.getElementById('phrasesList');
       expect(container.children.length).toBe(1);
       expect(container.textContent).toContain('Test phrase');
@@ -247,7 +252,7 @@ describe('Phrase Management', () => {
     test('should render multiple phrases', () => {
       customPhrases = ['First', 'Second', 'Third'];
       renderPhrasesList();
-      
+
       const container = document.getElementById('phrasesList');
       expect(container.children.length).toBe(3);
     });
@@ -255,7 +260,7 @@ describe('Phrase Management', () => {
     test('should include delete button for each phrase', () => {
       customPhrases = ['Test'];
       renderPhrasesList();
-      
+
       const deleteBtn = document.querySelector('.btn-delete');
       expect(deleteBtn).not.toBeNull();
       expect(deleteBtn.getAttribute('data-index')).toBe('0');
@@ -264,7 +269,7 @@ describe('Phrase Management', () => {
     test('should update phrase count', () => {
       customPhrases = ['One', 'Two', 'Three'];
       renderPhrasesList();
-      
+
       const countElement = document.getElementById('phraseCount');
       expect(countElement.textContent).toBe('3');
     });
@@ -273,7 +278,7 @@ describe('Phrase Management', () => {
       customPhrases = ['One'];
       renderPhrasesList();
       expect(document.getElementById('phraseCount').textContent).toBe('1');
-      
+
       customPhrases.push('Two');
       renderPhrasesList();
       expect(document.getElementById('phraseCount').textContent).toBe('2');
@@ -291,29 +296,31 @@ describe('Phrase Management', () => {
     test('should save phrases to storage', async () => {
       customPhrases = ['Test phrase 1', 'Test phrase 2'];
       await saveCustomPhrases();
-      
+
       expect(chrome.storage.local.set).toHaveBeenCalledWith({
-        customPhrases: ['Test phrase 1', 'Test phrase 2']
+        customPhrases: ['Test phrase 1', 'Test phrase 2'],
       });
     });
 
     test('should load phrases from storage', async () => {
       customPhrases = ['Saved phrase 1', 'Saved phrase 2'];
       await saveCustomPhrases();
-      
+
       customPhrases = [];
       const loaded = await loadCustomPhrases();
-      
+
       expect(loaded).toEqual(['Saved phrase 1', 'Saved phrase 2']);
       expect(customPhrases).toEqual(['Saved phrase 1', 'Saved phrase 2']);
     });
 
     test('should handle empty storage', async () => {
       global.chrome.storage.local.get.mockImplementation((keys, callback) => {
-        callback({});
+        if (typeof callback === 'function') {
+          callback({});
+        }
         return Promise.resolve({});
       });
-      
+
       const loaded = await loadCustomPhrases();
       expect(loaded).toEqual([]);
     });
@@ -321,23 +328,23 @@ describe('Phrase Management', () => {
     test('should persist after adding phrase', async () => {
       addCustomPhrase('New phrase');
       await saveCustomPhrases();
-      
+
       customPhrases = [];
       await loadCustomPhrases();
-      
+
       expect(customPhrases).toContain('New phrase');
     });
 
     test('should persist after deleting phrase', async () => {
       customPhrases = ['Keep', 'Delete'];
       await saveCustomPhrases();
-      
+
       deleteCustomPhrase(1);
       await saveCustomPhrases();
-      
+
       customPhrases = [];
       await loadCustomPhrases();
-      
+
       expect(customPhrases).toEqual(['Keep']);
     });
   });
@@ -346,17 +353,17 @@ describe('Phrase Management', () => {
     test('should add phrase when button is clicked', () => {
       const input = document.getElementById('newPhraseInput');
       const button = document.getElementById('addNewPhrase');
-      
+
       input.value = 'New phrase from UI';
-      
+
       button.addEventListener('click', () => {
         addCustomPhrase(input.value);
         input.value = '';
         renderPhrasesList();
       });
-      
+
       button.click();
-      
+
       expect(customPhrases).toContain('New phrase from UI');
       expect(input.value).toBe('');
     });
@@ -364,17 +371,17 @@ describe('Phrase Management', () => {
     test('should clear input after adding phrase', () => {
       const input = document.getElementById('newPhraseInput');
       input.value = 'Test';
-      
+
       addCustomPhrase(input.value);
       input.value = '';
-      
+
       expect(input.value).toBe('');
     });
 
     test('should update list after adding phrase', () => {
       addCustomPhrase('Test');
       renderPhrasesList();
-      
+
       const container = document.getElementById('phrasesList');
       expect(container.children.length).toBe(1);
     });
@@ -382,16 +389,16 @@ describe('Phrase Management', () => {
     test('should delete phrase when delete button is clicked', () => {
       customPhrases = ['To be deleted'];
       renderPhrasesList();
-      
+
       const deleteBtn = document.querySelector('.btn-delete');
       deleteBtn.addEventListener('click', (e) => {
         const index = parseInt(e.target.getAttribute('data-index'));
         deleteCustomPhrase(index);
         renderPhrasesList();
       });
-      
+
       deleteBtn.click();
-      
+
       expect(customPhrases.length).toBe(0);
     });
   });
@@ -431,7 +438,7 @@ describe('Phrase Management', () => {
       for (let i = 0; i < 100; i++) {
         addCustomPhrase(`Phrase ${i}`);
       }
-      
+
       expect(customPhrases.length).toBe(100);
     });
   });
@@ -439,15 +446,15 @@ describe('Phrase Management', () => {
   describe('Phrase Operations', () => {
     test('should maintain phrase order', () => {
       const phrases = ['First', 'Second', 'Third', 'Fourth'];
-      phrases.forEach(p => addCustomPhrase(p));
-      
+      phrases.forEach((p) => addCustomPhrase(p));
+
       expect(customPhrases).toEqual(phrases);
     });
 
     test('should update indexes after deletion', () => {
       customPhrases = ['A', 'B', 'C', 'D'];
       deleteCustomPhrase(1); // Delete 'B'
-      
+
       expect(customPhrases).toEqual(['A', 'C', 'D']);
       expect(customPhrases[1]).toBe('C');
     });

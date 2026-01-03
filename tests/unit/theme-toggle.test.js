@@ -18,13 +18,13 @@ describe('Theme Toggle', () => {
 
     // Mock storage
     mockStorage = {
-      theme: 'light'
+      theme: 'light',
     };
 
     global.chrome.storage.local.get.mockImplementation((keys, callback) => {
       const result = {};
       if (Array.isArray(keys)) {
-        keys.forEach(key => {
+        keys.forEach((key) => {
           if (mockStorage[key] !== undefined) {
             result[key] = mockStorage[key];
           }
@@ -34,7 +34,9 @@ describe('Theme Toggle', () => {
           result[keys] = mockStorage[keys];
         }
       }
-      callback(result);
+      if (typeof callback === 'function') {
+        callback(result);
+      }
       return Promise.resolve(result);
     });
 
@@ -45,7 +47,7 @@ describe('Theme Toggle', () => {
     });
 
     // Define applyTheme function
-    applyTheme = function(theme) {
+    applyTheme = function (theme) {
       if (theme === 'dark') {
         document.body.classList.add('dark-theme');
         themeToggle.textContent = '☀️';
@@ -75,7 +77,7 @@ describe('Theme Toggle', () => {
   test('should toggle from light to dark theme', () => {
     applyTheme('light');
     expect(document.body.classList.contains('dark-theme')).toBe(false);
-    
+
     applyTheme('dark');
     expect(document.body.classList.contains('dark-theme')).toBe(true);
   });
@@ -83,7 +85,7 @@ describe('Theme Toggle', () => {
   test('should toggle from dark to light theme', () => {
     applyTheme('dark');
     expect(document.body.classList.contains('dark-theme')).toBe(true);
-    
+
     applyTheme('light');
     expect(document.body.classList.contains('dark-theme')).toBe(false);
   });
@@ -135,7 +137,7 @@ describe('Theme Toggle', () => {
     chrome.storage.local.get('theme', (data) => {
       applyTheme(data.theme || 'light');
     });
-    
+
     expect(chrome.storage.local.get).toHaveBeenCalledWith('theme', expect.any(Function));
   });
 });

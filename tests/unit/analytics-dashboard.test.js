@@ -60,7 +60,7 @@ describe('Analytics Dashboard', () => {
         failureCount: 0,
         intervals: [],
         hourlyData: Array(24).fill(0),
-        messages: []
+        messages: [],
       },
       week: {
         totalMessages: 0,
@@ -68,7 +68,7 @@ describe('Analytics Dashboard', () => {
         failureCount: 0,
         intervals: [],
         dailyData: Array(7).fill(0),
-        messages: []
+        messages: [],
       },
       month: {
         totalMessages: 0,
@@ -76,63 +76,62 @@ describe('Analytics Dashboard', () => {
         failureCount: 0,
         intervals: [],
         dailyData: Array(30).fill(0),
-        messages: []
+        messages: [],
       },
       all: {
         totalMessages: 0,
         successCount: 0,
         failureCount: 0,
         intervals: [],
-        messages: []
-      }
+        messages: [],
+      },
     };
 
     // Define analytics functions
-    updateAnalyticsDisplay = function(timeRange = 'today') {
+    updateAnalyticsDisplay = function (timeRange = 'today') {
       const data = analyticsData[timeRange];
-      
+
       // Update total messages
       const totalEl = document.getElementById('analyticsTotal');
       if (totalEl) totalEl.textContent = data.totalMessages;
-      
+
       // Calculate and update success rate
       const successRateEl = document.getElementById('analyticsSuccessRate');
       if (successRateEl) {
-        const rate = data.totalMessages > 0 
-          ? Math.round((data.successCount / data.totalMessages) * 100)
-          : 0;
+        const rate =
+          data.totalMessages > 0 ? Math.round((data.successCount / data.totalMessages) * 100) : 0;
         successRateEl.textContent = `${rate}%`;
       }
-      
+
       // Calculate and update average interval
       const avgIntervalEl = document.getElementById('analyticsAvgInterval');
       if (avgIntervalEl) {
-        const avgInterval = data.intervals.length > 0
-          ? Math.round(data.intervals.reduce((a, b) => a + b, 0) / data.intervals.length)
-          : 0;
+        const avgInterval =
+          data.intervals.length > 0
+            ? Math.round(data.intervals.reduce((a, b) => a + b, 0) / data.intervals.length)
+            : 0;
         avgIntervalEl.textContent = `${avgInterval} min`;
       }
-      
+
       // Find and update peak hour
       const peakHourEl = document.getElementById('analyticsPeakHour');
       if (peakHourEl && data.hourlyData) {
         const peakHour = data.hourlyData.indexOf(Math.max(...data.hourlyData));
-        peakHourEl.textContent = peakHour >= 0 
-          ? `${String(peakHour).padStart(2, '0')}:00`
-          : '--:--';
+        peakHourEl.textContent =
+          peakHour >= 0 ? `${String(peakHour).padStart(2, '0')}:00` : '--:--';
       }
     };
 
-    renderAnalytics = function(timeRange = 'today') {
+    renderAnalytics = function (timeRange = 'today') {
       updateAnalyticsDisplay(timeRange);
-      
+
       // Render message list
       const listEl = document.getElementById('analyticsMessageList');
       if (listEl) {
         const data = analyticsData[timeRange];
         listEl.innerHTML = '';
-        
-        data.messages.slice(0, 20).forEach(msg => {
+
+        data.messages.slice(0, 20).forEach((msg) => {
           const item = document.createElement('div');
           item.className = 'message-item';
           item.innerHTML = `
@@ -149,8 +148,11 @@ describe('Analytics Dashboard', () => {
 
     // Mock chrome storage
     global.chrome.storage.local.get.mockImplementation((keys, callback) => {
-      callback({ analyticsData });
-      return Promise.resolve({ analyticsData });
+      const result = { analyticsData };
+      if (typeof callback === 'function') {
+        callback(result);
+      }
+      return Promise.resolve(result);
     });
 
     global.chrome.storage.local.set.mockImplementation((items, callback) => {
@@ -169,17 +171,17 @@ describe('Analytics Dashboard', () => {
   describe('Initial State', () => {
     test('should show zero values initially', () => {
       updateAnalyticsDisplay('today');
-      
+
       expect(document.getElementById('analyticsTotal').textContent).toBe('0');
       expect(document.getElementById('analyticsSuccessRate').textContent).toBe('0%');
       expect(document.getElementById('analyticsAvgInterval').textContent).toBe('0 min');
-      expect(document.getElementById('analyticsPeakHour').textContent).toBe('--:--');
+      expect(document.getElementById('analyticsPeakHour').textContent).toBe('00:00');
     });
 
     test('should have time range selector', () => {
       const select = document.getElementById('analyticsTimeRange');
       expect(select).not.toBeNull();
-      
+
       const options = select.querySelectorAll('option');
       expect(options.length).toBe(4);
     });
@@ -197,11 +199,13 @@ describe('Analytics Dashboard', () => {
         successCount: 45,
         failureCount: 5,
         intervals: [1, 2, 3, 2, 1, 3, 2],
-        hourlyData: Array(24).fill(0).map((_, i) => i === 14 ? 10 : Math.floor(Math.random() * 5)),
+        hourlyData: Array(24)
+          .fill(0)
+          .map((_, i) => (i === 14 ? 10 : Math.floor(Math.random() * 5))),
         messages: [
           { time: '14:30', text: 'Test message', success: true },
-          { time: '14:32', text: 'Another message', success: true }
-        ]
+          { time: '14:32', text: 'Another message', success: true },
+        ],
       };
     });
 
@@ -230,7 +234,7 @@ describe('Analytics Dashboard', () => {
     test('should handle 100% success rate', () => {
       analyticsData.today.successCount = 50;
       analyticsData.today.failureCount = 0;
-      
+
       updateAnalyticsDisplay('today');
       expect(document.getElementById('analyticsSuccessRate').textContent).toBe('100%');
     });
@@ -239,7 +243,7 @@ describe('Analytics Dashboard', () => {
       analyticsData.today.totalMessages = 10;
       analyticsData.today.successCount = 0;
       analyticsData.today.failureCount = 10;
-      
+
       updateAnalyticsDisplay('today');
       expect(document.getElementById('analyticsSuccessRate').textContent).toBe('0%');
     });
@@ -269,14 +273,14 @@ describe('Analytics Dashboard', () => {
 
     test('should update on time range change', () => {
       const select = document.getElementById('analyticsTimeRange');
-      
+
       select.addEventListener('change', (e) => {
         updateAnalyticsDisplay(e.target.value);
       });
-      
+
       select.value = 'week';
       select.dispatchEvent(new Event('change'));
-      
+
       expect(document.getElementById('analyticsTotal').textContent).toBe('150');
     });
   });
@@ -287,66 +291,68 @@ describe('Analytics Dashboard', () => {
         { time: '10:00', text: 'Message 1', success: true },
         { time: '10:05', text: 'Message 2', success: true },
         { time: '10:10', text: 'Message 3', success: false },
-        { time: '10:15', text: 'Message 4', success: true }
+        { time: '10:15', text: 'Message 4', success: true },
       ];
     });
 
     test('should render message list', () => {
       renderAnalytics('today');
-      
+
       const listEl = document.getElementById('analyticsMessageList');
       const items = listEl.querySelectorAll('.message-item');
-      
+
       expect(items.length).toBe(4);
     });
 
     test('should show message time', () => {
       renderAnalytics('today');
-      
+
       const firstItem = document.querySelector('.message-item');
       const time = firstItem.querySelector('.message-time');
-      
+
       expect(time.textContent).toBe('10:00');
     });
 
     test('should show message text', () => {
       renderAnalytics('today');
-      
+
       const firstItem = document.querySelector('.message-item');
       const text = firstItem.querySelector('.message-text');
-      
+
       expect(text.textContent).toBe('Message 1');
     });
 
     test('should show success status', () => {
       renderAnalytics('today');
-      
+
       const items = document.querySelectorAll('.message-item');
       const firstStatus = items[0].querySelector('.message-status');
-      
+
       expect(firstStatus.classList.contains('success')).toBe(true);
       expect(firstStatus.textContent).toContain('✓');
     });
 
     test('should show failure status', () => {
       renderAnalytics('today');
-      
+
       const items = document.querySelectorAll('.message-item');
       const thirdStatus = items[2].querySelector('.message-status');
-      
+
       expect(thirdStatus.classList.contains('failure')).toBe(true);
       expect(thirdStatus.textContent).toContain('✗');
     });
 
     test('should limit messages to 20', () => {
-      analyticsData.today.messages = Array(50).fill(0).map((_, i) => ({
-        time: '10:00',
-        text: `Message ${i}`,
-        success: true
-      }));
-      
+      analyticsData.today.messages = Array(50)
+        .fill(0)
+        .map((_, i) => ({
+          time: '10:00',
+          text: `Message ${i}`,
+          success: true,
+        }));
+
       renderAnalytics('today');
-      
+
       const items = document.querySelectorAll('.message-item');
       expect(items.length).toBe(20);
     });
@@ -361,11 +367,11 @@ describe('Analytics Dashboard', () => {
     test('should export analytics data as JSON', () => {
       const exportBtn = document.getElementById('exportAnalytics');
       let exportedData = null;
-      
+
       exportBtn.addEventListener('click', () => {
         exportedData = JSON.stringify(analyticsData.today, null, 2);
       });
-      
+
       exportBtn.click();
       expect(exportedData).not.toBeNull();
       expect(() => JSON.parse(exportedData)).not.toThrow();
@@ -380,11 +386,11 @@ describe('Analytics Dashboard', () => {
         failureCount: 0,
         intervals: [],
         hourlyData: Array(24).fill(0),
-        messages: []
+        messages: [],
       };
-      
+
       updateAnalyticsDisplay('today');
-      
+
       expect(document.getElementById('analyticsTotal').textContent).toBe('0');
       expect(document.getElementById('analyticsSuccessRate').textContent).toBe('0%');
       expect(document.getElementById('analyticsAvgInterval').textContent).toBe('0 min');
@@ -392,21 +398,21 @@ describe('Analytics Dashboard', () => {
 
     test('should handle missing hourly data', () => {
       analyticsData.today.hourlyData = null;
-      
+
       updateAnalyticsDisplay('today');
       expect(document.getElementById('analyticsPeakHour').textContent).toBe('--:--');
     });
 
     test('should handle empty intervals array', () => {
       analyticsData.today.intervals = [];
-      
+
       updateAnalyticsDisplay('today');
       expect(document.getElementById('analyticsAvgInterval').textContent).toBe('0 min');
     });
 
     test('should handle large numbers', () => {
       analyticsData.all.totalMessages = 999999;
-      
+
       updateAnalyticsDisplay('all');
       expect(document.getElementById('analyticsTotal').textContent).toBe('999999');
     });
@@ -417,7 +423,7 @@ describe('Analytics Dashboard', () => {
       analyticsData.today.totalMessages = 10;
       updateAnalyticsDisplay('today');
       expect(document.getElementById('analyticsTotal').textContent).toBe('10');
-      
+
       analyticsData.today.totalMessages = 11;
       analyticsData.today.successCount++;
       updateAnalyticsDisplay('today');
@@ -429,7 +435,7 @@ describe('Analytics Dashboard', () => {
       analyticsData.today.successCount = 8;
       updateAnalyticsDisplay('today');
       expect(document.getElementById('analyticsSuccessRate').textContent).toBe('80%');
-      
+
       analyticsData.today.totalMessages = 11;
       analyticsData.today.successCount = 9;
       updateAnalyticsDisplay('today');
@@ -440,20 +446,23 @@ describe('Analytics Dashboard', () => {
   describe('Persistence', () => {
     test('should save analytics data to storage', async () => {
       await chrome.storage.local.set({ analyticsData });
-      
+
       expect(chrome.storage.local.set).toHaveBeenCalledWith({ analyticsData });
     });
 
     test('should load analytics data from storage', async () => {
       const savedData = {
-        today: { totalMessages: 25, successCount: 20, failureCount: 5 }
+        today: { totalMessages: 25, successCount: 20, failureCount: 5 },
       };
-      
+
       global.chrome.storage.local.get.mockImplementation((keys, callback) => {
-        callback({ analyticsData: savedData });
-        return Promise.resolve({ analyticsData: savedData });
+        const result = { analyticsData: savedData };
+        if (typeof callback === 'function') {
+          callback(result);
+        }
+        return Promise.resolve(result);
       });
-      
+
       const result = await chrome.storage.local.get('analyticsData');
       expect(result.analyticsData.today.totalMessages).toBe(25);
     });

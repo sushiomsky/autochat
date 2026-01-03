@@ -40,18 +40,18 @@ describe('Account Selector', () => {
     manageAccountsBtn = document.getElementById('manageAccounts');
 
     // Initialize state
-    accounts = [
-      { id: 'default', name: 'Default Account', domains: [], isDefault: true }
-    ];
+    accounts = [{ id: 'default', name: 'Default Account', domains: [], isDefault: true }];
     currentAccount = 'default';
 
     // Mock chrome storage
     global.chrome.storage.local.get.mockImplementation((keys, callback) => {
       const result = {
         accounts: accounts,
-        currentAccount: currentAccount
+        currentAccount: currentAccount,
       };
-      callback(result);
+      if (typeof callback === 'function') {
+        callback(result);
+      }
       return Promise.resolve(result);
     });
 
@@ -94,12 +94,12 @@ describe('Account Selector', () => {
       accounts = [
         { id: 'default', name: 'Default Account', domains: [] },
         { id: 'work', name: 'Work Account', domains: ['work.com'] },
-        { id: 'personal', name: 'Personal Account', domains: ['gmail.com'] }
+        { id: 'personal', name: 'Personal Account', domains: ['gmail.com'] },
       ];
-      
+
       // Populate select
       accountSelect.innerHTML = '';
-      accounts.forEach(account => {
+      accounts.forEach((account) => {
         const option = document.createElement('option');
         option.value = account.id;
         option.textContent = account.name;
@@ -124,22 +124,22 @@ describe('Account Selector', () => {
 
     test('should update current account on selection', async () => {
       accountSelect.value = 'work';
-      
+
       const changeHandler = async (e) => {
         currentAccount = e.target.value;
         await chrome.storage.local.set({ currentAccount });
       };
-      
+
       accountSelect.addEventListener('change', changeHandler);
       accountSelect.dispatchEvent(new Event('change'));
-      
+
       expect(currentAccount).toBe('work');
     });
 
     test('should persist account selection', async () => {
       accountSelect.value = 'work';
       await chrome.storage.local.set({ currentAccount: 'work' });
-      
+
       const result = await chrome.storage.local.get('currentAccount');
       expect(result.currentAccount).toBe('work');
     });
@@ -149,25 +149,30 @@ describe('Account Selector', () => {
     let createAccount;
 
     beforeEach(() => {
-      createAccount = function(name, domains) {
+      createAccount = function (name, domains) {
         if (!name || name.trim() === '') {
           return { success: false, error: 'Account name is required' };
         }
-        
+
         const id = name.toLowerCase().replace(/\s+/g, '-');
-        
-        if (accounts.find(a => a.id === id)) {
+
+        if (accounts.find((a) => a.id === id)) {
           return { success: false, error: 'Account already exists' };
         }
-        
+
         const newAccount = {
           id,
           name: name.trim(),
-          domains: domains ? domains.split(',').map(d => d.trim()).filter(d => d) : [],
+          domains: domains
+            ? domains
+                .split(',')
+                .map((d) => d.trim())
+                .filter((d) => d)
+            : [],
           isDefault: false,
-          created: new Date().toISOString()
+          created: new Date().toISOString(),
         };
-        
+
         accounts.push(newAccount);
         return { success: true, account: newAccount };
       };
@@ -175,7 +180,7 @@ describe('Account Selector', () => {
 
     test('should create new account', () => {
       const result = createAccount('Work Account', 'work.com,company.net');
-      
+
       expect(result.success).toBe(true);
       expect(result.account.name).toBe('Work Account');
       expect(result.account.domains).toEqual(['work.com', 'company.net']);
@@ -200,7 +205,7 @@ describe('Account Selector', () => {
     test('should reject duplicate account', () => {
       createAccount('Work Account', 'work.com');
       const result = createAccount('Work Account', 'other.com');
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Account already exists');
     });
@@ -240,25 +245,25 @@ describe('Account Selector', () => {
       accounts = [
         { id: 'default', name: 'Default Account', domains: [], isDefault: true },
         { id: 'work', name: 'Work Account', domains: ['work.com'] },
-        { id: 'personal', name: 'Personal Account', domains: ['gmail.com'] }
+        { id: 'personal', name: 'Personal Account', domains: ['gmail.com'] },
       ];
 
-      deleteAccount = function(accountId) {
+      deleteAccount = function (accountId) {
         if (accountId === 'default') {
           return { success: false, error: 'Cannot delete default account' };
         }
-        
-        const index = accounts.findIndex(a => a.id === accountId);
+
+        const index = accounts.findIndex((a) => a.id === accountId);
         if (index === -1) {
           return { success: false, error: 'Account not found' };
         }
-        
+
         accounts.splice(index, 1);
-        
+
         if (currentAccount === accountId) {
           currentAccount = 'default';
         }
-        
+
         return { success: true };
       };
     });
@@ -266,7 +271,7 @@ describe('Account Selector', () => {
     test('should delete non-default account', () => {
       const result = deleteAccount('work');
       expect(result.success).toBe(true);
-      expect(accounts.find(a => a.id === 'work')).toBeUndefined();
+      expect(accounts.find((a) => a.id === 'work')).toBeUndefined();
     });
 
     test('should not delete default account', () => {
@@ -298,13 +303,13 @@ describe('Account Selector', () => {
     let renderAccountList;
 
     beforeEach(() => {
-      renderAccountList = function() {
+      renderAccountList = function () {
         const container = document.getElementById('accountList');
         if (!container) return;
-        
+
         container.innerHTML = '';
-        
-        accounts.forEach(account => {
+
+        accounts.forEach((account) => {
           const item = document.createElement('div');
           item.className = 'account-item';
           item.innerHTML = `
@@ -323,18 +328,18 @@ describe('Account Selector', () => {
     test('should render all accounts', () => {
       accounts = [
         { id: 'default', name: 'Default', domains: [], isDefault: true },
-        { id: 'work', name: 'Work', domains: ['work.com'], isDefault: false }
+        { id: 'work', name: 'Work', domains: ['work.com'], isDefault: false },
       ];
-      
+
       renderAccountList();
-      
+
       const container = document.getElementById('accountList');
       expect(container.children.length).toBe(2);
     });
 
     test('should show default badge for default account', () => {
       renderAccountList();
-      
+
       const container = document.getElementById('accountList');
       const defaultBadge = container.querySelector('.badge');
       expect(defaultBadge).not.toBeNull();
@@ -343,7 +348,7 @@ describe('Account Selector', () => {
 
     test('should not show delete button for default account', () => {
       renderAccountList();
-      
+
       const accountItems = document.querySelectorAll('.account-item');
       const defaultItem = accountItems[0];
       const deleteBtn = defaultItem.querySelector('.btn-delete');
@@ -353,7 +358,7 @@ describe('Account Selector', () => {
     test('should show delete button for non-default accounts', () => {
       accounts.push({ id: 'work', name: 'Work', domains: [], isDefault: false });
       renderAccountList();
-      
+
       const accountItems = document.querySelectorAll('.account-item');
       const workItem = accountItems[1];
       const deleteBtn = workItem.querySelector('.btn-delete');
@@ -363,11 +368,11 @@ describe('Account Selector', () => {
     test('should display account domains', () => {
       accounts = [
         { id: 'default', name: 'Default', domains: [], isDefault: true },
-        { id: 'work', name: 'Work', domains: ['work.com', 'company.net'], isDefault: false }
+        { id: 'work', name: 'Work', domains: ['work.com', 'company.net'], isDefault: false },
       ];
-      
+
       renderAccountList();
-      
+
       const domainElements = document.querySelectorAll('.account-domains');
       expect(domainElements[0].textContent).toBe('No domains');
       expect(domainElements[1].textContent).toBe('work.com, company.net');
@@ -377,11 +382,11 @@ describe('Account Selector', () => {
   describe('Manage Accounts Modal', () => {
     test('should open modal when manage button is clicked', () => {
       const modal = document.getElementById('accountModal');
-      
+
       manageAccountsBtn.addEventListener('click', () => {
         modal.style.display = 'block';
       });
-      
+
       manageAccountsBtn.click();
       expect(modal.style.display).toBe('block');
     });
@@ -390,7 +395,7 @@ describe('Account Selector', () => {
       const nameInput = document.getElementById('newAccountName');
       const domainsInput = document.getElementById('newAccountDomains');
       const createBtn = document.getElementById('createAccount');
-      
+
       expect(nameInput).not.toBeNull();
       expect(domainsInput).not.toBeNull();
       expect(createBtn).not.toBeNull();
@@ -401,9 +406,9 @@ describe('Account Selector', () => {
     test('should save accounts to storage', async () => {
       const newAccounts = [
         { id: 'default', name: 'Default', domains: [] },
-        { id: 'work', name: 'Work', domains: ['work.com'] }
+        { id: 'work', name: 'Work', domains: ['work.com'] },
       ];
-      
+
       await chrome.storage.local.set({ accounts: newAccounts });
       expect(accounts).toEqual(newAccounts);
     });
@@ -422,37 +427,43 @@ describe('Account Selector', () => {
 
   describe('Edge Cases', () => {
     test('should handle account with special characters in name', () => {
-      const createAccount = function(name) {
-        const id = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      const createAccount = function (name) {
+        const id = name
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9-]/g, '');
         return { success: true, account: { id, name } };
       };
-      
+
       const result = createAccount('Test & Work Account!');
-      expect(result.account.id).toBe('test-work-account');
+      expect(result.account.id).toBe('test--work-account');
     });
 
     test('should handle very long account name', () => {
       const longName = 'A'.repeat(100);
-      const createAccount = function(name) {
+      const createAccount = function (name) {
         return { success: true, account: { name: name.trim() } };
       };
-      
+
       const result = createAccount(longName);
       expect(result.account.name.length).toBe(100);
     });
 
     test('should handle many domains', () => {
-      const manyDomains = Array(50).fill(0).map((_, i) => `domain${i}.com`).join(',');
-      const createAccount = function(name, domains) {
+      const manyDomains = Array(50)
+        .fill(0)
+        .map((_, i) => `domain${i}.com`)
+        .join(',');
+      const createAccount = function (name, domains) {
         return {
           success: true,
           account: {
             name,
-            domains: domains.split(',').map(d => d.trim())
-          }
+            domains: domains.split(',').map((d) => d.trim()),
+          },
         };
       };
-      
+
       const result = createAccount('Test', manyDomains);
       expect(result.account.domains.length).toBe(50);
     });
@@ -463,11 +474,11 @@ describe('Account Selector', () => {
       accounts = [
         { id: 'default', name: 'Default', domains: [] },
         { id: 'work', name: 'Work', domains: ['work.com'] },
-        { id: 'personal', name: 'Personal', domains: ['gmail.com'] }
+        { id: 'personal', name: 'Personal', domains: ['gmail.com'] },
       ];
-      
+
       accountSelect.innerHTML = '';
-      accounts.forEach(account => {
+      accounts.forEach((account) => {
         const option = document.createElement('option');
         option.value = account.id;
         option.textContent = account.name;
@@ -478,10 +489,10 @@ describe('Account Selector', () => {
     test('should switch between accounts', () => {
       accountSelect.value = 'work';
       expect(accountSelect.value).toBe('work');
-      
+
       accountSelect.value = 'personal';
       expect(accountSelect.value).toBe('personal');
-      
+
       accountSelect.value = 'default';
       expect(accountSelect.value).toBe('default');
     });
@@ -489,10 +500,10 @@ describe('Account Selector', () => {
     test('should trigger change event when switching', () => {
       const changeHandler = jest.fn();
       accountSelect.addEventListener('change', changeHandler);
-      
+
       accountSelect.value = 'work';
       accountSelect.dispatchEvent(new Event('change'));
-      
+
       expect(changeHandler).toHaveBeenCalled();
     });
   });

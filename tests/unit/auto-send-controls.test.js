@@ -28,7 +28,7 @@ describe('Auto-Send Control Workflow', () => {
     stopBtn = document.getElementById('stopAutoSend');
     pauseBtn = document.getElementById('pauseAutoSend');
     autoSendStatus = document.getElementById('autoSendStatus');
-    
+
     isAutoSendActive = false;
 
     // Mock chrome APIs
@@ -39,8 +39,11 @@ describe('Auto-Send Control Workflow', () => {
     });
 
     global.chrome.storage.local.get.mockImplementation((keys, callback) => {
-      callback({ autoSendActive: isAutoSendActive });
-      return Promise.resolve({ autoSendActive: isAutoSendActive });
+      const result = { autoSendActive: isAutoSendActive };
+      if (typeof callback === 'function') {
+        callback(result);
+      }
+      return Promise.resolve(result);
     });
 
     global.chrome.storage.local.set.mockImplementation((items, callback) => {
@@ -93,12 +96,12 @@ describe('Auto-Send Control Workflow', () => {
       startBtn.addEventListener('click', async () => {
         await chrome.runtime.sendMessage({ action: 'startAutoSend' });
       });
-      
+
       startBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
-        action: 'startAutoSend'
+        action: 'startAutoSend',
       });
     });
 
@@ -110,10 +113,10 @@ describe('Auto-Send Control Workflow', () => {
           isAutoSendActive = true;
         }
       });
-      
+
       startBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(autoSendStatus.textContent).toBe('🟢 Active');
       expect(isAutoSendActive).toBe(true);
     });
@@ -123,9 +126,9 @@ describe('Auto-Send Control Workflow', () => {
         startBtn.style.display = 'none';
         pauseBtn.style.display = 'inline-block';
       });
-      
+
       startBtn.click();
-      
+
       expect(startBtn.style.display).toBe('none');
       expect(pauseBtn.style.display).toBe('inline-block');
     });
@@ -134,12 +137,12 @@ describe('Auto-Send Control Workflow', () => {
       startBtn.addEventListener('click', async () => {
         await chrome.storage.local.set({ autoSendActive: true });
       });
-      
+
       startBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(chrome.storage.local.set).toHaveBeenCalledWith({
-        autoSendActive: true
+        autoSendActive: true,
       });
     });
 
@@ -149,7 +152,7 @@ describe('Auto-Send Control Workflow', () => {
         if (callback) callback(response);
         return Promise.resolve(response);
       });
-      
+
       let errorMessage = '';
       startBtn.addEventListener('click', async () => {
         const response = await chrome.runtime.sendMessage({ action: 'startAutoSend' });
@@ -158,10 +161,10 @@ describe('Auto-Send Control Workflow', () => {
           autoSendStatus.textContent = '🔴 Error';
         }
       });
-      
+
       startBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(errorMessage).toBe('No messages configured');
       expect(autoSendStatus.textContent).toBe('🔴 Error');
     });
@@ -180,12 +183,12 @@ describe('Auto-Send Control Workflow', () => {
       pauseBtn.addEventListener('click', async () => {
         await chrome.runtime.sendMessage({ action: 'pauseAutoSend' });
       });
-      
+
       pauseBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
-        action: 'pauseAutoSend'
+        action: 'pauseAutoSend',
       });
     });
 
@@ -196,10 +199,10 @@ describe('Auto-Send Control Workflow', () => {
           autoSendStatus.textContent = '⏸️ Paused';
         }
       });
-      
+
       pauseBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(autoSendStatus.textContent).toBe('⏸️ Paused');
     });
 
@@ -211,10 +214,10 @@ describe('Auto-Send Control Workflow', () => {
           pauseBtn.textContent = '⏸️ Pause';
         }
       });
-      
+
       pauseBtn.click();
       expect(pauseBtn.textContent).toContain('Resume');
-      
+
       pauseBtn.click();
       expect(pauseBtn.textContent).toContain('Pause');
     });
@@ -233,12 +236,12 @@ describe('Auto-Send Control Workflow', () => {
       stopBtn.addEventListener('click', async () => {
         await chrome.runtime.sendMessage({ action: 'stopAutoSend' });
       });
-      
+
       stopBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
-        action: 'stopAutoSend'
+        action: 'stopAutoSend',
       });
     });
 
@@ -250,10 +253,10 @@ describe('Auto-Send Control Workflow', () => {
           isAutoSendActive = false;
         }
       });
-      
+
       stopBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(autoSendStatus.textContent).toBe('⚪ Inactive');
       expect(isAutoSendActive).toBe(false);
     });
@@ -263,9 +266,9 @@ describe('Auto-Send Control Workflow', () => {
         startBtn.style.display = 'inline-block';
         pauseBtn.style.display = 'none';
       });
-      
+
       stopBtn.click();
-      
+
       expect(startBtn.style.display).toBe('inline-block');
       expect(pauseBtn.style.display).toBe('none');
     });
@@ -274,26 +277,26 @@ describe('Auto-Send Control Workflow', () => {
       stopBtn.addEventListener('click', async () => {
         await chrome.storage.local.set({ autoSendActive: false });
       });
-      
+
       stopBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(chrome.storage.local.set).toHaveBeenCalledWith({
-        autoSendActive: false
+        autoSendActive: false,
       });
     });
 
     test('should work even when not active', async () => {
       isAutoSendActive = false;
-      
+
       stopBtn.addEventListener('click', async () => {
         await chrome.runtime.sendMessage({ action: 'stopAutoSend' });
         autoSendStatus.textContent = '⚪ Inactive';
       });
-      
+
       stopBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(autoSendStatus.textContent).toBe('⚪ Inactive');
     });
   });
@@ -328,7 +331,7 @@ describe('Auto-Send Control Workflow', () => {
         startBtn.style.display = 'none';
         pauseBtn.style.display = 'inline-block';
       });
-      
+
       // Pause/Resume toggle
       let isPaused = false;
       pauseBtn.addEventListener('click', async () => {
@@ -336,24 +339,24 @@ describe('Auto-Send Control Workflow', () => {
         autoSendStatus.textContent = isPaused ? '⏸️ Paused' : '🟢 Active';
         pauseBtn.textContent = isPaused ? '▶️ Resume' : '⏸️ Pause';
       });
-      
+
       // Stop
       stopBtn.addEventListener('click', async () => {
         autoSendStatus.textContent = '⚪ Inactive';
         startBtn.style.display = 'inline-block';
         pauseBtn.style.display = 'none';
       });
-      
+
       // Execute cycle
       startBtn.click();
       expect(autoSendStatus.textContent).toBe('🟢 Active');
-      
+
       pauseBtn.click();
       expect(autoSendStatus.textContent).toBe('⏸️ Paused');
-      
+
       pauseBtn.click();
       expect(autoSendStatus.textContent).toBe('🟢 Active');
-      
+
       stopBtn.click();
       expect(autoSendStatus.textContent).toBe('⚪ Inactive');
     });
@@ -362,19 +365,19 @@ describe('Auto-Send Control Workflow', () => {
       const startHandler = jest.fn(() => {
         autoSendStatus.textContent = '🟢 Active';
       });
-      
+
       const stopHandler = jest.fn(() => {
         autoSendStatus.textContent = '⚪ Inactive';
       });
-      
+
       startBtn.addEventListener('click', startHandler);
       stopBtn.addEventListener('click', stopHandler);
-      
+
       for (let i = 0; i < 3; i++) {
         startBtn.click();
         stopBtn.click();
       }
-      
+
       expect(startHandler).toHaveBeenCalledTimes(3);
       expect(stopHandler).toHaveBeenCalledTimes(3);
       expect(autoSendStatus.textContent).toBe('⚪ Inactive');
@@ -385,11 +388,11 @@ describe('Auto-Send Control Workflow', () => {
     test('should allow restart after error', async () => {
       // Simulate error
       autoSendStatus.textContent = '🔴 Error';
-      
+
       startBtn.addEventListener('click', async () => {
         autoSendStatus.textContent = '🟢 Active';
       });
-      
+
       startBtn.click();
       expect(autoSendStatus.textContent).toBe('🟢 Active');
     });
@@ -397,12 +400,12 @@ describe('Auto-Send Control Workflow', () => {
     test('should handle rapid button clicks', async () => {
       const clickHandler = jest.fn();
       startBtn.addEventListener('click', clickHandler);
-      
+
       // Rapid clicks
       for (let i = 0; i < 10; i++) {
         startBtn.click();
       }
-      
+
       expect(clickHandler).toHaveBeenCalledTimes(10);
     });
   });
@@ -410,15 +413,15 @@ describe('Auto-Send Control Workflow', () => {
   describe('State Persistence', () => {
     test('should restore active state on page load', async () => {
       isAutoSendActive = true;
-      
+
       const result = await chrome.storage.local.get('autoSendActive');
-      
+
       if (result.autoSendActive) {
         autoSendStatus.textContent = '🟢 Active';
         startBtn.style.display = 'none';
         pauseBtn.style.display = 'inline-block';
       }
-      
+
       expect(autoSendStatus.textContent).toBe('🟢 Active');
       expect(startBtn.style.display).toBe('none');
       expect(pauseBtn.style.display).toBe('inline-block');
@@ -426,15 +429,15 @@ describe('Auto-Send Control Workflow', () => {
 
     test('should restore inactive state on page load', async () => {
       isAutoSendActive = false;
-      
+
       const result = await chrome.storage.local.get('autoSendActive');
-      
+
       if (!result.autoSendActive) {
         autoSendStatus.textContent = '⚪ Inactive';
         startBtn.style.display = 'inline-block';
         pauseBtn.style.display = 'none';
       }
-      
+
       expect(autoSendStatus.textContent).toBe('⚪ Inactive');
       expect(startBtn.style.display).toBe('inline-block');
       expect(pauseBtn.style.display).toBe('none');
@@ -468,14 +471,9 @@ describe('Auto-Send Control Workflow', () => {
     });
 
     test('should show visual state through status emoji', () => {
-      const states = [
-        '⚪ Inactive',
-        '🟢 Active',
-        '⏸️ Paused',
-        '🔴 Error'
-      ];
-      
-      states.forEach(state => {
+      const states = ['⚪ Inactive', '🟢 Active', '⏸️ Paused', '🔴 Error'];
+
+      states.forEach((state) => {
         autoSendStatus.textContent = state;
         expect(autoSendStatus.textContent).toBe(state);
       });
