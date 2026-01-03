@@ -1,9 +1,16 @@
-name: Build, Test and Publish on Tag
+name: Release Packaging
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [released]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  CHROMEDRIVER_SKIP_DOWNLOAD: true
+  PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
 
 jobs:
   build_and_publish:
@@ -12,35 +19,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node.js 20
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
+          cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
-      - name: Build (production)
-        run: npm run build:prod
-
-      - name: Run unit tests
-        run: npm test --if-present
-
-      - name: Run Selenium integration tests
-        run: npm run test:selenium --if-present
-
-      - name: Run Puppeteer UI/UX tests (Xvfb)
-        run: |
-          sudo apt-get update && sudo apt-get install -y xvfb
-          xvfb-run --auto-servernum --server-args='-screen 0 1280x720x24' npm run test:puppeteer --if-present
+      - name: Verify and build
+        run: npm run verify
 
       - name: Package artifact
         run: |
-          npm run package || true
+          npm run package
+          npm run package:firefox
           mkdir -p release
-          if [ -d dist ]; then
-            zip -r release/autochat-${{ github.ref_name }}.zip dist || true
-          fi
+          for artifact in autochat-*.zip; do
+            if [ -f "$artifact" ]; then
+              mv "$artifact" release/
+            fi
+          done
 
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
@@ -48,5 +48,9 @@ jobs:
           name: autochat-release-${{ github.ref_name }}
           path: release/
 
-      - name: Publish placeholder
-        run: echo "Add publish steps here (Chrome Web Store/API) using repository secrets."
+      - name: Attach assets to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

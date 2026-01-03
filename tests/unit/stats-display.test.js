@@ -34,7 +34,7 @@ describe('Stats Display', () => {
       messagesSentToday: document.getElementById('messagesSentToday'),
       totalMessages: document.getElementById('totalMessages'),
       autoSendStatus: document.getElementById('autoSendStatus'),
-      activeCampaignsCount: document.getElementById('activeCampaignsCount')
+      activeCampaignsCount: document.getElementById('activeCampaignsCount'),
     };
 
     // Mock storage
@@ -42,28 +42,34 @@ describe('Stats Display', () => {
       messagesSentToday: 0,
       totalMessages: 0,
       autoSendActive: false,
-      activeCampaigns: []
+      activeCampaigns: [],
     };
 
     global.chrome.storage.local.get.mockImplementation((keys, callback) => {
       const result = {};
       if (Array.isArray(keys)) {
-        keys.forEach(key => {
+        keys.forEach((key) => {
           if (mockStorage[key] !== undefined) {
             result[key] = mockStorage[key];
           }
         });
       } else if (typeof keys === 'object') {
-        Object.keys(keys).forEach(key => {
+        Object.keys(keys).forEach((key) => {
           result[key] = mockStorage[key] !== undefined ? mockStorage[key] : keys[key];
         });
+      } else if (typeof keys === 'string') {
+        if (mockStorage[keys] !== undefined) {
+          result[keys] = mockStorage[keys];
+        }
       }
-      callback(result);
+      if (typeof callback === 'function') {
+        callback(result);
+      }
       return Promise.resolve(result);
     });
 
     // Define updateStatWithAnimation function
-    updateStatWithAnimation = function(elementId, value) {
+    updateStatWithAnimation = function (elementId, value) {
       const element = document.getElementById(elementId);
       if (element) {
         element.classList.add('stat-updated');
@@ -119,7 +125,7 @@ describe('Stats Display', () => {
   test('should remove animation class after timeout', (done) => {
     updateStatWithAnimation('messagesSentToday', '10');
     expect(statsElements.messagesSentToday.classList.contains('stat-updated')).toBe(true);
-    
+
     setTimeout(() => {
       expect(statsElements.messagesSentToday.classList.contains('stat-updated')).toBe(false);
       done();
@@ -135,7 +141,7 @@ describe('Stats Display', () => {
   test('should load stats from storage', async () => {
     mockStorage.messagesSentToday = 25;
     mockStorage.totalMessages = 500;
-    
+
     const result = await chrome.storage.local.get(['messagesSentToday', 'totalMessages']);
     expect(result.messagesSentToday).toBe(25);
     expect(result.totalMessages).toBe(500);
@@ -163,14 +169,9 @@ describe('Stats Display', () => {
   });
 
   test('should display status with emoji indicators', () => {
-    const statuses = [
-      '⚪ Inactive',
-      '🟢 Active',
-      '⏸️ Paused',
-      '🔴 Error'
-    ];
+    const statuses = ['⚪ Inactive', '🟢 Active', '⏸️ Paused', '🔴 Error'];
 
-    statuses.forEach(status => {
+    statuses.forEach((status) => {
       statsElements.autoSendStatus.textContent = status;
       expect(statsElements.autoSendStatus.textContent).toBe(status);
     });
@@ -179,13 +180,13 @@ describe('Stats Display', () => {
   test('should update campaigns count when campaigns change', async () => {
     mockStorage.activeCampaigns = [
       { id: 1, name: 'Campaign 1' },
-      { id: 2, name: 'Campaign 2' }
+      { id: 2, name: 'Campaign 2' },
     ];
 
     const result = await chrome.storage.local.get('activeCampaigns');
     const count = result.activeCampaigns?.length || 0;
     updateStatWithAnimation('activeCampaignsCount', count.toString());
-    
+
     expect(statsElements.activeCampaignsCount.textContent).toBe('2');
   });
 });

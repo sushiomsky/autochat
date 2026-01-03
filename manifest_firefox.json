@@ -1,16 +1,10 @@
 {
   "manifest_version": 2,
   "name": "__MSG_extName__",
-  "version": "4.5.3",
+  "version": "5.0.0",
   "description": "__MSG_extDescription__",
   "default_locale": "en",
-  "permissions": [
-    "storage",
-    "activeTab",
-    "tabs",
-    "alarms",
-    "<all_urls>"
-  ],
+  "permissions": ["storage", "activeTab", "tabs", "alarms", "<all_urls>"],
   "browser_action": {
     "default_popup": "popup-enhanced.html",
     "default_icon": {

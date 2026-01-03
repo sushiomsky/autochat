@@ -74,7 +74,7 @@ describe('Donation Modal', () => {
 
     // Mock clipboard API
     global.navigator.clipboard = {
-      writeText: jest.fn(() => Promise.resolve())
+      writeText: jest.fn(() => Promise.resolve()),
     };
   });
 
@@ -92,7 +92,7 @@ describe('Donation Modal', () => {
       openDonationBtn.addEventListener('click', () => {
         donationModal.style.display = 'block';
       });
-      
+
       openDonationBtn.click();
       expect(donationModal.style.display).toBe('block');
     });
@@ -104,12 +104,12 @@ describe('Donation Modal', () => {
 
     test('should close when close button is clicked', () => {
       donationModal.style.display = 'block';
-      
+
       const closeBtn = donationModal.querySelector('.close');
       closeBtn.addEventListener('click', () => {
         donationModal.style.display = 'none';
       });
-      
+
       closeBtn.click();
       expect(donationModal.style.display).toBe('none');
     });
@@ -138,7 +138,7 @@ describe('Donation Modal', () => {
 
     test('should make address fields readonly', () => {
       const addresses = donationModal.querySelectorAll('.crypto-address');
-      addresses.forEach(address => {
+      addresses.forEach((address) => {
         expect(address.hasAttribute('readonly')).toBe(true);
       });
     });
@@ -153,68 +153,74 @@ describe('Donation Modal', () => {
     test('should copy Bitcoin address to clipboard', async () => {
       const btcCopyBtn = donationModal.querySelector('.btn-copy[data-crypto="btc"]');
       const btcAddress = donationModal.querySelector('.crypto-address[data-crypto="btc"]');
-      
+
       btcCopyBtn.addEventListener('click', async () => {
         await navigator.clipboard.writeText(btcAddress.value);
       });
-      
+
       btcCopyBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh');
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+        'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh'
+      );
     });
 
     test('should copy Ethereum address to clipboard', async () => {
       const ethCopyBtn = donationModal.querySelector('.btn-copy[data-crypto="eth"]');
       const ethAddress = donationModal.querySelector('.crypto-address[data-crypto="eth"]');
-      
+
       ethCopyBtn.addEventListener('click', async () => {
         await navigator.clipboard.writeText(ethAddress.value);
       });
-      
+
       ethCopyBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb');
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+        '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb'
+      );
     });
 
     test('should copy Litecoin address to clipboard', async () => {
       const ltcCopyBtn = donationModal.querySelector('.btn-copy[data-crypto="ltc"]');
       const ltcAddress = donationModal.querySelector('.crypto-address[data-crypto="ltc"]');
-      
+
       ltcCopyBtn.addEventListener('click', async () => {
         await navigator.clipboard.writeText(ltcAddress.value);
       });
-      
+
       ltcCopyBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('ltc1q8c6fshw2dlwun7ekn9qwf37cu2rn755u9ym7p0');
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+        'ltc1q8c6fshw2dlwun7ekn9qwf37cu2rn755u9ym7p0'
+      );
     });
 
     test('should show success feedback after copying', async () => {
       const copyBtn = donationModal.querySelector('.btn-copy');
       const feedback = document.getElementById('copyFeedback');
-      
+
       copyBtn.addEventListener('click', async () => {
         await navigator.clipboard.writeText('test');
         feedback.textContent = '✓ Address copied to clipboard!';
         feedback.style.display = 'block';
       });
-      
+
       copyBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(feedback.style.display).toBe('block');
       expect(feedback.textContent).toContain('copied');
     });
 
-    test('should hide feedback after timeout', async () => {
+    test('should hide feedback after timeout', () => {
       jest.useFakeTimers();
-      
+
       const copyBtn = donationModal.querySelector('.btn-copy');
       const feedback = document.getElementById('copyFeedback');
-      
+
       copyBtn.addEventListener('click', async () => {
         await navigator.clipboard.writeText('test');
         feedback.style.display = 'block';
@@ -222,15 +228,15 @@ describe('Donation Modal', () => {
           feedback.style.display = 'none';
         }, 3000);
       });
-      
+
       copyBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
+
+      jest.runAllTimers();
       expect(feedback.style.display).toBe('block');
-      
+
       jest.advanceTimersByTime(3000);
       expect(feedback.style.display).toBe('none');
-      
+
       jest.useRealTimers();
     });
   });
@@ -238,29 +244,31 @@ describe('Donation Modal', () => {
   describe('Copy Error Handling', () => {
     test('should handle clipboard API not available', async () => {
       delete global.navigator.clipboard;
-      
+
       const copyBtn = donationModal.querySelector('.btn-copy');
       const feedback = document.getElementById('copyFeedback');
-      
+
       copyBtn.addEventListener('click', async () => {
         if (!navigator.clipboard) {
           feedback.textContent = '✗ Copy failed. Please copy manually.';
           feedback.style.display = 'block';
         }
       });
-      
+
       copyBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(feedback.textContent).toContain('Copy failed');
     });
 
     test('should handle clipboard write failure', async () => {
-      global.navigator.clipboard.writeText = jest.fn(() => Promise.reject(new Error('Permission denied')));
-      
+      global.navigator.clipboard.writeText = jest.fn(() =>
+        Promise.reject(new Error('Permission denied'))
+      );
+
       const copyBtn = donationModal.querySelector('.btn-copy');
       const feedback = document.getElementById('copyFeedback');
-      
+
       copyBtn.addEventListener('click', async () => {
         try {
           await navigator.clipboard.writeText('test');
@@ -270,10 +278,10 @@ describe('Donation Modal', () => {
         }
         feedback.style.display = 'block';
       });
-      
+
       copyBtn.click();
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(feedback.textContent).toContain('Copy failed');
     });
   });
@@ -304,7 +312,7 @@ describe('Donation Modal', () => {
 
     test('should have copy icon on buttons', () => {
       const copyButtons = donationModal.querySelectorAll('.btn-copy');
-      copyButtons.forEach(btn => {
+      copyButtons.forEach((btn) => {
         expect(btn.textContent).toContain('📋');
       });
     });
@@ -313,7 +321,7 @@ describe('Donation Modal', () => {
   describe('Accessibility', () => {
     test('should have title attributes on copy buttons', () => {
       const copyButtons = donationModal.querySelectorAll('.btn-copy');
-      copyButtons.forEach(btn => {
+      copyButtons.forEach((btn) => {
         expect(btn.hasAttribute('title')).toBe(true);
         expect(btn.getAttribute('title')).toContain('Copy');
       });
@@ -321,7 +329,7 @@ describe('Donation Modal', () => {
 
     test('should have alt text for crypto icons', () => {
       const icons = donationModal.querySelectorAll('.crypto-icon');
-      icons.forEach(icon => {
+      icons.forEach((icon) => {
         expect(icon.hasAttribute('alt')).toBe(true);
       });
     });
@@ -337,11 +345,11 @@ describe('Donation Modal', () => {
       const address = donationModal.querySelector('.crypto-address');
       const selectMock = jest.fn();
       address.select = selectMock;
-      
+
       address.addEventListener('click', () => {
         address.select();
       });
-      
+
       address.click();
       expect(selectMock).toHaveBeenCalled();
     });
@@ -351,7 +359,7 @@ describe('Donation Modal', () => {
       address.addEventListener('focus', () => {
         address.select();
       });
-      
+
       address.focus();
       expect(address.selectionStart).toBe(0);
     });
@@ -361,22 +369,22 @@ describe('Donation Modal', () => {
     test('should handle copying different addresses sequentially', async () => {
       const btcBtn = donationModal.querySelector('.btn-copy[data-crypto="btc"]');
       const ethBtn = donationModal.querySelector('.btn-copy[data-crypto="eth"]');
-      
+
       const copyHandler = async (e) => {
         const crypto = e.target.getAttribute('data-crypto');
         const address = donationModal.querySelector(`.crypto-address[data-crypto="${crypto}"]`);
         await navigator.clipboard.writeText(address.value);
       };
-      
+
       btcBtn.addEventListener('click', copyHandler);
       ethBtn.addEventListener('click', copyHandler);
-      
+
       btcBtn.click();
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       ethBtn.click();
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       expect(navigator.clipboard.writeText).toHaveBeenCalledTimes(2);
     });
   });
@@ -385,19 +393,19 @@ describe('Donation Modal', () => {
     test('should use execCommand as fallback', () => {
       delete global.navigator.clipboard;
       document.execCommand = jest.fn(() => true);
-      
+
       const copyBtn = donationModal.querySelector('.btn-copy');
       const address = donationModal.querySelector('.crypto-address');
-      
+
       copyBtn.addEventListener('click', () => {
         address.select();
         document.execCommand('copy');
       });
-      
+
       copyBtn.click();
-      
+
       expect(document.execCommand).toHaveBeenCalledWith('copy');
-      
+
       delete document.execCommand;
     });
   });
